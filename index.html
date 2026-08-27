@@ -1,0 +1,190 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daily Puzzle Lab</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css"></head><body><header><div class="brand"><small>FREE DAILY PUZZLES</small><h1>Daily Puzzle Lab</h1></div>
+<div class="date-tools">
+  <span class="status-pill">TEST MODE</span>
+  <button type="button" id="prevDayBtn" class="secondary">← Previous Day</button>
+  <span id="todayLabel" class="status-pill"></span>
+  <button type="button" id="nextDayBtn" class="secondary">Next Day →</button>
+  <button type="button" id="resetActiveGameBtn" class="secondary">Reset Active Game</button>
+</div></header><main>
+<nav class="game-ribbon" aria-label="Puzzle games">
+  <button type="button" class="game-tab active" data-game="five" onclick="showFive()">
+    <span class="game-icon game-icon-five nav-icon" aria-hidden="true"><i></i><i></i><i>S</i><i></i><i></i></span>
+    <span>Six to Five</span>
+  </button>
+  <button type="button" class="game-tab" data-game="ell" onclick="showEveryLastLetter()">
+    <span class="game-icon game-icon-ell nav-icon" aria-hidden="true"><i>E</i><i>L</i><i>L</i><i></i></span>
+    <span>Every Last Letter</span>
+  </button>
+  <button type="button" class="game-tab" data-game="same" onclick="showOneAndTheSame()">
+    <span class="game-icon game-icon-same nav-icon" aria-hidden="true"><i>1</i><i>=</i><i>1</i></span>
+    <span>One and the Same</span>
+  </button>
+  <button type="button" class="game-tab" data-game="quads" onclick="showQuads()">
+    <span class="game-icon game-icon-quads nav-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span>Quads</span>
+  </button>
+  <button type="button" class="game-tab" data-game="mini" onclick="showMini()">
+    <span class="game-icon game-icon-mini nav-icon" aria-hidden="true"><i></i><i></i><i class="dark"></i><i></i><i class="dark"></i><i></i><i></i><i></i><i class="dark"></i></span>
+    <span>Mini</span>
+  </button>
+  <button type="button" class="game-tab" data-game="trail" onclick="showWordTrail()">
+    <span class="game-icon game-icon-trail nav-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 9H24V24L39 39"/><g><polygon points="9,4 13,6 14,10 11,14 7,14 4,10 5,6" class="end"/><polygon points="24,4 28,6 29,10 26,14 22,14 19,10 20,6"/><polygon points="39,4 43,6 44,10 41,14 37,14 34,10 35,6"/><polygon points="9,19 13,21 14,25 11,29 7,29 4,25 5,21"/><polygon points="24,19 28,21 29,25 26,29 22,29 19,25 20,21"/><polygon points="39,19 43,21 44,25 41,29 37,29 34,25 35,21"/><polygon points="9,34 13,36 14,40 11,44 7,44 4,40 5,36"/><polygon points="24,34 28,36 29,40 26,44 22,44 19,40 20,36"/><polygon points="39,34 43,36 44,40 41,44 37,44 34,40 35,36" class="end"/></g></svg></span>
+    <span>On the Right Track</span>
+  </button>
+</nav>
+
+<div id="playArea">
+
+<section id="ellPanel" class="game-panel game-hidden">
+  <div class="five-head">
+    <div><small>EVERY LAST LETTER</small><h2 style="margin:4px 0 0">Use every tile</h2></div>
+    <span id="ellPuzzleMeta" class="status-pill">Loading…</span>
+  </div>
+  <div id="ellStatus"></div>
+  <div class="ell-player">
+    <div id="ellGrid" class="ell-grid"></div>
+    <div id="ellCurrentWord" class="ell-current-word" aria-live="polite"></div>
+    <div class="ell-stats-row">
+      <div id="ellProgress" class="ell-progress">0 / 25 letters used</div>
+      <div id="ellScore" class="ell-score">Score: 0</div>
+    </div>
+    <div class="action-row">
+      <button type="button" id="ellStartOverBtn" class="secondary">Start Over</button>
+      <button type="button" id="ellClearBtn" class="secondary">Clear</button>
+      <button type="button" id="ellGiveUpBtn" class="secondary">Give Up</button>
+      <button type="button" id="ellSubmitBtn">Submit</button>
+    </div>
+    <div id="ellCompletedWords" class="ell-completed"></div>
+  </div>
+</section>
+
+
+<section id="samePanel" class="game-panel game-hidden">
+  <div class="five-head">
+    <div>
+      <div class="game-kicker"><span class="game-icon game-icon-same small" aria-hidden="true"><i>1</i><i>=</i><i>1</i></span><small>ONE AND THE SAME</small></div>
+    </div>
+    <span id="samePuzzleMeta" class="status-pill">Loading…</span>
+  </div>
+
+  <div id="sameGame" class="same-game">
+    <div id="sameHistory" class="same-history"></div>
+
+    <div id="sameActiveArea" class="same-active-area">
+      <div id="sameCurrentClue" class="same-current-clue"></div>
+      <div class="same-guess-area">
+        <input id="sameGuessInput" class="same-guess-input" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Your guess">
+        <button type="button" id="sameGuessBtn" class="same-guess-btn">GUESS</button>
+      </div>
+    </div>
+
+    <div id="sameStatus" class="same-status" aria-live="polite"></div>
+  </div>
+</section>
+
+<section id="quadsPanel" class="game-panel game-hidden">
+  <div class="five-head">
+    <div>
+      <div class="game-kicker"><span class="game-icon game-icon-quads small" aria-hidden="true"><i></i><i></i><i></i><i></i></span><small>DAILY QUADS</small></div>
+      <h2 style="margin:4px 0 0">Find four groups of four</h2>
+    </div>
+    <span id="quadsPuzzleMeta" class="status-pill">Loading…</span>
+  </div>
+  <div id="quadsStatus"></div>
+  <div id="quadsSolved" class="quads-solved"></div>
+  <div id="quadsGrid" class="quads-grid"></div>
+  <div class="quads-footer">
+    <div id="quadsMistakes" class="mistakes"></div>
+    <div class="action-row">
+      <button type="button" id="quadsShuffleBtn" class="secondary">Shuffle</button>
+      <button type="button" id="quadsDeselectBtn" class="secondary">Deselect All</button>
+      <button type="button" id="quadsSubmitBtn">Submit</button>
+    </div>
+  </div>
+</section>
+
+
+<section id="wordTrailPanel" class="game-panel game-hidden">
+  <div class="five-head">
+    <div>
+      <small>ON THE RIGHT TRACK</small>
+      <h2 style="margin:4px 0 0">Find the themed words</h2>
+    </div>
+    <span id="wordTrailPuzzleMeta" class="status-pill">Loading…</span>
+  </div>
+
+  <div class="wordtrail-theme">
+    <div class="muted">Theme</div>
+    <div id="wordTrailTheme" class="wordtrail-theme-text">Loading…</div>
+  </div>
+
+  <div id="wordTrailStatus"></div>
+
+  <div class="wordtrail-board-wrap">
+    <svg id="wordTrailPathSvg" class="wordtrail-live-svg" viewBox="0 0 292 392" aria-hidden="true"></svg>
+    <div id="wordTrailGrid" class="wordtrail-player-grid"></div>
+  </div>
+
+  <div id="wordTrailCurrentWord" class="wordtrail-current"></div>
+
+  <div class="wordtrail-controls">
+    <div id="wordTrailProgress" class="muted"></div>
+    <div class="action-row">
+      <button type="button" id="wordTrailClearBtn" class="secondary">Clear Path</button>
+      <button type="button" id="wordTrailSubmitBtn">Submit Word</button>
+      <button type="button" id="wordTrailHintBtn" class="secondary">Use Hint</button>
+    </div>
+    <div id="wordTrailHintProgress" class="wordtrail-hint-system" aria-live="polite"></div>
+  </div>
+
+  <div id="wordTrailFound" class="wordtrail-found"></div>
+</section>
+
+
+<section id="miniPanel" class="game-panel game-hidden">
+  <div class="five-head">
+    <div>
+      <small>DAILY MINI</small>
+      <h2 style="margin:4px 0 0">6×6 Crossword</h2>
+    </div>
+    <span id="miniPuzzleMeta" class="status-pill">Loading…</span>
+  </div>
+
+  <div id="miniStatus"></div>
+
+  <div class="mini-layout">
+    <div>
+      <div id="miniActiveClue" class="mini-active-clue"></div>
+      <div id="miniGrid" class="mini-player-grid" aria-label="Mini crossword grid"></div>
+
+      <div class="mini-actions">
+        <div class="reveal-wrap">
+          <button type="button" id="miniRevealBtn" class="secondary">Reveal ▾</button>
+          <div id="miniRevealMenu" class="reveal-menu" hidden>
+            <button type="button" id="miniRevealLetterBtn">Reveal Letter</button>
+            <button type="button" id="miniRevealWordBtn">Reveal Word</button>
+            <button type="button" id="miniRevealPuzzleBtn">Reveal Puzzle</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-clues">
+      <section>
+        <h3>Across</h3>
+        <div id="miniAcrossClues"></div>
+      </section>
+      <section>
+        <h3>Down</h3>
+        <div id="miniDownClues"></div>
+      </section>
+    </div>
+  </div>
+</section>
+
+<section id="fivePanel" class="game-hidden"><div class="five-head"><div><div class="game-kicker"><span class="game-icon game-icon-five small" aria-hidden="true"><i></i><i></i><i>S</i><i></i><i></i></span><small>SIX TO FIVE</small></div><h2 style="margin:4px 0 0">Solve the five-letter word</h2></div><div class="five-options">
+        <label class="hard-toggle"><input id="hardModeToggle" type="checkbox"> Hard Mode</label>
+        <span id="fivePuzzleMeta" class="status-pill">Loading…</span>
+      </div></div><div id="fiveStatus"></div><div id="fiveGrid" class="word-grid"></div><div id="keyboard" class="keyboard"></div></section></div>
+
+<section class="ad"><div><small>ADVERTISEMENT</small><br>Reserved for future ad placement</div></section></main><div id="fiveEndgameOverlay" class="five-endgame-overlay" hidden aria-hidden="true"><section class="five-endgame-card" role="dialog" aria-modal="true" aria-labelledby="fiveEndgameTitle"><button type="button" id="fiveEndgameClose" class="five-endgame-close" aria-label="Close results">×</button><div class="five-endgame-content"><div class="five-endgame-kicker">SIX TO FIVE</div><div id="fiveEndgameMiniGrid" class="five-endgame-mini-grid" aria-hidden="true"></div><h2 id="fiveEndgameTitle">Solved in 3.</h2><div id="fiveEndgameAnswer" class="five-endgame-answer" hidden></div><div id="fiveEndgameMessage" class="five-endgame-message"></div><img class="five-endgame-art" src="assets/six-to-five-endgame-target.png" alt=""><div id="fiveEndgameStats" class="five-endgame-stats"></div><div id="fiveEndgameShareSection" class="five-endgame-share-section"><button type="button" class="five-endgame-primary-share" data-share="native">Share result <span aria-hidden="true">↗</span></button><button type="button" class="five-endgame-copy" data-share="copy">Copy result</button><div id="fiveEndgameResultLine" class="five-endgame-result-line"></div></div><div id="fiveEndgameDailyLine" class="five-endgame-daily-line"></div><button type="button" id="fiveTryAnother" class="five-endgame-next" aria-label="Try another Six to Five puzzle"><span>Try another one</span><strong aria-hidden="true">→</strong></button></div></section></div><script src="static-data-adapter.js"></script><script src="app.js"></script></body></html>
