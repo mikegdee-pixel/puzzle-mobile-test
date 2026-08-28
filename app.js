@@ -156,8 +156,10 @@ let currentGuess="";
 let sixToFiveResultCache=null;
 let sixToFiveResultCacheKey="";
 let gameComplete=false;
+let fiveAnimating=false;
+let fiveBracketsHeld=false;
 let validGuesses=new Set();
-let activeGame="five";
+let activeGame="home";
 
 let selectedDate=new Date();
 selectedDate.setHours(12,0,0,0);
@@ -171,10 +173,12 @@ function dateKey(d){
 function currentDateKey(){ return dateKey(selectedDate); }
 
 function updateDateLabel(){
-  document.getElementById("todayLabel").textContent=
-    selectedDate.toLocaleDateString(undefined,{
-      weekday:"short", year:"numeric", month:"short", day:"numeric"
-    });
+  const full=selectedDate.toLocaleDateString(undefined,{weekday:"short",year:"numeric",month:"short",day:"numeric"});
+  const compact=selectedDate.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+  const desktop=document.getElementById("todayLabel");
+  const mobile=document.getElementById("mobileTodayLabel");
+  if(desktop)desktop.textContent=full;
+  if(mobile)mobile.textContent=compact;
 }
 
 async function changeDay(delta){
@@ -191,7 +195,7 @@ async function changeDay(delta){
 }
 
 async function loadDictionary(){
-  const res=await fetch("data/five-guesses.json");
+  const res=await fetch("/data/five-guesses.json");
   if(!res.ok) throw new Error("Could not load Six to Five dictionary.");
   const list=await res.json();
   validGuesses=new Set(list.map(w=>String(w).toUpperCase()));
@@ -204,6 +208,8 @@ async function loadFiveForSelectedDate(){
   sixToFiveResultCacheKey="";
   currentGuess="";
   gameComplete=false;
+  fiveAnimating=false;
+  fiveBracketsHeld=false;
   fiveTimerElapsedMs=0;
   fiveTimerStartedAt=null;
   document.getElementById("fiveStatus").innerHTML="";
@@ -221,8 +227,7 @@ async function loadFiveForSelectedDate(){
   }
 
   puzzle=await res.json();
-  document.getElementById("fivePuzzleMeta").textContent=
-    `${formatPuzzleDate(puzzle.date)} · ${puzzle.difficulty||"Unrated"}`;
+  document.getElementById("fivePuzzleMeta").textContent=formatPuzzleDate(puzzle.date);
 
   restorePlayerState();
   drawFive();
@@ -260,6 +265,11 @@ function savePlayerState(){
 
 function setActiveGame(game){
   activeGame=game;
+  const frontPage=document.getElementById("frontPage");
+  const playArea=document.getElementById("playArea");
+  const isHome=game==="home";
+  if(frontPage) frontPage.classList.toggle("front-page-hidden",!isHome);
+  if(playArea) playArea.classList.toggle("play-area-hidden",isHome);
   const fivePanel=document.getElementById("fivePanel");
   const ellPanel=document.getElementById("ellPanel");
   const samePanel=document.getElementById("samePanel");
@@ -272,19 +282,23 @@ function setActiveGame(game){
       p.classList.remove("game-visible");
     }
   });
-  const active=game==="ell"?ellPanel:(game==="same"?samePanel:(game==="quads"?quadsPanel:(game==="trail"?wordTrailPanel:(game==="mini"?miniPanel:fivePanel))));
+  const active=isHome?null:(game==="ell"?ellPanel:(game==="same"?samePanel:(game==="quads"?quadsPanel:(game==="trail"?wordTrailPanel:(game==="mini"?miniPanel:fivePanel)))));
   if(active){
     active.classList.remove("game-hidden");
     active.classList.add("game-visible");
+  }
+  if(game==="trail"){
+    requestAnimationFrame(()=>requestAnimationFrame(queueWordTrailMobileBoardSize));
   }
   document.querySelectorAll(".game-tab").forEach(tab=>{
     tab.classList.toggle("active", tab.dataset.game===game);
     tab.setAttribute("aria-current", tab.dataset.game===game ? "page" : "false");
   });
 }
-function showFive(){ setActiveGame("five"); }
-function showEveryLastLetter(){ setActiveGame("ell"); }
-function showOneAndTheSame(){ setActiveGame("same"); }
+function showHomePage(){ setActiveGame("home"); closeMobileSiteMenu(); window.scrollTo({top:0,behavior:"smooth"}); }
+function showFive(){ setActiveGame("five"); closeMobileSiteMenu(); }
+function showEveryLastLetter(){ setActiveGame("ell"); closeMobileSiteMenu(); }
+function showOneAndTheSame(){ setActiveGame("same"); closeMobileSiteMenu(); }
 
 function scoreWord(guess,answer){
   const result=Array(5).fill("absent");
@@ -365,6 +379,7 @@ function drawFive(){
 
   const grid=document.getElementById("fiveGrid");
   grid.innerHTML="";
+  grid.classList.toggle("five-brackets-held",fiveBracketsHeld);
 
   for(let r=0;r<6;r++){
     const text=guesses[r] || (r===guesses.length ? currentGuess : "");
@@ -373,6 +388,8 @@ function drawFive(){
     for(let c=0;c<5;c++){
       const tile=document.createElement("div");
       tile.className=`tile ${feedback[c]||""}`;
+      tile.dataset.row=String(r);
+      tile.dataset.col=String(c);
       const isActiveRow=!gameComplete && r===guesses.length && guesses.length<6;
       if(isActiveRow){
         tile.classList.add("active-five-row");
@@ -387,7 +404,13 @@ function drawFive(){
   drawKeyboard();
 
   const status=document.getElementById("fiveStatus");
-  if(gameComplete){status.innerHTML="";requestAnimationFrame(showFiveEndgame)}else{status.innerHTML="";closeFiveEndgame()}
+  if(gameComplete){
+    status.innerHTML="";
+    if(!fiveAnimating)requestAnimationFrame(showFiveEndgame);
+  }else{
+    status.innerHTML="";
+    closeFiveEndgame();
+  }
 }
 
 function getFiveKeyboardStates(){
@@ -447,41 +470,173 @@ function drawKeyboard(){
   });
 }
 
+function fiveTileAt(row,col){
+  return document.querySelector(`#fiveGrid .tile[data-row="${row}"][data-col="${col}"]`);
+}
+function fiveActiveTiles(){
+  return [...document.querySelectorAll("#fiveGrid .tile.active-five-row")];
+}
+function fiveAnimateActiveRowNudge(){
+  const tiles=fiveActiveTiles();
+  tiles.forEach(tile=>{
+    tile.classList.remove("five-row-nudge");
+    void tile.offsetWidth;
+    tile.classList.add("five-row-nudge");
+  });
+  setTimeout(()=>tiles.forEach(tile=>tile.classList.remove("five-row-nudge")),260);
+}
+function fiveAnimateTypedTile(col){
+  const tile=fiveTileAt(guesses.length,col);
+  if(!tile)return;
+  tile.classList.remove("five-letter-pop");
+  void tile.offsetWidth;
+  tile.classList.add("five-letter-pop");
+  setTimeout(()=>tile.classList.remove("five-letter-pop"),150);
+}
+function fiveApplyKeyStates(states){
+  document.querySelectorAll("#keyboard .key").forEach(key=>{
+    const letter=(key.textContent||"").trim().toUpperCase();
+    if(!/^[A-Z]$/.test(letter))return;
+    key.classList.remove("good","present","absent");
+    if(states[letter])key.classList.add(states[letter]);
+  });
+}
+function fiveAnimateBracketAdvance(){
+  const grid=document.getElementById("fiveGrid");
+  const tiles=fiveActiveTiles();
+  if(!grid||!tiles.length){
+    fiveBracketsHeld=false;
+    if(grid)grid.classList.remove("five-brackets-held");
+    return;
+  }
+
+  tiles.forEach(tile=>tile.classList.add("five-brackets-slide"));
+  fiveBracketsHeld=false;
+
+  requestAnimationFrame(()=>{
+    grid.classList.remove("five-brackets-held");
+  });
+}
+function fiveAnimateSolvedRow(row,done){
+  const tiles=[...document.querySelectorAll(`#fiveGrid .tile[data-row="${row}"]`)];
+  tiles.forEach(tile=>tile.classList.add("five-solved-lift"));
+  setTimeout(()=>{
+    tiles.forEach(tile=>tile.classList.remove("five-solved-lift"));
+    if(done)done();
+  },300);
+}
+function fiveFinishSubmittedGuess(row,solved){
+  fiveAnimating=false;
+  if(solved){
+    fiveAnimateSolvedRow(row,()=>requestAnimationFrame(showFiveEndgame));
+  }else if(gameComplete){
+    requestAnimationFrame(showFiveEndgame);
+  }else{
+    fiveAnimateBracketAdvance();
+  }
+}
+function fiveAnimateSubmittedGuess(row,guess,priorKeyStates){
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const feedback=scoreWord(guess,puzzle.answer);
+  const finalKeyStates=getFiveKeyboardStates();
+
+  if(reduced){
+    fiveApplyKeyStates(finalKeyStates);
+    fiveFinishSubmittedGuess(row,guess===puzzle.answer);
+    return;
+  }
+
+  const tiles=[];
+  for(let c=0;c<5;c++){
+    const tile=fiveTileAt(row,c);
+    if(tile){
+      tile.classList.add("five-reveal-pending");
+      tiles.push(tile);
+    }
+  }
+
+  fiveApplyKeyStates(priorKeyStates);
+
+  const step=92;
+  const duration=190;
+  tiles.forEach((tile,c)=>{
+    setTimeout(()=>{
+      tile.classList.remove("five-reveal-pending");
+      tile.classList.add("five-tile-reveal");
+      const letter=guess[c];
+      document.querySelectorAll("#keyboard .key").forEach(key=>{
+        if((key.textContent||"").trim().toUpperCase()!==letter)return;
+        key.classList.remove("good","present","absent","five-key-reveal");
+        if(finalKeyStates[letter])key.classList.add(finalKeyStates[letter]);
+        void key.offsetWidth;
+        key.classList.add("five-key-reveal");
+        setTimeout(()=>key.classList.remove("five-key-reveal"),180);
+      });
+      setTimeout(()=>tile.classList.remove("five-tile-reveal"),duration+40);
+    },c*step);
+  });
+
+  const revealDone=(4*step)+duration+55;
+  setTimeout(()=>fiveFinishSubmittedGuess(row,guess===puzzle.answer),revealDone);
+}
+
 function showMessage(text,type="invalid"){
   document.getElementById("fiveStatus").innerHTML=
     `<div class="${type==="hard"?"hard-msg":"invalid-msg"}">${text}</div>`;
 }
 
 function pressKey(ch){
-  if(!puzzle || gameComplete) return;
+  if(!puzzle || gameComplete || fiveAnimating) return;
 
   if(ch==="BACK"){
-    currentGuess=currentGuess.slice(0,-1);
+    if(!currentGuess.length)return;
+    const col=currentGuess.length-1;
+    const tile=fiveTileAt(guesses.length,col);
+    if(tile && !window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      fiveAnimating=true;
+      tile.classList.add("five-letter-delete");
+      setTimeout(()=>{
+        currentGuess=currentGuess.slice(0,-1);
+        fiveAnimating=false;
+        drawFive();
+      },90);
+    }else{
+      currentGuess=currentGuess.slice(0,-1);
+      drawFive();
+    }
   }else if(currentGuess.length<5){
     if(!registerFiveStarted())return;
     ensureFiveTimerRunning();
+    const col=currentGuess.length;
     currentGuess+=ch;
+    drawFive();
+    fiveAnimateTypedTile(col);
   }
-  drawFive();
 }
 
 function submitGuess(){
-  if(!puzzle || gameComplete || currentGuess.length!==5) return;
+  if(!puzzle || gameComplete || fiveAnimating || currentGuess.length!==5) return;
 
   const guess=currentGuess.toUpperCase();
 
   // A bad dictionary entry does not use an attempt.
   if(!validGuesses.has(guess)){
     showMessage("Not in word list");
+    fiveAnimateActiveRowNudge();
     return;
   }
 
   const hardError=hardModeViolation(guess);
   if(hardError){
     showMessage(hardError,"hard");
+    fiveAnimateActiveRowNudge();
     return;
   }
 
+  const priorKeyStates=getFiveKeyboardStates();
+  const row=guesses.length;
+  fiveAnimating=true;
+  fiveBracketsHeld=guess!==puzzle.answer && guesses.length<5;
   guesses.push(guess);
 
   if(guess===puzzle.answer || guesses.length===6){
@@ -493,6 +648,7 @@ function submitGuess(){
   currentGuess="";
   savePlayerState();
   drawFive();
+  fiveAnimateSubmittedGuess(row,guess,priorKeyStates);
 }
 
 document.addEventListener("keydown",event=>{
@@ -532,6 +688,8 @@ function resetFiveForSelectedDate(){
   sixToFiveResultCacheKey="";
   currentGuess="";
   gameComplete=false;
+  fiveAnimating=false;
+  fiveBracketsHeld=false;
   fiveTimerElapsedMs=0;
   fiveTimerStartedAt=null;
   if(document.getElementById("hardModeToggle")) document.getElementById("hardModeToggle").checked=false;
@@ -551,6 +709,7 @@ function resetQuadsForSelectedDate(){
 }
 
 async function resetActiveGame(){
+  if(activeGame==="home")return;
   if(activeGame==="ell"){
     resetEveryLastLetterForSelectedDate();
     await loadEveryLastLetterForSelectedDate();
@@ -579,6 +738,47 @@ async function resetActiveGame(){
 }
 const resetActiveGameBtn=document.getElementById("resetActiveGameBtn");
 if(resetActiveGameBtn) resetActiveGameBtn.onclick=resetActiveGame;
+
+function openMobileSiteMenu(){
+  const menu=document.getElementById("mobileSiteMenu");
+  const btn=document.getElementById("mobileMenuBtn");
+  if(menu)menu.hidden=false;
+  if(btn)btn.setAttribute("aria-expanded","true");
+}
+function closeMobileSiteMenu(){
+  const menu=document.getElementById("mobileSiteMenu");
+  const btn=document.getElementById("mobileMenuBtn");
+  if(menu)menu.hidden=true;
+  if(btn)btn.setAttribute("aria-expanded","false");
+}
+function toggleMobileSiteMenu(){
+  const menu=document.getElementById("mobileSiteMenu");
+  if(!menu||menu.hidden)openMobileSiteMenu();else closeMobileSiteMenu();
+}
+function navigateToGame(game){
+  if(game==="home")return showHomePage();
+  if(game==="five")return showFive();
+  if(game==="ell")return showEveryLastLetter();
+  if(game==="same")return showOneAndTheSame();
+  if(game==="quads")return showQuads();
+  if(game==="trail")return showWordTrail();
+  if(game==="mini")return showMini();
+}
+
+document.getElementById("brandHomeBtn")?.addEventListener("click",showHomePage);
+document.getElementById("mobileMenuBtn")?.addEventListener("click",toggleMobileSiteMenu);
+document.getElementById("mobilePrevDayBtn")?.addEventListener("click",async()=>{await changeDay(-1)});
+document.getElementById("mobileNextDayBtn")?.addEventListener("click",async()=>{await changeDay(1)});
+document.getElementById("mobileResetActiveGameBtn")?.addEventListener("click",async()=>{await resetActiveGame();closeMobileSiteMenu()});
+document.querySelectorAll("[data-mobile-game]").forEach(btn=>btn.addEventListener("click",()=>navigateToGame(btn.dataset.mobileGame)));
+document.querySelectorAll("[data-front-game]").forEach(btn=>btn.addEventListener("click",()=>navigateToGame(btn.dataset.frontGame)));
+document.addEventListener("click",event=>{
+  const menu=document.getElementById("mobileSiteMenu");
+  const button=document.getElementById("mobileMenuBtn");
+  if(!menu||menu.hidden||menu.contains(event.target)||button?.contains(event.target))return;
+  closeMobileSiteMenu();
+});
+document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMobileSiteMenu()});
 
 (async function init(){
   updateDateLabel();
@@ -712,7 +912,7 @@ async function loadOneAndTheSameForSelectedDate(){
   }
 
   samePuzzle=await res.json();
-  meta.textContent=`Puzzle #${samePuzzle.id}`;
+  meta.textContent=formatPuzzleDate(samePuzzle.date);
   document.getElementById("sameActiveArea")?.classList.remove("same-hidden");
   restoreSameState();
   drawOneAndTheSame();
@@ -720,8 +920,11 @@ async function loadOneAndTheSameForSelectedDate(){
 function sameHistoryRow(item){
   const clue=samePuzzle?.clues?.[item.clueIndex]||"";
   return `<div class="same-history-row">
-    <div class="same-history-clue"><span class="same-history-index">${item.clueIndex+1}</span>${escapeSameHtml(clue)}</div>
-    <div class="same-history-guess">${escapeSameHtml(item.guess)}</div>
+    <div class="same-history-clue">
+      <span class="same-history-index">${item.clueIndex+1}</span>
+      <span class="same-history-clue-text">${escapeSameHtml(clue)}</span>
+    </div>
+    <div class="same-history-guess"><span class="same-history-guess-text">${escapeSameHtml(item.guess)}</span></div>
   </div>`;
 }
 function escapeSameHtml(value){
@@ -738,6 +941,156 @@ function sameSolveMessage(tries){
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
+function sameIsMobileKeyboard(){
+  return window.matchMedia("(max-width:700px)").matches;
+}
+function configureSameGuessInput(){
+  const input=document.getElementById("sameGuessInput");
+  if(!input)return;
+  const mobile=sameIsMobileKeyboard();
+  input.readOnly=mobile;
+  input.inputMode=mobile?"none":"text";
+  if(mobile)input.blur();
+}
+function sameKeyboardLetter(letter){
+  if(!samePuzzle||sameComplete)return;
+  const input=document.getElementById("sameGuessInput");
+  if(!input)return;
+  input.value=(input.value+letter).slice(0,24).toUpperCase();
+  input.classList.remove("same-input-nudge");
+}
+function sameKeyboardDelete(){
+  if(!samePuzzle||sameComplete)return;
+  const input=document.getElementById("sameGuessInput");
+  if(!input)return;
+  input.value=input.value.slice(0,-1);
+}
+function drawSameKeyboard(){
+  const host=document.getElementById("sameKeyboard");
+  if(!host)return;
+  host.innerHTML="";
+  const rows=["QWERTYUIOP","ASDFGHJKL","ZXCVBNM"];
+  rows.forEach((letters,rowIndex)=>{
+    const row=document.createElement("div");
+    row.className="key-row";
+    if(rowIndex===2){
+      const del=document.createElement("button");
+      del.type="button";
+      del.className="key key-action same-key-delete";
+      del.textContent="Delete";
+      del.setAttribute("aria-label","Delete last letter");
+      del.onclick=sameKeyboardDelete;
+      row.appendChild(del);
+    }
+    [...letters].forEach(letter=>{
+      const key=document.createElement("button");
+      key.type="button";
+      key.className="key";
+      key.textContent=letter;
+      key.setAttribute("aria-label",letter);
+      key.onclick=()=>sameKeyboardLetter(letter);
+      row.appendChild(key);
+    });
+    if(rowIndex===2){
+      const guess=document.createElement("button");
+      guess.type="button";
+      guess.className="key key-action same-key-guess";
+      guess.textContent="Guess";
+      guess.setAttribute("aria-label","Submit guess");
+      guess.onclick=submitSameGuess;
+      row.appendChild(guess);
+    }
+    host.appendChild(row);
+  });
+}
+function sameAnimateNextClue(){
+  const clue=document.getElementById("sameCurrentClue");
+  if(!clue)return;
+  clue.classList.remove("same-clue-enter","same-clue-pop");
+  void clue.offsetWidth;
+  clue.classList.add("same-clue-pop");
+}
+function sameCommitWrongGuess(clueIndex,guess){
+  sameWrong.push({clueIndex,guess});
+  if(sameRevealed>=4){
+    sameComplete=true;
+    sameWon=false;
+  }else{
+    sameRevealed++;
+  }
+  saveSameState();
+}
+function sameAnimateWrongToHistory(clueIndex,guess){
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const active=document.getElementById("sameActiveArea");
+  const clue=document.getElementById("sameCurrentClue");
+  const input=document.getElementById("sameGuessInput");
+  const history=document.getElementById("sameHistory");
+  if(reduced||!active||!clue||!input||!history){
+    sameCommitWrongGuess(clueIndex,guess);
+    drawOneAndTheSame();
+    if(!sameComplete)sameAnimateNextClue();
+    return;
+  }
+
+  const clueText=samePuzzle?.clues?.[clueIndex]||"";
+  const tempRow=document.createElement("div");
+  tempRow.className="same-history-row same-history-row-temp";
+  tempRow.innerHTML=`<div class="same-history-clue">
+    <span class="same-history-index">${clueIndex+1}</span>
+    <span class="same-history-clue-text">${escapeSameHtml(clueText)}</span>
+  </div>
+  <div class="same-history-guess">
+    <span class="same-history-guess-text">${escapeSameHtml(guess)}</span>
+  </div>`;
+  history.appendChild(tempRow);
+
+  const targetRect=tempRow.getBoundingClientRect();
+  const activeRect=active.getBoundingClientRect();
+
+  const ghost=document.createElement("div");
+  ghost.className="same-history-flight";
+  ghost.innerHTML=tempRow.innerHTML;
+  ghost.style.left=`${targetRect.left}px`;
+  ghost.style.top=`${Math.max(8,activeRect.top)}px`;
+  ghost.style.width=`${targetRect.width}px`;
+  document.body.appendChild(ghost);
+
+  tempRow.classList.add("same-history-row-pending");
+  active.classList.add("same-filing-out");
+
+  setTimeout(()=>{
+    const dy=targetRect.top-Math.max(8,activeRect.top);
+    const flight=ghost.animate([
+      {transform:"translateY(0) scale(1.035)",opacity:.92,filter:"blur(0px)"},
+      {transform:`translateY(${dy}px) scale(.985)`,opacity:1,filter:"blur(0px)"}
+    ],{
+      duration:238,
+      easing:"cubic-bezier(.2,.78,.2,1)",
+      fill:"forwards"
+    });
+
+    flight.onfinish=()=>{
+      ghost.remove();
+      tempRow.classList.remove("same-history-row-pending");
+      tempRow.classList.add("same-history-row-settle");
+      const guessEl=tempRow.querySelector(".same-history-guess");
+      if(guessEl)guessEl.classList.add("same-history-strike-in");
+
+      setTimeout(()=>{
+        if(guessEl)guessEl.classList.remove("same-history-strike-in");
+
+        // Commit the wrong guess only after the strike finishes.
+        // Until this point the active clue has never advanced, so the next
+        // clue cannot flash on screen before its entrance animation.
+        sameCommitWrongGuess(clueIndex,guess);
+        drawOneAndTheSame();
+        if(!sameComplete)sameAnimateNextClue();
+      },242);
+    };
+  },145);
+}
+
 function drawOneAndTheSame(){
   if(!samePuzzle)return;
 
@@ -748,6 +1101,7 @@ function drawOneAndTheSame(){
   const status=document.getElementById("sameStatus");
 
   history.innerHTML=sameWrong.map(sameHistoryRow).join("");
+  active.classList.remove("same-filing-out");
 
   if(sameComplete){
     active.classList.add("same-hidden");
@@ -775,7 +1129,13 @@ function drawOneAndTheSame(){
   clue.textContent=samePuzzle.clues?.[clueIndex]||"";
   status.innerHTML="";
   input.value="";
-  setTimeout(()=>input.focus(),0);
+  configureSameGuessInput();
+  drawSameKeyboard();
+  if(sameIsMobileKeyboard()){
+    input.blur();
+  }else{
+    setTimeout(()=>input.focus(),0);
+  }
 }
 function submitSameGuess(){
   if(!samePuzzle||sameComplete)return;
@@ -789,23 +1149,26 @@ function submitSameGuess(){
   }
 
   if(sameGuessMatchesAnswer(guess,samePuzzle.answer)){
-    sameComplete=true;
-    sameWon=true;
-    saveSameState();
-    drawOneAndTheSame();
+    input.classList.remove("same-input-correct");
+    void input.offsetWidth;
+    input.classList.add("same-input-correct");
+    const finish=()=>{
+      sameComplete=true;
+      sameWon=true;
+      saveSameState();
+      drawOneAndTheSame();
+    };
+    if(sameIsMobileKeyboard())setTimeout(finish,260);
+    else finish();
     return;
   }
 
   const clueIndex=Math.max(0,Math.min(3,sameRevealed-1));
-  sameWrong.push({clueIndex,guess});
-  if(sameRevealed>=4){
-    sameComplete=true;
-    sameWon=false;
-  }else{
-    sameRevealed++;
-  }
-  saveSameState();
-  drawOneAndTheSame();
+  input.classList.remove("same-input-nudge");
+  void input.offsetWidth;
+  input.classList.add("same-input-nudge");
+
+  sameAnimateWrongToHistory(clueIndex,guess);
 }
 
 document.getElementById("sameGuessBtn").onclick=submitSameGuess;
@@ -815,6 +1178,14 @@ document.getElementById("sameGuessInput").addEventListener("keydown",event=>{
     submitSameGuess();
   }
 });
+document.getElementById("sameGuessInput").addEventListener("pointerdown",event=>{
+  if(sameIsMobileKeyboard()){
+    event.preventDefault();
+    document.getElementById("sameGuessInput").blur();
+  }
+});
+window.addEventListener("resize",configureSameGuessInput);
+
 
 
 /* -----------------------------
@@ -822,6 +1193,58 @@ document.getElementById("sameGuessInput").addEventListener("keydown",event=>{
 ------------------------------ */
 const ELL_PLAYER_KEY="puzzlePublicEveryLastLetterV1";
 let ellPuzzle=null,ellTiles=[],ellSelected=[],ellSubmitted=[],ellReclaimCandidate=null,ellComplete=false,ellEnded=false,ellEndReason=null;
+let ellMotion={
+  pressedId:null,
+  submittingIds:[],
+  newWordIndex:null,
+  scoreRevealIndex:null,
+  reclaimingIndex:null,
+  returningIds:[]
+};
+let ellMotionTimers=[];
+function ellLater(fn,ms){
+  const id=setTimeout(fn,ms);
+  ellMotionTimers.push(id);
+  return id;
+}
+function ellClearMotionTimers(){
+  ellMotionTimers.forEach(clearTimeout);
+  ellMotionTimers=[];
+}
+let ellDisplayedScore=null;
+let ellScoreAnimFrame=null;
+function ellAnimateScoreTo(target){
+  const host=document.getElementById("ellScore");
+  if(!host)return;
+  const finalScore=Math.max(0,Number(target)||0);
+  const from=ellDisplayedScore===null?finalScore:ellDisplayedScore;
+  if(ellScoreAnimFrame)cancelAnimationFrame(ellScoreAnimFrame);
+  if(from===finalScore){
+    ellDisplayedScore=finalScore;
+    host.textContent=`Score: ${finalScore}`;
+    return;
+  }
+  const start=performance.now();
+  const duration=300;
+  const tick=now=>{
+    const t=Math.min(1,(now-start)/duration);
+    const eased=1-Math.pow(1-t,3);
+    const value=Math.round(from+(finalScore-from)*eased);
+    ellDisplayedScore=value;
+    host.textContent=`Score: ${value}`;
+    if(t<1){
+      ellScoreAnimFrame=requestAnimationFrame(tick);
+    }else{
+      ellDisplayedScore=finalScore;
+      ellScoreAnimFrame=null;
+      host.classList.remove("motion-score-total");
+      void host.offsetWidth;
+      host.classList.add("motion-score-total");
+    }
+  };
+  ellScoreAnimFrame=requestAnimationFrame(tick);
+}
+
 
 async function loadEveryLastLetterForSelectedDate(){
   ellPuzzle=null;ellTiles=[];ellSelected=[];ellSubmitted=[];ellReclaimCandidate=null;ellComplete=false;ellEnded=false;ellEndReason=null;
@@ -834,11 +1257,10 @@ async function loadEveryLastLetterForSelectedDate(){
     document.getElementById("ellGrid").innerHTML="";
     document.getElementById("ellCompletedWords").innerHTML="";
     document.getElementById("ellCurrentWord").textContent="";
-    document.getElementById("ellProgress").textContent="0 / 25 letters used";
     status.innerHTML='<div class="result">There is no Every Last Letter puzzle scheduled for this date.</div>';
     return;
   }
-  ellPuzzle=await res.json();meta.textContent=`Puzzle #${ellPuzzle.id}`;
+  ellPuzzle=await res.json();meta.textContent=formatPuzzleDate(ellPuzzle.date);
   let id=0;
   (ellPuzzle.grid||[]).forEach((row,r)=>row.forEach((letter,c)=>ellTiles.push({id:id++,letter:String(letter).toUpperCase(),r,c,used:false})));
   restoreEllState();drawEll();
@@ -867,7 +1289,7 @@ function ellUsed(){return ellTiles.filter(t=>t.used).length;}
 function ellScoreForLength(length){
   const n=Number(length);
   if(n<3)return 0;
-  return 1+((n-3)*(n-2))/2;
+  return 10*(1+((n-3)*(n-2))/2);
 }
 function ellCurrentScore(){
   return ellSubmitted.reduce((sum,entry)=>sum+(Number(entry.score)||ellScoreForLength(entry.word?.length||0)),0);
@@ -910,22 +1332,48 @@ function drawEll(){
       b.textContent=tile.letter;
       if(ellEnded){b.disabled=true;b.classList.add("ended");}
       if(selected.has(tile.id)){b.classList.add("selected");b.dataset.order=ellSelected.indexOf(tile.id)+1;}
+      const submitIndex=ellMotion.submittingIds.indexOf(tile.id);
+      if(submitIndex>=0){
+        b.classList.add("motion-submit");
+        b.style.setProperty("--ell-submit-delay",`${submitIndex*38}ms`);
+      }
+      const returnIndex=ellMotion.returningIds.indexOf(tile.id);
+      if(returnIndex>=0){
+        b.classList.add("motion-return");
+        b.style.setProperty("--ell-return-delay",`${returnIndex*42}ms`);
+      }
+      if(ellMotion.pressedId===tile.id)b.classList.add("motion-pressed");
+      b.addEventListener("pointerdown",()=>{ellMotion.pressedId=tile.id;b.classList.add("motion-pressed");});
+      const releasePress=()=>{if(ellMotion.pressedId===tile.id)ellMotion.pressedId=null;b.classList.remove("motion-pressed");};
+      b.addEventListener("pointerup",releasePress);
+      b.addEventListener("pointercancel",releasePress);
+      b.addEventListener("pointerleave",releasePress);
       b.onclick=()=>ellToggle(tile.id);
     }
     grid.appendChild(b);
   });
   document.getElementById("ellCurrentWord").textContent=ellWord()||" ";
-  document.getElementById("ellProgress").textContent=`${ellUsed()} / 25 letters used`;
-  const scoreEl=document.getElementById("ellScore");
-  if(scoreEl)scoreEl.textContent=`Score: ${ellCurrentScore()}`;
+  ellAnimateScoreTo(ellCurrentScore());
   const host=document.getElementById("ellCompletedWords");host.innerHTML="";
-  ellSubmitted.forEach((entry,index)=>{
-    const b=document.createElement("button");b.type="button";b.className="ell-completed-word";
-    if(ellReclaimCandidate===index)b.classList.add("reclaim-selected");
-    const pts=Number(entry.score)||ellScoreForLength(entry.word.length);
-    b.innerHTML=`<span>${entry.word}</span><small>+${pts}</small>`;
-    b.onclick=e=>{e.stopPropagation();ellReclaim(index);};host.appendChild(b);
-  });
+  if(ellSubmitted.length){
+    const heading=document.createElement("div");
+    heading.className="ell-words-made-heading";
+    heading.innerHTML=`<span>WORDS MADE</span><small>· ${ellSubmitted.length}</small>`;
+    host.appendChild(heading);
+    const collection=document.createElement("div");
+    collection.className="ell-word-collection";
+    ellSubmitted.forEach((entry,index)=>{
+      const b=document.createElement("button");b.type="button";b.className="ell-completed-word";
+      if(ellReclaimCandidate===index)b.classList.add("reclaim-selected");
+      if(ellMotion.newWordIndex===index)b.classList.add("motion-arrive");
+      if(ellMotion.reclaimingIndex===index)b.classList.add("motion-reclaim");
+      const pts=Number(entry.score)||ellScoreForLength(entry.word.length);
+      const scoreClass=ellMotion.scoreRevealIndex===index?" motion-score":"";
+      b.innerHTML=`<span class="ell-made-word">${entry.word}</span><small class="ell-made-score${scoreClass}">+${pts}</small>`;
+      b.onclick=e=>{e.stopPropagation();ellReclaim(index);};collection.appendChild(b);
+    });
+    host.appendChild(collection);
+  }
   if(ellComplete){
     document.getElementById("ellStatus").innerHTML=`<div class="ell-endgame ell-endgame-win">
       <div class="ell-endgame-title">Every Last Letter!</div>
@@ -990,11 +1438,31 @@ async function ellSubmit(){
   const res=await fetch(`/api/ell/validate?word=${encodeURIComponent(word)}`);
   const result=res.ok?await res.json():{valid:false};
   if(!result.valid){document.getElementById("ellStatus").innerHTML='<div class="result">Not a valid word.</div>';return;}
-  const tileIds=[...ellSelected];tileIds.forEach(id=>{const t=ellTiles.find(x=>x.id===id);if(t)t.used=true;});
-  ellSubmitted.push({word,tileIds,score:ellScoreForLength(word.length)});ellSelected=[];ellReclaimCandidate=null;ellComplete=ellUsed()===25;if(ellComplete)ellEnded=false;
-  ellEndReason=null;
-  document.getElementById("ellStatus").innerHTML="";saveEllState();drawEll();
-  if(!ellComplete) await ellCheckDeadBoard();
+  const tileIds=[...ellSelected];
+  ellMotion.submittingIds=[...tileIds];
+  document.getElementById("ellStatus").innerHTML="";
+  drawEll();
+
+  ellLater(async()=>{
+    tileIds.forEach(id=>{const t=ellTiles.find(x=>x.id===id);if(t)t.used=true;});
+    ellSubmitted.push({word,tileIds,score:ellScoreForLength(word.length)});
+    const newIndex=ellSubmitted.length-1;
+    ellSelected=[];ellReclaimCandidate=null;
+    ellComplete=ellUsed()===25;if(ellComplete)ellEnded=false;
+    ellEndReason=null;
+    ellMotion.submittingIds=[];
+    ellMotion.newWordIndex=newIndex;
+    ellMotion.scoreRevealIndex=newIndex;
+    saveEllState();drawEll();
+
+    ellLater(()=>{
+      ellMotion.newWordIndex=null;
+      ellMotion.scoreRevealIndex=null;
+      drawEll();
+    },520);
+
+    if(!ellComplete) await ellCheckDeadBoard();
+  },Math.min(420,190+tileIds.length*38));
 }
 function ellReturnSubmittedWord(index){
   const entry=ellSubmitted[index];if(!entry)return;
@@ -1011,7 +1479,25 @@ function ellReturnSubmittedWord(index){
 function ellReclaim(index){
   if(ellComplete)return;
   if(ellReclaimCandidate!==index){ellReclaimCandidate=index;drawEll();return;}
-  ellReturnSubmittedWord(index);
+  const entry=ellSubmitted[index];
+  if(!entry)return;
+  ellMotion.reclaimingIndex=index;
+  drawEll();
+  ellLater(()=>{
+    const returning=[...(entry.tileIds||[])];
+    (entry.tileIds||[]).forEach(id=>{const t=ellTiles.find(x=>x.id===id);if(t)t.used=false;});
+    ellSubmitted.splice(index,1);
+    ellReclaimCandidate=null;
+    ellSelected=[];
+    ellComplete=false;
+    ellEnded=false;
+    ellMotion.reclaimingIndex=null;
+    ellMotion.returningIds=returning;
+    document.getElementById("ellStatus").innerHTML="";
+    saveEllState();
+    drawEll();
+    ellLater(()=>{ellMotion.returningIds=[];drawEll();},420);
+  },220);
 }
 function ellStartOver(){
   if(!ellPuzzle)return;
@@ -1050,9 +1536,9 @@ let quadsComplete=false;
 let quadsWon=false;
 let quadsIncorrectGuesses=[];
 
-function showQuads(){ setActiveGame("quads"); }
-function showWordTrail(){ setActiveGame("trail"); }
-function showMini(){ setActiveGame("mini"); }
+function showQuads(){ setActiveGame("quads"); closeMobileSiteMenu(); }
+function showWordTrail(){ setActiveGame("trail"); closeMobileSiteMenu(); }
+function showMini(){ setActiveGame("mini"); closeMobileSiteMenu(); }
 
 function shuffleArray(arr){
   const a=[...arr];
@@ -1098,7 +1584,7 @@ async function loadQuadsForSelectedDate(){
 
   quadsPuzzle=await res.json();
   quadsPuzzle.groups=normalizedQuadGroups(quadsPuzzle);
-  meta.textContent=`Puzzle #${quadsPuzzle.id}`;
+  meta.textContent=formatPuzzleDate(quadsPuzzle.date);
 
   restoreQuadsState();
   if(!quadsRemaining.length && !quadsComplete){
@@ -1174,7 +1660,7 @@ function drawQuads(){
 
   const mistakesLeft=Math.max(0,4-quadsMistakes);
   document.getElementById("quadsMistakes").innerHTML=
-    `Mistakes remaining: ${Array.from({length:mistakesLeft},()=>'<span class="mistake-dot"></span>').join("")}`;
+    `Lives left: <span class="life-stars" aria-label="${mistakesLeft} lives left">${Array.from({length:mistakesLeft},()=>'<span class="mistake-star" aria-hidden="true">★</span>').join("")}</span>`;
 
   updateQuadsButtons();
 
@@ -1321,13 +1807,32 @@ let wordTrailPath=[];
 let wordTrailFound=[];
 let wordTrailNonThemeFound=[];
 let wordTrailHintsAvailable=0;
+let wordTrailHintProgressCount=0;
 let wordTrailHintedWord=null;
 let wordTrailComplete=false;
 let wordTrailPointerId=null;
 let wordTrailPointerStart=null;
 let wordTrailPointerMoved=false;
 let wordTrailDragMode=false;
+let wordTrailMotion={
+  selectedKey:null,
+  correctPath:[],
+  hintPieceIndex:null,
+  bankEarnedIndex:null,
+  bankSpentIndex:null,
+  hintRevealPath:[]
+};
+let wordTrailMotionTimers=[];
 
+function wtClearMotionTimers(){
+  wordTrailMotionTimers.forEach(clearTimeout);
+  wordTrailMotionTimers=[];
+}
+function wtLater(fn,ms){
+  const id=setTimeout(fn,ms);
+  wordTrailMotionTimers.push(id);
+  return id;
+}
 function wtCellKey(r,c){ return `${r},${c}`; }
 
 function wtAreAdjacent(a,b){
@@ -1371,6 +1876,7 @@ async function loadWordTrailForSelectedDate(){
   wordTrailFound=[];
   wordTrailNonThemeFound=[];
   wordTrailHintsAvailable=0;
+  wordTrailHintProgressCount=0;
   wordTrailHintedWord=null;
   wordTrailComplete=false;
 
@@ -1394,7 +1900,7 @@ async function loadWordTrailForSelectedDate(){
   }
 
   wordTrailPuzzle=await res.json();
-  meta.textContent=`Puzzle #${wordTrailPuzzle.id}`;
+  meta.textContent=formatPuzzleDate(wordTrailPuzzle.date);
   document.getElementById("wordTrailTheme").textContent=wordTrailPuzzle.theme||"";
 
   restoreWordTrailState();
@@ -1408,7 +1914,10 @@ function restoreWordTrailState(){
 
   wordTrailFound=s.found||[];
   wordTrailNonThemeFound=s.nonThemeFound||[];
-  wordTrailHintsAvailable=s.hintsAvailable||0;
+  wordTrailHintsAvailable=Math.min(3,Number(s.hintsAvailable)||0);
+  wordTrailHintProgressCount=Number.isInteger(s.hintProgressCount)
+    ? Math.max(0,Math.min(2,s.hintProgressCount))
+    : ((s.nonThemeFound||[]).length%3);
   wordTrailHintedWord=s.hintedWord||null;
   wordTrailComplete=!!s.complete;
 }
@@ -1420,7 +1929,8 @@ function saveWordTrailState(){
     puzzleId:wordTrailPuzzle.id,
     found:wordTrailFound,
     nonThemeFound:wordTrailNonThemeFound,
-    hintsAvailable:wordTrailHintsAvailable,
+    hintsAvailable:Math.min(3,wordTrailHintsAvailable),
+    hintProgressCount:wordTrailHintProgressCount,
     hintedWord:wordTrailHintedWord,
     complete:wordTrailComplete
   };
@@ -1435,6 +1945,7 @@ function resetWordTrailForSelectedDate(){
   wordTrailFound=[];
   wordTrailNonThemeFound=[];
   wordTrailHintsAvailable=0;
+  wordTrailHintProgressCount=0;
   wordTrailHintedWord=null;
   wordTrailComplete=false;
 }
@@ -1470,6 +1981,17 @@ function drawWordTrail(){
       if(foundCells.get(key)==="found") cell.classList.add("found");
       if(foundCells.get(key)==="theme") cell.classList.add("theme-word");
       if(hinted.has(key) && !foundCells.has(key)) cell.classList.add("hint");
+      if(wordTrailMotion.selectedKey===key) cell.classList.add("motion-select");
+      const correctIndex=wordTrailMotion.correctPath.findIndex(([rr,cc])=>rr===r&&cc===c);
+      if(correctIndex>=0){
+        cell.classList.add("motion-correct");
+        cell.style.setProperty("--wt-motion-delay",`${correctIndex*42}ms`);
+      }
+      const hintRevealIndex=wordTrailMotion.hintRevealPath.findIndex(([rr,cc])=>rr===r&&cc===c);
+      if(hintRevealIndex>=0){
+        cell.classList.add("motion-hint-reveal");
+        cell.style.setProperty("--wt-hint-delay",`${hintRevealIndex*58}ms`);
+      }
       cell.textContent=letter;
       cell.dataset.r=r;
       cell.dataset.c=c;
@@ -1492,7 +2014,7 @@ function drawWordTrail(){
   for(const word of wordTrailFound){
     lines+=wtPolyline(wtSolutionPath(word)||[], word===wtThemeWord()?"theme-line":"found-line");
   }
-  lines+=wtPolyline(wordTrailPath,"");
+  lines+=wtPolyline(wordTrailPath,wordTrailPath.length?"active-line":"");
   svg.innerHTML=lines;
 
   document.getElementById("wordTrailCurrentWord").textContent=wtPathWord(wordTrailPath);
@@ -1514,6 +2036,7 @@ function drawWordTrail(){
   }
 
   updateWordTrailButtons();
+  queueWordTrailMobileBoardSize();
 }
 
 
@@ -1521,32 +2044,27 @@ function renderWordTrailHintSystem(){
   const host=document.getElementById("wordTrailHintProgress");
   if(!host) return;
 
-  const remainder=wordTrailNonThemeFound.length%3;
+  const remainder=Math.max(0,Math.min(2,wordTrailHintProgressCount));
   const pieces=[0,1,2].map(i=>
-    `<span class="ort-hint-piece ${i<remainder?"filled":""}" aria-hidden="true"></span>`
+    `<span class="ort-hint-piece ${i<remainder?"filled":""} ${wordTrailMotion.hintPieceIndex===i?"motion-earned":""}" aria-hidden="true"></span>`
   ).join("");
 
-  const visibleBank=Math.min(wordTrailHintsAvailable,4);
-  const bankIcons=wordTrailHintsAvailable
-    ? Array.from({length:visibleBank},()=>'<span class="ort-hint-bank-token" aria-hidden="true">?</span>').join("")
-    : '<span class="ort-hint-bank-empty" aria-hidden="true"></span>';
+  const bankIcons=Array.from({length:3},(_,i)=>{
+    const filled=i<Math.min(3,wordTrailHintsAvailable);
+    const motionEarned=wordTrailMotion.bankEarnedIndex===i?"motion-bank-earned":"";
+    const motionSpent=wordTrailMotion.bankSpentIndex===i?"motion-bank-spent":"";
+    return `<span class="ort-hint-bank-slot ${filled?"filled":""} ${motionEarned} ${motionSpent}" aria-hidden="true"></span>`;
+  }).join("");
 
   host.innerHTML=`
     <div class="ort-hint-flow">
-      <div class="ort-hint-builder">
-        <div>
-          <div class="ort-hint-label">Next hint</div>
-          <div class="ort-hint-token" role="img" aria-label="${remainder} of 3 bonus words toward the next hint">${pieces}</div>
-        </div>
-        <div class="ort-hint-count">${remainder}/3</div>
+      <div class="ort-hint-column ort-hint-builder">
+        <div class="ort-hint-label">Next Hint</div>
+        <div class="ort-hint-token" role="img" aria-label="${remainder} of 3 bonus words toward the next hint">${pieces}</div>
       </div>
-      <div class="ort-hint-arrow" aria-hidden="true">→</div>
-      <div class="ort-hint-bank">
-        <div>
-          <div class="ort-hint-label">Hint bank</div>
-          <div class="ort-hint-bank-icons">${bankIcons}</div>
-        </div>
-        <div class="ort-hint-count">×${wordTrailHintsAvailable}</div>
+      <div class="ort-hint-column ort-hint-bank">
+        <div class="ort-hint-label">Hint Bank</div>
+        <div class="ort-hint-bank-icons" role="img" aria-label="${Math.min(3,wordTrailHintsAvailable)} stored hints">${bankIcons}</div>
       </div>
     </div>`;
 }
@@ -1577,6 +2095,8 @@ function wtAppendOrBacktrack(r,c){
 
   if(wordTrailPath.length===0){
     wordTrailPath.push(next);
+    wordTrailMotion.selectedKey=wtCellKey(r,c);
+    wtLater(()=>{ wordTrailMotion.selectedKey=null; },180);
     document.getElementById("wordTrailStatus").innerHTML="";
     drawWordTrail();
     return true;
@@ -1609,6 +2129,8 @@ function wtAppendOrBacktrack(r,c){
   if(!wtAreAdjacent(last,next)) return false;
 
   wordTrailPath.push(next);
+  wordTrailMotion.selectedKey=wtCellKey(r,c);
+  wtLater(()=>{ wordTrailMotion.selectedKey=null; },180);
   document.getElementById("wordTrailStatus").innerHTML="";
   drawWordTrail();
   return true;
@@ -1617,27 +2139,32 @@ function wtAppendOrBacktrack(r,c){
 function wtCellFromPoint(x,y){
   const grid=document.getElementById("wordTrailGrid");
   const rect=grid.getBoundingClientRect();
-  const pitch=50;
-  const cellSize=42;
   const localX=x-rect.left;
   const localY=y-rect.top;
   if(localX<0 || localY<0 || localX>=rect.width || localY>=rect.height) return null;
 
-  const c=Math.floor(localX/pitch);
-  const r=Math.floor(localY/pitch);
-  if(r<0 || r>=8 || c<0 || c>=6) return null;
+  const cols=6, rows=8;
+  const styles=getComputedStyle(grid);
+  const gapX=parseFloat(styles.columnGap)||0;
+  const gapY=parseFloat(styles.rowGap)||0;
+  const cellW=(rect.width-gapX*(cols-1))/cols;
+  const cellH=(rect.height-gapY*(rows-1))/rows;
+  const pitchX=cellW+gapX;
+  const pitchY=cellH+gapY;
 
-  const cx=localX-c*pitch;
-  const cy=localY-r*pitch;
-  if(cx<0 || cy<0 || cx>cellSize || cy>cellSize) return null;
+  const c=Math.floor(localX/pitchX);
+  const r=Math.floor(localY/pitchY);
+  if(r<0 || r>=rows || c<0 || c>=cols) return null;
 
-  // Respect the octagonal cut corners. This prevents a diagonal drag from
-  // being stolen by the clipped corner of an adjacent tile.
-  const cut=12;
+  const cx=localX-c*pitchX;
+  const cy=localY-r*pitchY;
+  if(cx<0 || cy<0 || cx>cellW || cy>cellH) return null;
+
+  const cut=Math.min(cellW,cellH)*0.285;
   const inTopLeft=(cx+cy)>=cut;
-  const inTopRight=((cellSize-cx)+cy)>=cut;
-  const inBottomLeft=(cx+(cellSize-cy))>=cut;
-  const inBottomRight=((cellSize-cx)+(cellSize-cy))>=cut;
+  const inTopRight=((cellW-cx)+cy)>=cut;
+  const inBottomLeft=(cx+(cellH-cy))>=cut;
+  const inBottomRight=((cellW-cx)+(cellH-cy))>=cut;
   if(!(inTopLeft&&inTopRight&&inBottomLeft&&inBottomRight)) return null;
 
   return [r,c];
@@ -1775,19 +2302,25 @@ async function submitWordTrail(){
     const exactPath=intended.length===wordTrailPath.length &&
       intended.every((p,i)=>p[0]===wordTrailPath[i][0]&&p[1]===wordTrailPath[i][1]);
 
-    // If the letters spell the correct answer via a valid alternate path, accept it too.
-    // The cell coverage will still be protected by already-found cell locking.
-    wordTrailFound.push(word);
-    wordTrailPath=[];
-    if(wordTrailHintedWord===word) wordTrailHintedWord=null;
-
-    if(wordTrailFound.length===themeWords.length){
-      wordTrailComplete=true;
-    }
-
-    saveWordTrailState();
-    showWordTrailMessage(word===wtThemeWord()?"Theme word found!":"Theme word found.","good");
+    // Premium confirmation: sweep through the selected path before committing it.
+    const confirmedPath=wordTrailPath.map(p=>[...p]);
+    wordTrailMotion.correctPath=confirmedPath;
     drawWordTrail();
+
+    wtLater(()=>{
+      wordTrailFound.push(word);
+      wordTrailPath=[];
+      wordTrailMotion.correctPath=[];
+      if(wordTrailHintedWord===word) wordTrailHintedWord=null;
+
+      if(wordTrailFound.length===themeWords.length){
+        wordTrailComplete=true;
+      }
+
+      saveWordTrailState();
+      showWordTrailMessage(word===wtThemeWord()?"Theme word found!":"Theme word found.","good");
+      drawWordTrail();
+    },Math.min(520,220+confirmedPath.length*42));
     return;
   }
 
@@ -1811,15 +2344,46 @@ async function submitWordTrail(){
     }
 
     wordTrailNonThemeFound.push(word);
-    if(wordTrailNonThemeFound.length%3===0){
-      wordTrailHintsAvailable++;
-      showWordTrailMessage("Hint earned!","good");
-    }else{
-      showWordTrailMessage("Valid non-theme word.","good");
-    }
     wordTrailPath=[];
-    saveWordTrailState();
-    drawWordTrail();
+
+    if(wordTrailHintsAvailable<3){
+      const earnedPiece=wordTrailHintProgressCount;
+      wordTrailHintProgressCount++;
+      wordTrailMotion.hintPieceIndex=earnedPiece;
+
+      if(wordTrailHintProgressCount>=3){
+        showWordTrailMessage("Hint earned!","good");
+        saveWordTrailState();
+        drawWordTrail();
+
+        wtLater(()=>{
+          const newBankIndex=Math.min(2,wordTrailHintsAvailable);
+          wordTrailHintsAvailable=Math.min(3,wordTrailHintsAvailable+1);
+          wordTrailHintProgressCount=0;
+          wordTrailMotion.hintPieceIndex=null;
+          wordTrailMotion.bankEarnedIndex=newBankIndex;
+          saveWordTrailState();
+          drawWordTrail();
+          wtLater(()=>{
+            wordTrailMotion.bankEarnedIndex=null;
+            drawWordTrail();
+          },420);
+        },360);
+      }else{
+        showWordTrailMessage("Valid non-theme word.","good");
+        saveWordTrailState();
+        drawWordTrail();
+        wtLater(()=>{
+          wordTrailMotion.hintPieceIndex=null;
+          drawWordTrail();
+        },360);
+      }
+    }else{
+      wordTrailHintProgressCount=0;
+      showWordTrailMessage("Valid non-theme word. Hint bank is full.","good");
+      saveWordTrailState();
+      drawWordTrail();
+    }
     return;
   }
 
@@ -1836,17 +2400,100 @@ function useWordTrailHint(){
   const remaining=wtAllThemeWords().filter(w=>!wordTrailFound.includes(w));
   if(!remaining.length) return;
 
-  wordTrailHintsAvailable--;
-  wordTrailHintedWord=remaining[Math.floor(Math.random()*remaining.length)];
+  const spentIndex=Math.max(0,wordTrailHintsAvailable-1);
+  const chosen=remaining[Math.floor(Math.random()*remaining.length)];
+  wordTrailMotion.bankSpentIndex=spentIndex;
   wordTrailPath=[];
-  saveWordTrailState();
-  showWordTrailMessage("Hint revealed — trace the highlighted letters.","warn");
   drawWordTrail();
+
+  wtLater(()=>{
+    wordTrailHintsAvailable--;
+    wordTrailMotion.bankSpentIndex=null;
+    wordTrailHintedWord=chosen;
+    wordTrailMotion.hintRevealPath=(wtSolutionPath(chosen)||[]).map(p=>[...p]);
+    saveWordTrailState();
+    showWordTrailMessage("Hint revealed — trace the highlighted letters.","warn");
+    drawWordTrail();
+
+    wtLater(()=>{
+      wordTrailMotion.hintRevealPath=[];
+      drawWordTrail();
+    },Math.min(900,280+wordTrailMotion.hintRevealPath.length*58));
+  },240);
 }
 
 document.getElementById("wordTrailClearBtn").onclick=clearWordTrailPath;
 document.getElementById("wordTrailSubmitBtn").onclick=submitWordTrail;
 document.getElementById("wordTrailHintBtn").onclick=useWordTrailHint;
+
+function sizeWordTrailMobileBoard(){
+  const panel=document.getElementById("wordTrailPanel");
+  const stage=document.getElementById("wordTrailBoardStage");
+  const board=panel?.querySelector(".wordtrail-board-wrap");
+  const dock=document.getElementById("wordTrailDock");
+  const current=document.getElementById("wordTrailCurrentWord");
+  if(!panel || !stage || !board || !dock || !current) return;
+
+  if(window.innerWidth>700){
+    board.style.removeProperty("width");
+    board.style.removeProperty("height");
+    return;
+  }
+
+  // Hidden panels report unusable geometry. Re-run after Unscrumble is shown.
+  if(panel.classList.contains("game-hidden") || stage.offsetParent===null) return;
+
+  const stageRect=stage.getBoundingClientRect();
+  const dockRect=dock.getBoundingClientRect();
+  const currentRect=current.getBoundingClientRect();
+
+  if(stageRect.width<=0 || stageRect.top>=window.innerHeight) return;
+
+  const ratio=292/392;
+  const widthLimit=Math.max(0,Math.min(stageRect.width,window.innerWidth-40));
+
+  /*
+    Full-grid visibility has priority over width.
+    The board must end before the current-word strip and the bottom gameplay
+    dock. On short screens this height limit shrinks the entire 6×8 board
+    proportionally instead of clipping its final row.
+  */
+  const dockTop=Math.min(window.innerHeight,dockRect.top);
+  const currentReserve=Math.max(18,currentRect.height);
+  const verticalSafety=8;
+  const heightLimit=Math.max(
+    0,
+    dockTop-stageRect.top-currentReserve-verticalSafety
+  );
+
+  const widthFromHeight=heightLimit*ratio;
+  const width=Math.min(widthLimit,widthFromHeight);
+
+  if(width<=0) return;
+
+  board.style.setProperty("width",`${width}px`,"important");
+  board.style.setProperty("height",`${width/ratio}px`,"important");
+}
+
+let wordTrailResizeFrame=0;
+function queueWordTrailMobileBoardSize(){
+  cancelAnimationFrame(wordTrailResizeFrame);
+  wordTrailResizeFrame=requestAnimationFrame(()=>{
+    sizeWordTrailMobileBoard();
+    requestAnimationFrame(sizeWordTrailMobileBoard);
+  });
+}
+
+window.addEventListener("resize",queueWordTrailMobileBoardSize);
+window.addEventListener("orientationchange",queueWordTrailMobileBoardSize);
+
+const wordTrailBoardStageEl=document.getElementById("wordTrailBoardStage");
+if(wordTrailBoardStageEl && "ResizeObserver" in window){
+  const wordTrailBoardResizeObserver=new ResizeObserver(()=>{
+    if(activeGame==="trail") queueWordTrailMobileBoardSize();
+  });
+  wordTrailBoardResizeObserver.observe(wordTrailBoardStageEl);
+}
 
 const wtGridEl=document.getElementById("wordTrailGrid");
 wtGridEl.addEventListener("pointermove",moveWordTrailPointer);
@@ -1972,8 +2619,7 @@ async function loadMiniForSelectedDate(){
   }
 
   miniPuzzle=normalizeMiniPuzzleData(await res.json());
-  const size=`${miniRows()}×${miniCols()}`;
-  meta.textContent=`Puzzle #${miniPuzzle.id} · ${size}`;
+  meta.textContent=formatPuzzleDate(miniPuzzle.date);
   restoreMiniState();
 
   if(!miniActiveCell){
@@ -2032,6 +2678,42 @@ function miniCurrentEntry(){
   return miniEntryAt(r,c,miniDirection)||miniAnyEntryAt(r,c);
 }
 
+function drawMiniKeyboard(){
+  const host=document.getElementById("miniKeyboard");
+  if(!host)return;
+  const rows=["QWERTYUIOP","ASDFGHJKL","ZXCVBNM"];
+  host.innerHTML="";
+  rows.forEach((row,index)=>{
+    const wrap=document.createElement("div");
+    wrap.className="key-row";
+    if(index===2){
+      const back=document.createElement("button");
+      back.type="button";
+      back.className="key key-action";
+      back.textContent="Delete";
+      back.onclick=miniBackspace;
+      wrap.appendChild(back);
+    }
+    [...row].forEach(ch=>{
+      const button=document.createElement("button");
+      button.type="button";
+      button.className="key";
+      button.textContent=ch;
+      button.onclick=()=>miniTypeLetter(ch);
+      wrap.appendChild(button);
+    });
+    if(index===2){
+      const enter=document.createElement("button");
+      enter.type="button";
+      enter.className="key key-action";
+      enter.textContent="Submit";
+      enter.onclick=miniMoveToNextIncompleteEntry;
+      wrap.appendChild(enter);
+    }
+    host.appendChild(wrap);
+  });
+}
+
 function drawMini(){
   if(!miniPuzzle)return;
 
@@ -2085,6 +2767,7 @@ function drawMini(){
 
   drawMiniClues();
   drawMiniActiveClue();
+  drawMiniKeyboard();
   updateMiniCompletionMessage();
 }
 
@@ -2122,7 +2805,8 @@ function drawMiniActiveClue(){
   const entry=miniCurrentEntry();
   const host=document.getElementById("miniActiveClue");
   if(!entry){host.textContent="";return;}
-  host.innerHTML=`<strong>${entry.n} ${miniDirection==="down"?"Down":"Across"}.</strong> ${entry.clue}`;
+  const clueId=`${String(entry.n).replace(/[^0-9]/g,"")}${miniDirection==="down"?"D":"A"}`;
+  host.innerHTML=`<span class="mini-active-clue-line"><strong>${clueId} -&nbsp;</strong><span>${entry.clue}</span></span>`;
 }
 
 function miniSelectCell(r,c,toggleIfSame=true){

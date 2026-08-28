@@ -1891,3 +1891,2261 @@ main{max-width:1040px;padding:0 24px 24px}
 .five-endgame-next:disabled{cursor:default!important;color:#929893!important;opacity:1}.five-endgame-next:disabled:hover{color:#929893!important}
 @media(max-width:560px){.five-endgame-daily-line{margin-top:13px;padding-top:11px}.five-endgame-daily-line+.five-endgame-next{margin-top:2px!important;padding-top:6px!important}}
 @media(max-height:700px){.five-endgame-daily-line{margin-top:9px;padding-top:8px}.five-endgame-daily-line+.five-endgame-next{margin-top:1px!important;padding-top:4px!important}}
+
+
+/* =========================================================
+   V66 — FRONT PAGE + MOBILE SITE SHELL
+   Phase 1 intentionally changes the site shell only. Individual game
+   layouts retain their existing responsive rules for later tuning.
+   ========================================================= */
+.brand-home{
+  appearance:none;background:transparent!important;color:inherit!important;border:0!important;
+  padding:0!important;border-radius:0!important;box-shadow:none!important;text-align:left;
+}
+.brand-home:hover,.brand-home:active{transform:none!important;background:transparent!important;box-shadow:none!important}
+.mobile-menu-btn,.mobile-site-menu{display:none}
+.home-tab-icon{font-size:22px;line-height:1;color:#59615c}
+
+/* Front page */
+.front-page{padding:28px 0 8px}
+.front-page-hidden{display:none!important}
+.play-area-hidden{display:none!important}
+.front-page-intro{max-width:760px;margin:0 auto 20px;text-align:center}
+.front-page-intro small{font-size:11px;font-weight:900;letter-spacing:.14em;color:#777f7a}
+.front-page-intro h2{font-size:34px;letter-spacing:-.035em;margin:5px 0 0;color:#202322}
+.front-game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:900px;margin:0 auto}
+.front-game-card{
+  min-height:150px;padding:20px 18px;border:0;border-radius:18px;box-shadow:var(--shadow-1);
+  display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:1fr;gap:14px;align-items:center;
+  text-align:left;color:#202322;background:#fff;transition:transform .16s ease,box-shadow .16s ease;
+}
+.front-game-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-2)}
+.front-game-card:active{transform:translateY(0)}
+.front-game-icon{width:52px;height:52px;flex:0 0 auto}
+.front-game-copy{display:flex;flex-direction:column;gap:5px;min-width:0}
+.front-game-copy strong{font-size:19px;line-height:1.08;font-weight:900;letter-spacing:-.02em}
+.front-game-copy>span{font-size:13px;line-height:1.35;color:#5f6762;font-weight:600}
+.front-card-arrow{font-size:22px;color:#6d756f;align-self:center}
+.front-five{background:var(--game-five-soft)}
+.front-quads{background:var(--game-quads-soft)}
+.front-mini{background:var(--game-mini-soft)}
+.front-trail{background:var(--game-trail-soft)}
+.front-ell{background:var(--game-ell-soft)}
+.front-same{background:var(--game-same-soft)}
+
+@media(max-width:700px){
+  /* The mobile site shell is a single compact bar. */
+  body{background:#f7f8f6}
+  .site-header{
+    position:relative;z-index:100;max-width:none;min-height:50px;height:50px;margin:0;padding:0 14px;
+    display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px;
+    background:#fff;border-bottom:1px solid #e1e4e1;
+  }
+  .brand-home{height:50px;display:flex;align-items:center}
+  .brand h1{font-size:20px!important;line-height:1;margin:0!important;letter-spacing:-.025em}
+  .desktop-site-tools{display:none!important}
+  .game-ribbon{display:none!important}
+  main{padding:0 12px 22px!important;max-width:none}
+  .mobile-menu-btn{
+    display:flex;width:40px;height:40px;padding:9px!important;border:0!important;border-radius:9px!important;
+    background:transparent!important;box-shadow:none!important;flex-direction:column;justify-content:center;gap:4px;
+  }
+  .mobile-menu-btn span{display:block;width:21px;height:2px;border-radius:2px;background:#252a27;margin:0 auto}
+  .mobile-site-menu[hidden]{display:none!important}
+  .mobile-site-menu{
+    display:block;position:absolute;top:48px;right:10px;width:min(310px,calc(100vw - 20px));
+    padding:10px;background:#fff;border:1px solid #e1e4e1;border-radius:14px;box-shadow:0 14px 34px rgba(25,32,28,.16);
+  }
+  .mobile-site-nav{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .mobile-site-nav button{
+    min-height:40px;padding:8px 10px;border-radius:8px;background:#f5f6f4;color:#242926;text-align:left;font-size:13px;font-weight:800;
+  }
+  .mobile-date-tools{margin-top:9px;padding-top:9px;border-top:1px solid #e6e8e5}
+  .mobile-date-row{display:grid;grid-template-columns:38px 1fr 38px;align-items:center;gap:7px}
+  .mobile-date-row #mobileTodayLabel{text-align:center;font-size:12px;font-weight:900;color:#535b56}
+  .mobile-icon-action{min-height:36px;padding:5px!important;border-radius:8px!important;background:#eef0ed!important;color:#252a27!important}
+  .mobile-reset-action{width:100%;margin-top:7px;min-height:36px;padding:7px 10px!important;background:#fff!important;color:#4d5550!important;border:1px solid #e0e3df!important;font-size:12px}
+
+  /* Mobile Front Page: deliberately 2 × 3, not a narrow one-column list. */
+  .front-page{padding:16px 0 4px}
+  .front-page-intro{margin:0 2px 12px;text-align:left}
+  .front-page-intro small{font-size:9px;letter-spacing:.12em}
+  .front-page-intro h2{font-size:24px;margin-top:3px}
+  .front-game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;max-width:none}
+  .front-game-card{
+    min-height:132px;padding:13px 11px;border-radius:14px;display:flex;flex-direction:column;align-items:flex-start;
+    justify-content:flex-start;gap:8px;position:relative;
+  }
+  .front-game-icon{width:40px;height:40px}
+  .front-game-copy{gap:3px;padding-right:8px}
+  .front-game-copy strong{font-size:15px;line-height:1.1}
+  .front-game-copy>span{font-size:11px;line-height:1.28;font-weight:600}
+  .front-card-arrow{position:absolute;right:10px;bottom:9px;font-size:18px}
+  .front-game-card:hover{transform:none;box-shadow:var(--shadow-1)}
+}
+
+@media(max-width:360px){
+  .front-game-card{min-height:128px;padding:11px 9px}
+  .front-game-copy strong{font-size:14px}
+  .front-game-copy>span{font-size:10.5px}
+}
+
+
+/* =========================================================
+   V67 — MOBILE GAME PASS 01
+   Six to Five + InCommon only
+   ========================================================= */
+
+.game-clean-head{
+  width:100%;
+  max-width:760px;
+  min-height:46px;
+  margin:0 auto;
+  padding:0 6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.game-name-title{
+  margin:0;
+  color:#202322;
+  font:900 25px/1.1 Lato,system-ui,sans-serif;
+  letter-spacing:-.025em;
+}
+.game-head-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+}
+.simple-instructions{
+  width:100%;
+  margin:8px auto 10px;
+  padding:0 8px;
+  text-align:center;
+  color:#59615c;
+  font:700 14px/1.35 Lato,system-ui,sans-serif;
+}
+
+/* Six to Five */
+#fivePanel .five-board-stage{
+  width:100%;
+}
+#fivePanel .word-grid{
+  position:relative;
+}
+#fivePanel .hard-toggle{
+  white-space:nowrap;
+}
+
+/* InCommon */
+#quadsPanel .simple-instructions{
+  max-width:720px;
+}
+#quadsPanel .quads-footer{
+  margin-top:0;
+}
+#quadsPanel .mistakes{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.life-stars{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+.mistake-star{
+  display:inline-block;
+  color:#59645d;
+  font-size:15px;
+  line-height:1;
+}
+
+@media(max-width:700px){
+  /* ---------- Six to Five ---------- */
+  #fivePanel{
+    position:relative;
+    max-width:none!important;
+    min-height:calc(100dvh - 50px);
+    margin:0 -12px!important;
+    padding:8px 12px calc(164px + env(safe-area-inset-bottom))!important;
+    border:0!important;
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+  }
+  #fivePanel.game-hidden{display:none!important}
+
+  #fivePanel .game-clean-head{
+    min-height:40px;
+    padding:0 8px;
+  }
+  #fivePanel .game-name-title{
+    font-size:21px;
+  }
+  #fivePanel .game-head-actions{
+    gap:7px;
+  }
+  #fivePanel .status-pill{
+    flex:0 0 auto;
+    font-size:10px;
+    padding:5px 7px;
+  }
+  #fivePanel .hard-toggle{
+    gap:4px;
+    padding:5px 7px;
+    font-size:11px;
+    border-radius:8px;
+  }
+  #fivePanel .hard-toggle input{
+    width:13px;
+    height:13px;
+  }
+  #fivePanel .simple-instructions{
+    margin:8px auto 2px;
+    padding:0 20px;
+    font-size:13px;
+  }
+  #fivePanel #fiveStatus{
+    min-height:20px;
+  }
+
+  /* The board stage consumes the remaining space above the fixed keyboard,
+     allowing the puzzle itself to settle near the vertical centre. */
+  #fivePanel .five-board-stage{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:6px 0 10px;
+  }
+  #fivePanel .word-grid{
+    width:calc(100vw - 40px);
+    max-width:410px;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    gap:7px!important;
+    margin:0 auto!important;
+  }
+  #fivePanel .tile{
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:1/1;
+    min-width:0;
+    font-size:clamp(22px,6.5vw,29px);
+  }
+
+  /* Full-width keyboard fixed to the bottom of the actual mobile viewport. */
+  #fivePanel .keyboard{
+    position:fixed;
+    z-index:80;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    max-width:none!important;
+    margin:0!important;
+    padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+    gap:6px!important;
+    background:#fff;
+    border-top:1px solid #e2e5e2;
+    box-shadow:0 -5px 16px rgba(25,32,28,.06);
+  }
+  #fivePanel .key-row{
+    width:100%;
+    gap:4px!important;
+    padding:0;
+  }
+  #fivePanel .key{
+    flex:1 1 0;
+    min-width:0!important;
+    min-height:44px!important;
+    padding:7px 2px!important;
+    border-radius:7px!important;
+    font-size:13px!important;
+  }
+  #fivePanel .key-action{
+    flex:1.55 1 0;
+    font-size:11px!important;
+  }
+
+  /* ---------- InCommon ---------- */
+  #quadsPanel{
+    width:calc(100vw - 10px);
+    max-width:none;
+    margin-left:-7px!important;
+    margin-right:-7px!important;
+    padding:8px 0 12px!important;
+  }
+  #quadsPanel .game-clean-head{
+    min-height:40px;
+    padding:0 5px;
+  }
+  #quadsPanel .game-name-title{
+    font-size:21px;
+  }
+  #quadsPanel .status-pill{
+    font-size:10px;
+    padding:5px 7px;
+  }
+  #quadsPanel .simple-instructions{
+    margin:8px auto 8px;
+    padding:0 10px;
+    font-size:13px;
+  }
+  #quadsPanel #quadsStatus{
+    min-height:18px;
+  }
+  #quadsPanel .quads-solved,
+  #quadsPanel .quads-grid{
+    width:100%;
+    max-width:none;
+  }
+  #quadsPanel .quads-grid{
+    gap:8px;
+    margin:6px auto 5px;
+  }
+  #quadsPanel .quads-tile{
+    min-height:74px; /* +10px over prior mobile 64px */
+    padding:9px 5px;
+    font-size:13px;
+  }
+  #quadsPanel .quads-footer{
+    gap:18px;
+    padding-top:0;
+  }
+  #quadsPanel .mistakes{
+    min-height:20px;
+    font-size:14px;
+  }
+  #quadsPanel .mistake-star{
+    font-size:16px;
+  }
+  #quadsPanel .action-row{
+    margin-top:0;
+  }
+}
+
+
+/* =========================================================
+   V68 — MOBILE GAME PASS 01 REFINEMENT
+   Six to Five + InCommon
+   ========================================================= */
+
+@media(max-width:700px){
+
+  /* Shared simple-instruction positioning */
+  #fivePanel .simple-instructions,
+  #quadsPanel .simple-instructions{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto !important;
+    min-height:44px;
+  }
+
+  /* ---------- Six to Five ---------- */
+  #fivePanel{
+    padding-bottom:calc(154px + env(safe-area-inset-bottom)) !important;
+  }
+
+  #fivePanel .five-clean-head{
+    flex:0 0 auto;
+  }
+
+  #fivePanel .simple-instructions{
+    flex:0 0 44px;
+  }
+
+  #fivePanel #fiveStatus{
+    flex:0 0 auto;
+  }
+
+  #fivePanel .five-board-stage{
+    flex:1 1 auto;
+    min-height:0;
+    overflow:hidden;
+    padding:0 20px 8px;
+    box-sizing:border-box;
+  }
+
+  #fivePanel .word-grid{
+    gap:6px !important;
+    width:min(
+      calc(100vw - 40px),
+      calc((100dvh - 50px - 40px - 44px - 20px - 154px) * 5 / 6)
+    ) !important;
+    max-width:410px;
+    max-height:100%;
+    aspect-ratio:5 / 6;
+    grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+    grid-template-rows:repeat(6,minmax(0,1fr)) !important;
+    margin:auto !important;
+  }
+
+  #fivePanel .tile{
+    aspect-ratio:auto !important;
+    width:auto !important;
+    height:auto !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    font-size:clamp(18px,6vw,29px) !important;
+  }
+
+  @media(max-height:680px){
+    #fivePanel{
+      padding-top:4px !important;
+      padding-bottom:calc(148px + env(safe-area-inset-bottom)) !important;
+    }
+    #fivePanel .game-clean-head{
+      min-height:34px;
+    }
+    #fivePanel .game-name-title{
+      font-size:19px;
+    }
+    #fivePanel .simple-instructions{
+      flex-basis:34px;
+      min-height:34px;
+      padding:0 12px;
+      font-size:12px;
+    }
+    #fivePanel #fiveStatus{
+      min-height:10px;
+    }
+    #fivePanel .five-board-stage{
+      padding-bottom:4px;
+    }
+    #fivePanel .word-grid{
+      width:min(
+        calc(100vw - 40px),
+        calc((100dvh - 50px - 34px - 34px - 10px - 148px) * 5 / 6)
+      ) !important;
+    }
+    #fivePanel .key{
+      min-height:40px !important;
+    }
+  }
+
+  /* ---------- InCommon ---------- */
+  #quadsPanel{
+    min-height:calc(100dvh - 50px);
+    display:flex;
+    flex-direction:column;
+    padding-bottom:10px !important;
+  }
+
+  #quadsPanel.game-hidden{
+    display:none !important;
+  }
+
+  #quadsPanel .game-clean-head{
+    flex:0 0 auto;
+  }
+
+  #quadsPanel .simple-instructions{
+    flex:0 0 44px;
+  }
+
+  #quadsPanel #quadsStatus{
+    flex:0 0 auto;
+  }
+
+  #quadsPanel .quads-solved,
+  #quadsPanel .quads-grid{
+    flex:0 0 auto;
+  }
+
+  #quadsPanel .mistakes{
+    margin-top:10px !important;
+  }
+
+  #quadsPanel .quads-footer{
+    margin-top:auto !important;
+    padding-top:0 !important;
+    padding-bottom:10px !important;
+  }
+
+  #quadsPanel .action-row{
+    margin-top:14px !important;
+    margin-bottom:0 !important;
+  }
+}
+
+
+/* =========================================================
+   V69 — MOBILE GAME PASS 02
+   Daily Crossword + Unscrumble
+   ========================================================= */
+
+.mini-keyboard{
+  display:none;
+}
+
+@media(max-width:700px){
+  /* ---------- Daily Crossword ---------- */
+  #miniPanel{
+    width:100%;
+    max-width:none;
+    min-height:calc(100dvh - 50px);
+    margin:0!important;
+    padding:8px 0 calc(154px + env(safe-area-inset-bottom))!important;
+    border:0!important;
+    display:flex;
+    flex-direction:column;
+  }
+  #miniPanel.game-hidden{display:none!important}
+
+  #miniPanel .game-clean-head{
+    min-height:40px;
+    padding:0 15px;
+  }
+  #miniPanel .game-name-title{
+    font-size:21px;
+  }
+  #miniPanel .status-pill{
+    font-size:10px;
+    padding:5px 7px;
+  }
+  #miniPanel #miniStatus{
+    min-height:16px;
+  }
+  #miniPanel .mini-layout{
+    display:block!important;
+    width:100%;
+    max-width:none!important;
+    margin:0!important;
+  }
+  #miniPanel .mini-layout>div:first-child{
+    width:100%;
+  }
+  #miniPanel .mini-active-clue{
+    width:calc(100vw - 30px);
+    max-width:none;
+    margin:8px auto 10px;
+  }
+  #miniPanel .mini-player-grid{
+    width:calc(100vw - 30px)!important;
+    height:auto!important;
+    max-width:none!important;
+    aspect-ratio:var(--mini-cols) / var(--mini-rows);
+    margin:0 auto!important;
+  }
+  #miniPanel .mini-cell{
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+  }
+  #miniPanel .mini-clues{
+    display:none!important;
+  }
+  #miniPanel .mini-actions{
+    width:calc(100vw - 30px);
+    margin:10px auto 0;
+  }
+  #miniPanel .mini-keyboard{
+    display:block;
+    position:fixed;
+    z-index:80;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    max-width:none!important;
+    margin:0!important;
+    padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+    background:#fff;
+    border-top:1px solid #e2e5e2;
+    box-shadow:0 -5px 16px rgba(25,32,28,.06);
+  }
+  #miniPanel .mini-keyboard .key-row{
+    width:100%;
+    gap:4px!important;
+    padding:0;
+  }
+  #miniPanel .mini-keyboard .key{
+    flex:1 1 0;
+    min-width:0!important;
+    min-height:44px!important;
+    padding:7px 2px!important;
+    border-radius:7px!important;
+    font-size:13px!important;
+  }
+  #miniPanel .mini-keyboard .key-action{
+    flex:1.55 1 0;
+    font-size:11px!important;
+  }
+
+  /* ---------- Unscrumble ---------- */
+  #wordTrailPanel{
+    width:100%;
+    max-width:none;
+    margin:0!important;
+    padding:8px 0 14px!important;
+  }
+  #wordTrailPanel .game-clean-head{
+    min-height:40px;
+    padding:0 20px;
+  }
+  #wordTrailPanel .game-name-title{
+    font-size:21px;
+  }
+  #wordTrailPanel .status-pill{
+    font-size:10px;
+    padding:5px 7px;
+  }
+  #wordTrailPanel .wordtrail-theme{
+    margin-top:6px;
+  }
+  #wordTrailPanel .wordtrail-board-wrap{
+    width:calc(100vw - 40px)!important;
+    max-width:none!important;
+    height:auto!important;
+    aspect-ratio:292 / 392;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  #wordTrailPanel .wordtrail-player-grid{
+    width:100%!important;
+    height:100%!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    grid-template-rows:repeat(8,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  #wordTrailPanel .wordtrail-player-cell{
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    font-size:clamp(16px,5vw,24px)!important;
+  }
+  #wordTrailPanel .wordtrail-live-svg{
+    width:100%!important;
+    height:100%!important;
+  }
+  #wordTrailPanel .wordtrail-controls .action-row{
+    gap:10px!important;
+  }
+  #wordTrailPanel .wordtrail-controls .action-row button{
+    transform:scale(1.2);
+    transform-origin:center;
+    margin:5px 6px;
+  }
+}
+
+@media(max-width:380px){
+  #wordTrailPanel .wordtrail-controls .action-row{
+    gap:5px!important;
+  }
+  #wordTrailPanel .wordtrail-controls .action-row button{
+    transform:scale(1.12);
+    margin:4px 2px;
+  }
+}
+
+
+/* =========================================================
+   V70 — DAILY CROSSWORD MOBILE REFINEMENT
+   ========================================================= */
+
+#miniPanel .mini-header-reveal{
+  position:relative;
+}
+
+#miniPanel .mini-header-reveal .reveal-menu{
+  right:0;
+  left:auto;
+  z-index:120;
+}
+
+#miniPanel .mini-active-clue{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+}
+
+@media(max-width:700px){
+
+  #miniPanel{
+    padding:8px 0 calc(160px + env(safe-area-inset-bottom))!important;
+  }
+
+  #miniPanel .game-clean-head{
+    padding:0 15px;
+  }
+
+  #miniPanel .game-head-actions{
+    gap:7px;
+  }
+
+  #miniPanel .mini-header-reveal #miniRevealBtn{
+    padding:5px 8px;
+    font-size:11px;
+    min-height:auto;
+  }
+
+  #miniPanel .mini-header-reveal .reveal-menu{
+    top:calc(100% + 5px);
+  }
+
+  #miniPanel .mini-layout{
+    flex:1 1 auto;
+    min-height:0;
+  }
+
+  #miniPanel .mini-play-column{
+    width:100%;
+    height:100%;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /*
+    Grid stage owns the available visual area between header/status and
+    clue/keyboard. The crossword itself is a true square sized from BOTH
+    viewport width and available viewport height, so all rows/columns and
+    borders scale together.
+  */
+  #miniPanel .mini-grid-stage{
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 15px 8px;
+    overflow:hidden;
+  }
+
+  #miniPanel .mini-player-grid{
+    width:min(
+      calc(100vw - 30px),
+      calc(100dvh - 50px - 40px - 16px - 64px - 160px - 24px)
+    )!important;
+    height:auto!important;
+    aspect-ratio:1 / 1!important;
+    max-width:none!important;
+    max-height:100%!important;
+    margin:0 auto!important;
+
+    display:grid!important;
+    grid-template-columns:repeat(var(--mini-cols),minmax(0,1fr))!important;
+    grid-template-rows:repeat(var(--mini-rows),minmax(0,1fr))!important;
+  }
+
+  #miniPanel .mini-cell{
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    aspect-ratio:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  #miniPanel .mini-letter{
+    font-size:clamp(18px,7vw,30px)!important;
+  }
+
+  #miniPanel .mini-number{
+    font-size:clamp(8px,2.2vw,11px)!important;
+  }
+
+  /* Active clue now lives below the puzzle and is vertically centred. */
+  #miniPanel .mini-active-clue{
+    flex:0 0 64px;
+    width:calc(100vw - 30px);
+    min-height:64px;
+    margin:0 auto 8px!important;
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    box-sizing:border-box;
+  }
+
+  #miniPanel .mini-keyboard{
+    row-gap:7px!important;
+  }
+
+  #miniPanel .mini-keyboard .key-row{
+    margin-top:0!important;
+    margin-bottom:7px!important;
+  }
+
+  #miniPanel .mini-keyboard .key-row:last-child{
+    margin-bottom:0!important;
+  }
+
+  /* Extra-short phones: reduce clue band and keyboard footprint slightly. */
+  @media(max-height:680px){
+    #miniPanel{
+      padding-bottom:calc(150px + env(safe-area-inset-bottom))!important;
+    }
+
+    #miniPanel .mini-active-clue{
+      flex-basis:54px;
+      min-height:54px;
+      font-size:13px;
+      margin-bottom:5px!important;
+    }
+
+    #miniPanel .mini-player-grid{
+      width:min(
+        calc(100vw - 30px),
+        calc(100dvh - 50px - 36px - 12px - 54px - 150px - 18px)
+      )!important;
+    }
+
+    #miniPanel .mini-keyboard .key-row{
+      margin-bottom:5px!important;
+    }
+
+    #miniPanel .mini-keyboard .key{
+      min-height:40px!important;
+    }
+  }
+}
+
+
+/* =========================================================
+   V71 — DAILY CROSSWORD CLUE POSITION + FORMAT
+   ========================================================= */
+
+#miniPanel .mini-active-clue-line{
+  display:inline;
+}
+
+@media(max-width:700px){
+  /*
+    The clue is anchored immediately above the fixed keyboard rather than
+    floating with the grid. Reserve its footprint in the panel so the grid
+    can never disappear underneath it.
+  */
+  #miniPanel{
+    padding-bottom:calc(224px + env(safe-area-inset-bottom))!important;
+  }
+
+  #miniPanel .mini-active-clue{
+    position:fixed;
+    z-index:79;
+    left:15px;
+    right:15px;
+    bottom:calc(160px + env(safe-area-inset-bottom));
+    width:auto!important;
+    min-height:56px;
+    height:56px;
+    margin:0!important;
+    padding:9px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    box-sizing:border-box;
+  }
+
+  /*
+    Keep ID + hyphen attached to the opening of the clue as one flowing
+    text line. The clue wraps naturally after that point rather than the
+    identifier occupying its own layout column/space.
+  */
+  #miniPanel .mini-active-clue-line{
+    display:inline;
+    width:100%;
+    line-height:1.35;
+  }
+
+  #miniPanel .mini-active-clue-line strong{
+    display:inline;
+    white-space:nowrap;
+  }
+
+  /* Recalculate the square using the newly reserved clue footprint. */
+  #miniPanel .mini-player-grid{
+    width:min(
+      calc(100vw - 30px),
+      calc(100dvh - 50px - 40px - 16px - 224px - 20px)
+    )!important;
+  }
+
+  @media(max-height:680px){
+    #miniPanel{
+      padding-bottom:calc(205px + env(safe-area-inset-bottom))!important;
+    }
+
+    #miniPanel .mini-active-clue{
+      bottom:calc(150px + env(safe-area-inset-bottom));
+      min-height:50px;
+      height:50px;
+      font-size:13px;
+      padding:7px 10px;
+    }
+
+    #miniPanel .mini-player-grid{
+      width:min(
+        calc(100vw - 30px),
+        calc(100dvh - 50px - 36px - 12px - 205px - 14px)
+      )!important;
+    }
+  }
+}
+
+
+/* =========================================================
+   V72 — UNSCRUMBLE HINT BANK + MOBILE VIEWPORT LAYOUT
+   ========================================================= */
+
+.ort-hint-flow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:38px;
+}
+
+.ort-hint-column{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+  min-width:105px;
+}
+
+.ort-hint-builder,
+.ort-hint-bank{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+}
+
+.ort-hint-token{
+  width:38px;
+  height:38px;
+  margin:0 auto;
+}
+
+.ort-hint-bank-icons{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-width:0;
+}
+
+.ort-hint-bank-slot{
+  width:28px;
+  height:28px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:1px;
+  overflow:hidden;
+  background:#fff;
+  clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);
+  filter:drop-shadow(0 1px 2px rgba(31,42,35,.13));
+}
+
+.ort-hint-bank-slot > span{
+  display:block;
+  background:#e5e8e5;
+}
+
+.ort-hint-bank-slot.filled > span{
+  background:var(--ort-accent);
+}
+
+.ort-hint-count,
+.ort-hint-arrow,
+.ort-hint-bank-token,
+.ort-hint-bank-empty{
+  display:none!important;
+}
+
+@media(max-width:700px){
+  #wordTrailPanel{
+    min-height:auto!important;
+    padding:8px 0 0!important;
+  }
+
+  #wordTrailPanel .game-clean-head{
+    padding:0 20px;
+  }
+
+  #wordTrailPanel .wordtrail-gameplay{
+    min-height:calc(100dvh - 50px - 48px);
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+
+  #wordTrailPanel .wordtrail-theme{
+    flex:0 0 auto;
+    margin:5px auto 4px!important;
+  }
+
+  #wordTrailPanel .wordtrail-theme-text{
+    font-size:20px;
+  }
+
+  #wordTrailPanel #wordTrailStatus{
+    flex:0 0 auto;
+    min-height:24px;
+  }
+
+  #wordTrailPanel .wordtrail-board-stage{
+    flex:1 1 auto;
+    min-height:150px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    padding:2px 20px 4px;
+  }
+
+  #wordTrailPanel .wordtrail-board-wrap{
+    flex:0 0 auto;
+    width:auto!important;
+    height:auto!important;
+    max-width:calc(100vw - 40px)!important;
+    margin:0 auto!important;
+    aspect-ratio:292 / 392;
+  }
+
+  #wordTrailPanel .wordtrail-player-grid{
+    width:100%!important;
+    height:100%!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    grid-template-rows:repeat(8,minmax(0,1fr))!important;
+    gap:clamp(3px,1.5vw,8px)!important;
+  }
+
+  #wordTrailPanel .wordtrail-player-cell{
+    width:auto!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    font-size:clamp(14px,4.7vw,23px)!important;
+  }
+
+  #wordTrailPanel .wordtrail-live-svg{
+    width:100%!important;
+    height:100%!important;
+  }
+
+  #wordTrailPanel #wordTrailCurrentWord{
+    flex:0 0 auto;
+    min-height:24px;
+    font-size:17px;
+  }
+
+  /*
+    This dock is the bottom edge of the gameplay viewport. Because it is
+    sticky inside .wordtrail-gameplay (which ends before the found-word
+    list), it stays at the bottom during play but naturally scrolls away
+    once the player moves down into the list of found theme words.
+  */
+  #wordTrailPanel .wordtrail-mobile-dock{
+    position:sticky;
+    z-index:60;
+    bottom:0;
+    flex:0 0 auto;
+    width:100%;
+    box-sizing:border-box;
+    padding:7px 10px calc(8px + env(safe-area-inset-bottom));
+    margin-top:auto;
+    background:#fff;
+    border-top:1px solid #e6e8e6;
+    box-shadow:0 -4px 12px rgba(31,42,35,.05);
+    gap:5px!important;
+  }
+
+  #wordTrailPanel #wordTrailProgress{
+    line-height:1.15;
+    font-size:12px;
+  }
+
+  #wordTrailPanel .wordtrail-controls .action-row{
+    gap:7px!important;
+    margin:2px 0!important;
+  }
+
+  #wordTrailPanel .wordtrail-controls .action-row button{
+    transform:none!important;
+    margin:0!important;
+    padding:10px 14px!important;
+    font-size:14px!important;
+    min-height:40px;
+  }
+
+  #wordTrailPanel .wordtrail-hint-system{
+    width:100%;
+    margin:1px auto 0;
+  }
+
+  #wordTrailPanel .ort-hint-flow{
+    gap:32px;
+    min-height:52px;
+  }
+
+  #wordTrailPanel .ort-hint-column{
+    gap:4px;
+    min-width:100px;
+  }
+
+  #wordTrailPanel .ort-hint-label{
+    font-size:10px;
+  }
+
+  #wordTrailPanel .ort-hint-token{
+    width:34px;
+    height:34px;
+  }
+
+  #wordTrailPanel .ort-hint-bank-slot{
+    width:25px;
+    height:25px;
+  }
+
+  #wordTrailPanel .wordtrail-found{
+    position:relative;
+    z-index:1;
+    width:calc(100% - 24px);
+    margin:14px auto 24px;
+    padding-bottom:12px;
+  }
+}
+
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel .wordtrail-gameplay{
+    min-height:calc(100dvh - 50px - 44px);
+  }
+
+  #wordTrailPanel .wordtrail-theme{
+    margin:2px auto 2px!important;
+  }
+
+  #wordTrailPanel .wordtrail-theme-text{
+    font-size:18px;
+  }
+
+  #wordTrailPanel #wordTrailStatus{
+    min-height:18px;
+  }
+
+  #wordTrailPanel .wordtrail-board-stage{
+    min-height:125px;
+    padding-top:0;
+    padding-bottom:2px;
+  }
+
+  #wordTrailPanel #wordTrailCurrentWord{
+    min-height:18px;
+    font-size:15px;
+  }
+
+  #wordTrailPanel .wordtrail-mobile-dock{
+    padding-top:5px;
+    padding-bottom:calc(6px + env(safe-area-inset-bottom));
+    gap:3px!important;
+  }
+
+  #wordTrailPanel .wordtrail-controls .action-row button{
+    padding:8px 10px!important;
+    min-height:36px;
+    font-size:12px!important;
+  }
+
+  #wordTrailPanel .ort-hint-flow{
+    min-height:46px;
+    gap:24px;
+  }
+
+  #wordTrailPanel .ort-hint-token{
+    width:31px;
+    height:31px;
+  }
+
+  #wordTrailPanel .ort-hint-bank-slot{
+    width:23px;
+    height:23px;
+  }
+}
+
+
+/* =========================================================
+   V73 — UNSCRUMBLE GRID EXPANSION + CORRECT HINT BANK ICONS
+   ========================================================= */
+
+.ort-hint-bank-slot{
+  display:block!important;
+  width:28px;
+  height:28px;
+  background:#e5e8e5;
+  clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);
+  filter:drop-shadow(0 1px 2px rgba(31,42,35,.13));
+}
+
+.ort-hint-bank-slot.filled{
+  background:var(--ort-accent);
+}
+
+/* Bank icons are whole octagons. Only Next Hint uses three visible pieces. */
+.ort-hint-bank-slot > span{
+  display:none!important;
+}
+
+@media(max-width:700px){
+  #wordTrailPanel .wordtrail-board-stage{
+    width:100%;
+    min-height:0!important;
+  }
+
+  #wordTrailPanel .wordtrail-board-wrap{
+    /* JS sets the actual maximized dimensions after the panel becomes visible. */
+    max-width:calc(100vw - 40px)!important;
+    max-height:100%!important;
+    margin:auto!important;
+  }
+
+  #wordTrailPanel .ort-hint-bank-slot{
+    width:25px;
+    height:25px;
+  }
+}
+
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel .ort-hint-bank-slot{
+    width:23px;
+    height:23px;
+  }
+}
+
+
+/* =========================================================
+   V74 — UNSCRUMBLE FULL GRID VISIBILITY ON SHORT MOBILE SCREENS
+   ========================================================= */
+
+@media(max-width:700px){
+  #wordTrailPanel .wordtrail-board-stage{
+    box-sizing:border-box;
+    overflow:hidden!important;
+    min-height:0!important;
+  }
+
+  #wordTrailPanel .wordtrail-board-wrap{
+    flex:0 0 auto;
+    align-self:center;
+    max-width:calc(100vw - 40px)!important;
+    max-height:100%!important;
+  }
+
+  #wordTrailPanel #wordTrailCurrentWord{
+    flex-shrink:0;
+  }
+
+  #wordTrailPanel .wordtrail-mobile-dock{
+    flex-shrink:0;
+  }
+}
+
+
+/* =========================================================
+   V75 — UNSCRUMBLE PREMIUM MOTION
+   ========================================================= */
+
+.wordtrail-player-cell{
+  transition:
+    transform 130ms cubic-bezier(.2,.8,.2,1),
+    background-color 150ms ease-out,
+    box-shadow 150ms ease-out,
+    color 120ms ease-out,
+    filter 150ms ease-out;
+  will-change:transform;
+}
+
+.wordtrail-player-cell.active{
+  transform:translateY(-2px) scale(1.035);
+  box-shadow:0 5px 11px rgba(28,39,32,.17);
+}
+
+.wordtrail-player-cell.motion-select{
+  animation:wtTileLift 180ms cubic-bezier(.18,.86,.28,1);
+}
+
+@keyframes wtTileLift{
+  0%{transform:translateY(0) scale(.98)}
+  55%{transform:translateY(-3px) scale(1.055)}
+  100%{transform:translateY(-2px) scale(1.035)}
+}
+
+.wordtrail-live-svg polyline.active-line.motion-path{
+  stroke-dasharray:900;
+  stroke-dashoffset:900;
+  animation:wtPathDraw 190ms ease-out forwards;
+}
+
+@keyframes wtPathDraw{
+  to{stroke-dashoffset:0}
+}
+
+.wordtrail-player-cell.motion-correct{
+  animation:wtCorrectSweep 420ms cubic-bezier(.2,.75,.2,1) var(--wt-motion-delay,0ms) both;
+}
+
+@keyframes wtCorrectSweep{
+  0%{transform:translateY(-2px) scale(1.035);filter:brightness(1)}
+  45%{transform:translateY(-4px) scale(1.075);filter:brightness(1.12)}
+  100%{transform:translateY(-1px) scale(1.015);filter:brightness(1)}
+}
+
+.ort-hint-piece{
+  transition:background-color 180ms ease-out, transform 180ms ease-out, filter 180ms ease-out;
+}
+
+.ort-hint-piece.motion-earned{
+  animation:wtHintPieceEarn 360ms cubic-bezier(.18,.85,.25,1);
+}
+
+@keyframes wtHintPieceEarn{
+  0%{transform:scale(.72);filter:brightness(1)}
+  55%{transform:scale(1.14);filter:brightness(1.18)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+
+.ort-hint-token:has(.motion-earned){
+  animation:wtHintTokenPulse 360ms ease-out;
+}
+
+@keyframes wtHintTokenPulse{
+  0%,100%{transform:scale(1)}
+  55%{transform:scale(1.07)}
+}
+
+.ort-hint-bank-slot{
+  transition:background-color 180ms ease-out,transform 180ms ease-out,filter 180ms ease-out,opacity 180ms ease-out;
+}
+
+.ort-hint-bank-slot.motion-bank-earned{
+  animation:wtBankEarn 420ms cubic-bezier(.16,.9,.25,1);
+}
+
+@keyframes wtBankEarn{
+  0%{transform:scale(.65);opacity:.35}
+  55%{transform:scale(1.12);opacity:1;filter:brightness(1.14) drop-shadow(0 2px 4px rgba(31,42,35,.16))}
+  100%{transform:scale(1);opacity:1}
+}
+
+.ort-hint-bank-slot.motion-bank-spent{
+  animation:wtBankSpend 240ms ease-in forwards;
+}
+
+@keyframes wtBankSpend{
+  0%{transform:scale(1);opacity:1;filter:brightness(1)}
+  45%{transform:scale(1.08);filter:brightness(1.18)}
+  100%{transform:scale(.55);opacity:.15}
+}
+
+.wordtrail-player-cell.motion-hint-reveal{
+  animation:wtHintReveal 440ms cubic-bezier(.2,.75,.2,1) var(--wt-hint-delay,0ms) both;
+}
+
+@keyframes wtHintReveal{
+  0%{transform:scale(.96);filter:brightness(1)}
+  45%{transform:scale(1.07);filter:brightness(1.18)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .wordtrail-player-cell,
+  .ort-hint-piece,
+  .ort-hint-bank-slot{
+    transition:none!important;
+  }
+  .wordtrail-player-cell.motion-select,
+  .wordtrail-player-cell.motion-correct,
+  .wordtrail-player-cell.motion-hint-reveal,
+  .wordtrail-live-svg polyline.motion-path,
+  .ort-hint-piece.motion-earned,
+  .ort-hint-token:has(.motion-earned),
+  .ort-hint-bank-slot.motion-bank-earned,
+  .ort-hint-bank-slot.motion-bank-spent{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V76 — UNSCRUMBLE SMOOTH LIVE TRACING
+   ========================================================= */
+
+/*
+  The active path is rebuilt as the pointer enters each new tile. Animating
+  the full polyline's stroke-dash on every rebuild made all existing segments
+  restart their animation and visibly flicker. The live path now stays solid
+  and stable; tactile tile motion remains the tracing feedback.
+*/
+.wordtrail-live-svg polyline.active-line{
+  stroke-dasharray:none!important;
+  stroke-dashoffset:0!important;
+  animation:none!important;
+  opacity:.56;
+}
+
+/* Keep previously found and theme paths equally stable during live tracing. */
+.wordtrail-live-svg polyline.found-line,
+.wordtrail-live-svg polyline.theme-line{
+  animation:none!important;
+}
+
+
+/* =========================================================
+   V77 — EVERY LAST LETTER MOBILE / HEADER REFINEMENT
+   ========================================================= */
+
+#ellPanel{
+  max-width:760px;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+
+#ellPanel .ell-clean-head{
+  width:100%;
+}
+
+#ellPanel .ell-player{
+  margin-top:10px;
+}
+
+#ellPanel .ell-score{
+  width:100%;
+  text-align:center;
+  font-size:18px;
+  font-weight:900;
+  line-height:1.2;
+  margin-bottom:1px;
+}
+
+/* Keep the four game controls on one row on normal phone widths. */
+#ellPanel .ell-action-row{
+  width:min(100%,430px);
+  display:flex;
+  flex-wrap:nowrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:7px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+#ellPanel .ell-action-row button{
+  flex:1 1 0;
+  min-width:0;
+  padding-left:6px;
+  padding-right:6px;
+  white-space:nowrap;
+  font-size:clamp(10px,3.15vw,14px);
+  line-height:1.15;
+}
+
+/* Only permit wrapping once the screen is genuinely too narrow to keep
+   four readable controls side by side at the 10px floor. */
+@media(max-width:285px){
+  #ellPanel .ell-action-row{
+    flex-wrap:wrap;
+  }
+  #ellPanel .ell-action-row button{
+    flex:1 1 calc(50% - 4px);
+  }
+}
+
+@media(max-width:700px){
+  #ellPanel{
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+
+  #ellPanel .ell-clean-head{
+    padding-left:4px;
+    padding-right:4px;
+  }
+
+  #ellPanel .simple-instructions{
+    margin-top:7px;
+    margin-bottom:7px;
+  }
+
+  #ellPanel .ell-player{
+    gap:11px;
+    margin-top:6px;
+  }
+
+  #ellPanel .ell-action-row{
+    width:100%;
+    max-width:430px;
+  }
+}
+
+
+/* =========================================================
+   V78 — EVERY LAST LETTER PREMIUM TACTILE MOTION
+   ========================================================= */
+
+/* Resting tiles remain physical; selected tiles rise and float above the board. */
+#ellPanel .ell-tile{
+  transform:translateY(0) scale(1);
+  transform-origin:center;
+  will-change:transform,box-shadow,opacity;
+}
+#ellPanel .ell-tile.selected{
+  transform:translateY(-3px) scale(1.018)!important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.92) inset,
+    0 -2px 0 rgba(74,101,84,.14) inset,
+    0 8px 13px rgba(45,67,53,.25)!important;
+  animation:ellSelectRise 190ms cubic-bezier(.18,.82,.24,1);
+}
+#ellPanel .ell-tile.motion-pressed,
+#ellPanel .ell-tile.selected.motion-pressed{
+  transform:translateY(2px) scale(.972)!important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.72) inset,
+    0 -1px 0 rgba(74,84,79,.10) inset,
+    0 1px 2px rgba(24,31,28,.16)!important;
+  transition:transform 75ms ease-out,box-shadow 75ms ease-out!important;
+}
+@keyframes ellSelectRise{
+  0%{transform:translateY(2px) scale(.972)}
+  62%{transform:translateY(-4px) scale(1.032)}
+  100%{transform:translateY(-3px) scale(1.018)}
+}
+
+/* A valid word acknowledges each selected tile in reading/selection order. */
+#ellPanel .ell-tile.motion-submit{
+  animation:ellSubmitTile 330ms cubic-bezier(.2,.75,.2,1) var(--ell-submit-delay,0ms) both!important;
+}
+@keyframes ellSubmitTile{
+  0%{transform:translateY(-3px) scale(1.018);filter:brightness(1)}
+  48%{transform:translateY(-7px) scale(1.07);filter:brightness(1.09)}
+  100%{transform:translateY(2px) scale(.92);filter:brightness(1);opacity:.72}
+}
+
+/* Reclaimed letters rise back into their board positions. */
+#ellPanel .ell-tile.motion-return{
+  animation:ellTileReturn 390ms cubic-bezier(.16,.88,.25,1) var(--ell-return-delay,0ms) both!important;
+}
+@keyframes ellTileReturn{
+  0%{opacity:0;transform:translateY(7px) scale(.78);box-shadow:none}
+  62%{opacity:1;transform:translateY(-3px) scale(1.035)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* Completed words are earned objects, not generic tags. */
+#ellPanel .ell-completed{
+  width:min(100%,650px);
+  display:block;
+  margin-top:2px;
+}
+#ellPanel .ell-words-made-heading{
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:5px;
+  margin:2px 0 9px;
+  color:#69706c;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.11em;
+}
+#ellPanel .ell-words-made-heading small{
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+#ellPanel .ell-word-collection{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+}
+#ellPanel .ell-completed-word{
+  appearance:none;
+  min-height:38px;
+  padding:8px 11px 8px 13px;
+  border:0!important;
+  border-radius:8px;
+  background:#f7f6f1!important;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.92) inset,
+    0 3px 7px rgba(39,43,40,.13)!important;
+  color:#202322!important;
+  display:inline-flex;
+  align-items:center;
+  gap:11px;
+  letter-spacing:0;
+  transform:translateY(0);
+  transition:transform 140ms ease,box-shadow 140ms ease,background 140ms ease!important;
+}
+#ellPanel .ell-made-word{
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:.075em;
+}
+#ellPanel .ell-made-score{
+  font-size:11px;
+  font-weight:900;
+  color:#737b76!important;
+  opacity:.82;
+  letter-spacing:0;
+}
+#ellPanel .ell-completed-word.motion-arrive{
+  animation:ellWordArrive 430ms cubic-bezier(.18,.82,.25,1) both;
+}
+@keyframes ellWordArrive{
+  0%{opacity:0;transform:translateY(-11px) scale(.92)}
+  62%{opacity:1;transform:translateY(2px) scale(1.025)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+#ellPanel .ell-made-score.motion-score{
+  animation:ellScoreArrive 360ms ease-out 100ms both;
+}
+@keyframes ellScoreArrive{
+  0%{opacity:0;transform:translateX(-3px) scale(.8)}
+  65%{opacity:1;transform:translateX(0) scale(1.08)}
+  100%{opacity:.82;transform:translateX(0) scale(1)}
+}
+
+/* First tap lifts a completed word; second tap returns its tiles. */
+#ellPanel .ell-completed-word.reclaim-selected{
+  outline:none!important;
+  background:#eef3ef!important;
+  transform:translateY(-3px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.94) inset,
+    0 7px 12px rgba(43,63,50,.20)!important;
+}
+#ellPanel .ell-completed-word.motion-reclaim{
+  animation:ellWordReclaim 220ms ease-in both!important;
+}
+@keyframes ellWordReclaim{
+  0%{opacity:1;transform:translateY(-3px) scale(1)}
+  100%{opacity:0;transform:translateY(5px) scale(.86)}
+}
+
+@media (hover:hover) and (pointer:fine){
+  #ellPanel .ell-completed-word:hover{
+    transform:translateY(-1px);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.94) inset,
+      0 5px 9px rgba(39,43,40,.16)!important;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  #ellPanel .ell-tile.selected,
+  #ellPanel .ell-tile.motion-submit,
+  #ellPanel .ell-tile.motion-return,
+  #ellPanel .ell-completed-word.motion-arrive,
+  #ellPanel .ell-made-score.motion-score,
+  #ellPanel .ell-completed-word.motion-reclaim{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V79 — ELL CONTROL ICONS + REWARDED SCORE SCALE
+   ========================================================= */
+#ellPanel .ell-action-row button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+#ellPanel .ell-control-icon{
+  width:15px;height:15px;flex:0 0 15px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+#ellPanel .ell-control-icon svg{
+  width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;overflow:visible;
+}
+#ellPanel .ell-control-label{min-width:0;}
+#ellPanel .ell-score.motion-score-total{
+  animation:ellScoreTotalPop 220ms cubic-bezier(.2,.8,.2,1);
+}
+@keyframes ellScoreTotalPop{
+  0%{transform:scale(1)}
+  48%{transform:scale(1.045)}
+  100%{transform:scale(1)}
+}
+@media(max-width:700px){
+  #ellPanel .ell-control-icon{width:14px;height:14px;flex-basis:14px;}
+  #ellPanel .ell-action-row button{gap:4px;}
+}
+@media(prefers-reduced-motion:reduce){
+  #ellPanel .ell-score.motion-score-total{animation:none!important;}
+}
+
+
+/* =========================================================
+   V80 — ONE AND THE SAME MOBILE KEYBOARD + SHARED HEADER
+   ========================================================= */
+
+#samePanel{
+  max-width:760px;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+#samePanel .same-clean-head{
+  width:100%;
+}
+
+/* The dedicated keyboard is mobile-only; desktop keeps the physical keyboard. */
+#samePanel .same-keyboard{
+  display:none;
+}
+
+/* Refined clue/answer feedback. */
+#samePanel .same-current-clue.same-clue-enter{
+  animation:sameClueEnter 260ms cubic-bezier(.2,.78,.2,1);
+}
+@keyframes sameClueEnter{
+  0%{opacity:0;transform:translateY(7px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+#samePanel .same-guess-input.same-input-correct{
+  animation:sameInputCorrect 260ms cubic-bezier(.2,.8,.2,1);
+}
+@keyframes sameInputCorrect{
+  0%{transform:scale(1);box-shadow:0 5px 16px rgba(0,0,0,.16)}
+  48%{transform:scale(1.025);box-shadow:0 8px 20px rgba(63,107,77,.23),0 0 0 4px rgba(86,143,103,.13)}
+  100%{transform:scale(1);box-shadow:0 5px 16px rgba(0,0,0,.16)}
+}
+
+@media(max-width:700px){
+  #samePanel{
+    width:100%;
+    max-width:none;
+    min-height:calc(100dvh - 50px);
+    margin:0!important;
+    padding:8px 10px calc(164px + env(safe-area-inset-bottom))!important;
+    border:0!important;
+  }
+  #samePanel.game-hidden{display:none!important}
+
+  #samePanel .same-clean-head{
+    min-height:40px;
+    padding:0 4px;
+  }
+  #samePanel .game-name-title{
+    font-size:21px;
+  }
+  #samePanel .status-pill{
+    font-size:10px;
+    padding:5px 7px;
+  }
+
+  #samePanel .same-game{
+    width:100%;
+    max-width:none;
+    margin:8px auto 0;
+  }
+
+  /* History grows upward in normal document flow while the keyboard never moves. */
+  #samePanel .same-history{
+    min-height:0;
+    margin-bottom:14px;
+    gap:5px;
+  }
+  #samePanel .same-history-row{
+    grid-template-columns:minmax(0,1fr) minmax(82px,34%);
+    column-gap:16px;
+    padding:6px 2px;
+  }
+  #samePanel .same-history-clue,
+  #samePanel .same-history-guess{
+    font-size:14px!important;
+    line-height:1.28;
+  }
+
+  #samePanel .same-current-clue{
+    font-size:clamp(25px,7.8vw,31px);
+    line-height:1.12;
+    margin-bottom:16px;
+  }
+  #samePanel .same-clue-number{
+    margin-bottom:6px;
+  }
+  #samePanel .same-guess-area{
+    width:100%;
+    gap:8px;
+  }
+  #samePanel .same-guess-input{
+    width:min(100%,560px);
+    min-height:54px;
+    font-size:22px!important;
+    padding:9px 18px!important;
+    cursor:default;
+    caret-color:transparent;
+  }
+
+  /* The standalone Guess button is replaced by the keyboard action key on mobile. */
+  #samePanel .same-guess-btn{
+    display:none!important;
+  }
+
+  #samePanel .same-keyboard{
+    display:block;
+    position:fixed;
+    z-index:80;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100vw;
+    max-width:none!important;
+    margin:0!important;
+    padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+    background:#fff;
+    border-top:1px solid #e2e5e2;
+    box-shadow:0 -5px 16px rgba(25,32,28,.07);
+  }
+  #samePanel .same-keyboard .key-row{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    gap:4px!important;
+    padding:0;
+    margin:0 0 5px;
+  }
+  #samePanel .same-keyboard .key-row:last-child{
+    margin-bottom:0;
+  }
+  #samePanel .same-keyboard .key{
+    flex:1 1 0;
+    min-width:0!important;
+    min-height:44px!important;
+    padding:7px 2px!important;
+    border-radius:7px!important;
+    font-size:13px!important;
+  }
+  #samePanel .same-keyboard .key-action{
+    flex:1.55 1 0;
+    font-size:10px!important;
+    letter-spacing:0!important;
+  }
+  #samePanel .same-keyboard .same-key-guess{
+    background:var(--game-same)!important;
+    color:#fff!important;
+  }
+
+  #samePanel .same-status{
+    margin-top:14px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  #samePanel .same-current-clue.same-clue-enter,
+  #samePanel .same-guess-input.same-input-correct{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V81 — ONE AND THE SAME HISTORY HANGING INDENT
+   ========================================================= */
+
+/* Keep wrapped clue lines aligned with the clue text instead of the number. */
+#samePanel .same-history-clue{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:start;
+  column-gap:.35em;
+}
+
+#samePanel .same-history-index{
+  display:block;
+  min-width:0;
+  margin-right:0;
+  padding-top:.13em;
+}
+
+#samePanel .same-history-clue-text{
+  display:block;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   V82 — ONE AND THE SAME WRONG-GUESS "FILE AWAY" MOTION
+   ========================================================= */
+
+/* The live clue/guess compresses subtly before being filed into history. */
+#samePanel .same-active-area.same-filing-out{
+  animation:sameFilingOut 145ms cubic-bezier(.3,.1,.7,.2) both;
+}
+@keyframes sameFilingOut{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  100%{opacity:.18;transform:translateY(-5px) scale(.975)}
+}
+
+/* Temporary moving history row. It uses the exact history typography/layout. */
+.same-history-flight{
+  position:fixed;
+  z-index:120;
+  pointer-events:none;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(82px,34%);
+  column-gap:16px;
+  align-items:start;
+  padding:6px 2px;
+  border-bottom:1px solid #ece9e2;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 8px 22px rgba(42,37,31,.08);
+  transform-origin:center;
+}
+.same-history-flight .same-history-clue{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  align-items:start;
+  column-gap:.35em;
+  min-width:0;
+  text-align:left;
+  color:#55534d;
+  font-size:14px;
+  line-height:1.28;
+}
+.same-history-flight .same-history-index{
+  display:block;
+  min-width:0;
+  margin-right:0;
+  padding-top:.13em;
+  color:#9a958a;
+  font-size:11px;
+  font-weight:900;
+}
+.same-history-flight .same-history-clue-text{
+  display:block;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.same-history-flight .same-history-guess{
+  min-width:0;
+  text-align:right;
+  font-size:14px;
+  line-height:1.28;
+  font-weight:800;
+  color:#777169;
+  overflow-wrap:anywhere;
+}
+
+/* Hide the destination until the moving copy lands. */
+#samePanel .same-history-row.same-history-row-pending{
+  opacity:0;
+}
+
+/* A soft settle gives the new history entry a physical arrival without bounce. */
+#samePanel .same-history-row.same-history-row-settle{
+  animation:sameHistorySettle 255ms cubic-bezier(.18,.82,.25,1) both;
+}
+@keyframes sameHistorySettle{
+  0%{opacity:.55;transform:translateY(-3px);background:rgba(166,107,43,.06)}
+  58%{opacity:1;transform:translateY(1px);background:rgba(166,107,43,.035)}
+  100%{opacity:1;transform:translateY(0);background:transparent}
+}
+
+/* Let the strike-through appear only after the row has landed. */
+#samePanel .same-history-guess.same-history-strike-in{
+  text-decoration:none!important;
+  position:relative;
+}
+#samePanel .same-history-guess.same-history-strike-in::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:52%;
+  height:2px;
+  background:currentColor;
+  transform:scaleX(0);
+  transform-origin:left center;
+  animation:sameStrikeIn 179ms ease-out 47ms forwards;
+}
+@keyframes sameStrikeIn{
+  to{transform:scaleX(1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #samePanel .same-active-area.same-filing-out,
+  #samePanel .same-history-row.same-history-row-settle,
+  #samePanel .same-history-guess.same-history-strike-in::after{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V83 — ONE AND THE SAME TRANSITION FIXES
+   ========================================================= */
+
+/* Keep the strike line exactly over the guessed word, not the full right column. */
+#samePanel .same-history-guess-text,
+.same-history-flight .same-history-guess-text{
+  position:relative;
+  display:inline-block;
+}
+
+/* Disable the V82 full-column strike pseudo-element. */
+#samePanel .same-history-guess.same-history-strike-in::after{
+  content:none!important;
+}
+
+/* Draw the animated strike from the first letter to the last letter only. */
+#samePanel .same-history-guess.same-history-strike-in .same-history-guess-text{
+  text-decoration:none!important;
+}
+#samePanel .same-history-guess.same-history-strike-in .same-history-guess-text::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:52%;
+  height:2px;
+  background:currentColor;
+  transform:scaleX(0);
+  transform-origin:left center;
+  animation:sameStrikeIn 179ms ease-out 47ms forwards;
+}
+
+@media(prefers-reduced-motion:reduce){
+  #samePanel .same-history-guess.same-history-strike-in .same-history-guess-text::after{
+    animation:none!important;
+    transform:scaleX(1);
+  }
+}
+
+
+/* =========================================================
+   V84 — ONE AND THE SAME PERSISTENT WRONG-GUESS STRIKE
+   ========================================================= */
+
+/* Persist the strike on the exact word after the arrival animation finishes. */
+#samePanel .same-history-guess .same-history-guess-text{
+  text-decoration-line:line-through;
+  text-decoration-thickness:2px;
+}
+
+/* During the draw-in animation, hide the native strike so only the animated
+   line is visible. Removing this class restores the persistent strike above. */
+#samePanel .same-history-guess.same-history-strike-in .same-history-guess-text{
+  text-decoration:none!important;
+}
+
+
+/* =========================================================
+   V85 — ONE AND THE SAME CLUE POP TIMING
+   ========================================================= */
+
+/* The next clue stays still until the wrong-guess strike finishes, then
+   pops into the active position with a restrained scale/lift. */
+#samePanel .same-current-clue.same-clue-pop{
+  animation:sameCluePop 221ms cubic-bezier(.18,.86,.24,1) both;
+}
+@keyframes sameCluePop{
+  0%{
+    opacity:0;
+    transform:translateY(10px) scale(.94);
+  }
+  62%{
+    opacity:1;
+    transform:translateY(-1px) scale(1.018);
+  }
+  100%{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  #samePanel .same-current-clue.same-clue-pop{
+    animation:none!important;
+    opacity:1;
+    transform:none;
+  }
+}
+
+
+/* =========================================================
+   V86 — ONE AND THE SAME DEFERRED CLUE ADVANCE
+   ========================================================= */
+
+/* Temporary history row reserves the exact landing position while game state
+   remains on the current clue. It is replaced by the real row only after the
+   strike animation has completed and the state is committed. */
+#samePanel .same-history-row.same-history-row-temp{
+  pointer-events:none;
+}
+
+
+/* =========================================================
+   V87 — ONE AND THE SAME FASTER + DESKTOP MOTION
+   ========================================================= */
+
+/* Match the moving row to desktop history typography when the same transition
+   is used with a mouse/physical keyboard. */
+@media(min-width:701px){
+  .same-history-flight{
+    grid-template-columns:minmax(0,1fr) minmax(120px,190px);
+    column-gap:48px;
+    padding:8px 2px;
+  }
+  .same-history-flight .same-history-clue,
+  .same-history-flight .same-history-guess{
+    font-size:17px;
+    line-height:1.42;
+  }
+}
+
+
+/* =========================================================
+   V88 — SIX TO FIVE PREMIUM MOTION
+   ========================================================= */
+
+#fiveGrid .tile{
+  will-change:transform,opacity;
+}
+
+/* Typed letters feel like they press into and spring out of the floating tile. */
+#fiveGrid .tile.five-letter-pop{
+  animation:fiveLetterPop 125ms cubic-bezier(.2,.82,.25,1);
+}
+@keyframes fiveLetterPop{
+  0%{transform:scale(.90)}
+  62%{transform:scale(1.045)}
+  100%{transform:scale(1)}
+}
+
+/* Delete is the inverse: the occupied tile retreats before the redraw removes it. */
+#fiveGrid .tile.five-letter-delete{
+  animation:fiveLetterDelete 90ms ease-in forwards;
+}
+@keyframes fiveLetterDelete{
+  to{transform:scale(.86);opacity:.25}
+}
+
+/* Invalid / Hard Mode submissions nudge the complete active row as one unit. */
+#fiveGrid .tile.five-row-nudge{
+  animation:fiveRowNudge 230ms ease-in-out;
+}
+@keyframes fiveRowNudge{
+  0%,100%{transform:translateX(0)}
+  24%{transform:translateX(-5px)}
+  52%{transform:translateX(5px)}
+  76%{transform:translateX(-2px)}
+}
+
+/* Submitted tiles start visually neutral, then reveal left-to-right without a Wordle flip. */
+#fiveGrid .tile.five-reveal-pending{
+  background:#f7faf7!important;
+  color:#202322!important;
+  box-shadow:0 4px 9px rgba(31,42,35,.18),0 1px 2px rgba(31,42,35,.13)!important;
+}
+#fiveGrid .tile.five-tile-reveal{
+  animation:fiveTileReveal 190ms cubic-bezier(.2,.78,.24,1);
+}
+@keyframes fiveTileReveal{
+  0%{transform:scaleX(1) scaleY(1)}
+  42%{transform:scaleX(.94) scaleY(.76)}
+  72%{transform:scaleX(1.025) scaleY(1.04)}
+  100%{transform:scale(1)}
+}
+#fivePanel .key.five-key-reveal{
+  animation:fiveKeyReveal 165ms cubic-bezier(.2,.8,.25,1);
+}
+@keyframes fiveKeyReveal{
+  0%{transform:scale(.92)}
+  65%{transform:scale(1.045)}
+  100%{transform:scale(1)}
+}
+
+/* The existing active-row brackets become a moving cursor between attempts. */
+#fiveGrid .tile.five-brackets-slide.active-five-row-start::before,
+#fiveGrid .tile.five-brackets-slide.active-five-row-end::after{
+  animation:fiveBracketSlide 250ms cubic-bezier(.18,.78,.22,1);
+}
+@keyframes fiveBracketSlide{
+  0%{transform:translateY(calc(-1 * var(--five-row-step)));opacity:.78}
+  78%{transform:translateY(2px);opacity:1}
+  100%{transform:translateY(0);opacity:1}
+}
+#fiveGrid{--five-row-step:62px}
+@media(max-width:700px){
+  #fiveGrid{--five-row-step:54px}
+}
+
+/* Correct row gets one restrained lift before the result modal. */
+#fiveGrid .tile.five-solved-lift{
+  animation:fiveSolvedLift 270ms cubic-bezier(.18,.82,.24,1);
+}
+@keyframes fiveSolvedLift{
+  0%,100%{transform:translateY(0) scale(1)}
+  52%{transform:translateY(-4px) scale(1.025)}
+}
+
+/* On the winning row the brackets subtly release outward rather than moving down. */
+#fiveGrid .tile.five-solved-lift.active-five-row-start::before{
+  animation:fiveBracketReleaseLeft 240ms ease-out forwards;
+}
+#fiveGrid .tile.five-solved-lift.active-five-row-end::after{
+  animation:fiveBracketReleaseRight 240ms ease-out forwards;
+}
+@keyframes fiveBracketReleaseLeft{
+  to{transform:translateX(-5px);opacity:0}
+}
+@keyframes fiveBracketReleaseRight{
+  to{transform:translateX(5px);opacity:0}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #fiveGrid .tile.five-letter-pop,
+  #fiveGrid .tile.five-letter-delete,
+  #fiveGrid .tile.five-row-nudge,
+  #fiveGrid .tile.five-tile-reveal,
+  #fiveGrid .tile.five-brackets-slide.active-five-row-start::before,
+  #fiveGrid .tile.five-brackets-slide.active-five-row-end::after,
+  #fiveGrid .tile.five-solved-lift,
+  #fivePanel .key.five-key-reveal{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V89 — SIX TO FIVE BRACKET TIMING REFINEMENT
+   ========================================================= */
+
+/* The next-row brackets are rendered for layout/state purposes but remain
+   invisible until all five submitted tiles have finished revealing. */
+#fiveGrid.five-brackets-held .tile.active-five-row-start::before,
+#fiveGrid.five-brackets-held .tile.active-five-row-end::after{
+  opacity:0!important;
+}
+
+/* The release animation begins only after the reveal sequence is complete.
+   `both` keeps the brackets at the animation's first frame before the first
+   paint and at the final frame afterward, preventing any snap/jump. */
+#fiveGrid .tile.five-brackets-slide.active-five-row-start::before,
+#fiveGrid .tile.five-brackets-slide.active-five-row-end::after{
+  animation:fiveBracketSlideV89 235ms cubic-bezier(.18,.82,.22,1) both!important;
+}
+@keyframes fiveBracketSlideV89{
+  0%{
+    transform:translateY(calc(-1 * var(--five-row-step)));
+    opacity:0;
+  }
+  18%{opacity:1}
+  82%{transform:translateY(1px);opacity:1}
+  100%{transform:translateY(0);opacity:1}
+}
