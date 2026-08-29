@@ -1,17 +1,23 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PuzzleNook</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=100.8"></head><body><header class="site-header">
-  <div class="site-brand-wrap">
-    <button type="button" class="brand-home" id="brandHomeBtn" aria-label="PuzzleNook home"><span class="site-name">PuzzleNook</span></button>
-    <span class="site-tagline">Your little escape.</span>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daily Puzzle Lab</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=89"></head><body><header class="site-header">
+  <button type="button" class="brand brand-home" id="brandHomeBtn" aria-label="Daily Puzzle Lab home">
+    <small>FREE DAILY PUZZLES</small><h1>Daily Puzzle Lab</h1>
+  </button>
+  <div class="date-tools desktop-site-tools">
+    <span class="status-pill">TEST MODE</span>
+    <button type="button" id="prevDayBtn" class="secondary">← Previous Day</button>
+    <span id="todayLabel" class="status-pill"></span>
+    <button type="button" id="nextDayBtn" class="secondary">Next Day →</button>
+    <button type="button" id="resetActiveGameBtn" class="secondary">Reset Active Game</button>
   </div>
   <button type="button" id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Open site menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
   <div id="mobileSiteMenu" class="mobile-site-menu" hidden>
-    <nav class="mobile-site-nav" aria-label="Site navigation">
+    <nav class="mobile-site-nav" aria-label="Mobile site navigation">
       <button type="button" data-mobile-game="home">Front Page</button>
       <button type="button" data-mobile-game="five">Six to Five</button>
       <button type="button" data-mobile-game="quads">InCommon</button>
-      <button type="button" data-mobile-game="mini">Daily Crossword</button>
+      <button type="button" data-mobile-game="mini">Short &amp; Cross</button>
       <button type="button" data-mobile-game="trail">Unscrumble</button>
       <button type="button" data-mobile-game="ell">Every Last Letter</button>
       <button type="button" data-mobile-game="same">One and the Same</button>
@@ -27,76 +33,71 @@
   </div>
 </header><main>
 <nav class="game-ribbon" aria-label="Puzzle games">
-  <button type="button" class="game-tab" data-game="five" onclick="showFive()"><span>Six to Five</span></button>
-  <button type="button" class="game-tab" data-game="same" onclick="showOneAndTheSame()"><span>One and the Same</span></button>
-  <button type="button" class="game-tab" data-game="quads" onclick="showQuads()"><span>InCommon</span></button>
-  <button type="button" class="game-tab" data-game="mini" onclick="showMini()"><span>Daily Crossword</span></button>
-  <button type="button" class="game-tab" data-game="trail" onclick="showWordTrail()"><span>Unscrumble</span></button>
-  <button type="button" class="game-tab" data-game="ell" onclick="showEveryLastLetter()"><span>Every Last Letter</span></button>
+  <button type="button" class="game-tab home-tab active" data-game="home" onclick="showHomePage()">
+    <span class="home-tab-icon" aria-hidden="true">⌂</span><span>Home</span>
+  </button>
+  <button type="button" class="game-tab active" data-game="five" onclick="showFive()">
+    <span class="game-icon game-icon-five nav-icon" aria-hidden="true"><i></i><i></i><i>S</i><i></i><i></i></span>
+    <span>Six to Five</span>
+  </button>
+  <button type="button" class="game-tab" data-game="ell" onclick="showEveryLastLetter()">
+    <span class="game-icon game-icon-ell nav-icon" aria-hidden="true"><i>E</i><i>L</i><i>L</i><i></i></span>
+    <span>Every Last Letter</span>
+  </button>
+  <button type="button" class="game-tab" data-game="same" onclick="showOneAndTheSame()">
+    <span class="game-icon game-icon-same nav-icon" aria-hidden="true"><i>1</i><i>=</i><i>1</i></span>
+    <span>One and the Same</span>
+  </button>
+  <button type="button" class="game-tab" data-game="quads" onclick="showQuads()">
+    <span class="game-icon game-icon-quads nav-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span>InCommon</span>
+  </button>
+  <button type="button" class="game-tab" data-game="mini" onclick="showMini()">
+    <span class="game-icon game-icon-mini nav-icon" aria-hidden="true"><i></i><i></i><i class="dark"></i><i></i><i class="dark"></i><i></i><i></i><i></i><i class="dark"></i></span>
+    <span>Short &amp; Cross</span>
+  </button>
+  <button type="button" class="game-tab" data-game="trail" onclick="showWordTrail()">
+    <span class="game-icon game-icon-trail nav-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 9H24V24L39 39"/><g><polygon points="9,4 13,6 14,10 11,14 7,14 4,10 5,6" class="end"/><polygon points="24,4 28,6 29,10 26,14 22,14 19,10 20,6"/><polygon points="39,4 43,6 44,10 41,14 37,14 34,10 35,6"/><polygon points="9,19 13,21 14,25 11,29 7,29 4,25 5,21"/><polygon points="24,19 28,21 29,25 26,29 22,29 19,25 20,21"/><polygon points="39,19 43,21 44,25 41,29 37,29 34,25 35,21"/><polygon points="9,34 13,36 14,40 11,44 7,44 4,40 5,36"/><polygon points="24,34 28,36 29,40 26,44 22,44 19,40 20,36"/><polygon points="39,34 43,36 44,40 41,44 37,44 34,40 35,36" class="end"/></g></svg></span>
+    <span>Unscrumble</span>
+  </button>
 </nav>
-<aside class="desktop-test-palette" aria-label="Testing controls">
-  <div class="date-tools desktop-site-tools">
-    <button type="button" id="prevDayBtn" class="secondary">← Previous Day</button>
-    <span id="todayLabel" class="status-pill"></span>
-    <button type="button" id="nextDayBtn" class="secondary">Next Day →</button>
-    <button type="button" id="resetActiveGameBtn" class="secondary">Reset Active Game</button>
-  </div>
-</aside>
 
 <section id="frontPage" class="front-page">
-  <div class="home-today">
-    <div>
-      <div class="home-eyebrow">DAILY PUZZLES</div>
-      <h2>Today’s Puzzles</h2>
-      <div id="homeDate" class="home-date"></div>
-    </div>
-    <div class="home-progress" aria-label="Today's puzzle progress">
-      <span id="homeProgressText">0 / 6 played</span>
-      <span class="home-progress-track" aria-hidden="true"><i id="homeProgressFill"></i></span>
-    </div>
+  <div class="front-page-intro">
+    <small>DAILY PUZZLES</small>
+    <h2>Choose a game</h2>
   </div>
-
-  <div class="front-game-grid" aria-label="Today's puzzle games">
+  <div class="front-game-grid" aria-label="Puzzle games">
     <button type="button" class="front-game-card front-five" data-front-game="five">
-      <span class="front-card-top"><strong>Six to Five</strong><span class="front-complete-mark" aria-hidden="true">✓</span></span>
-      <span class="front-preview five-preview"><img src="assets/home/six-to-five.webp" alt="Six to Five puzzle preview"></span>
-      <span class="front-card-sub">Find the five-letter word in six tries.</span>
+      <span class="game-icon game-icon-five front-game-icon" aria-hidden="true"><i></i><i></i><i>S</i><i></i><i></i></span>
+      <span class="front-game-copy"><strong>Six to Five</strong><span>Guess the five-letter word.</span></span>
+      <span class="front-card-arrow" aria-hidden="true">→</span>
     </button>
-
-    <button type="button" class="front-game-card front-same" data-front-game="same">
-      <span class="front-card-top"><strong>One and the Same</strong><span class="front-complete-mark" aria-hidden="true">✓</span></span>
-      <span class="front-preview same-preview"><img src="assets/home/one-and-the-same.webp" alt="One and the Same puzzle preview"></span>
-      <span class="front-card-sub">Different clues. One answer.</span>
-    </button>
-
     <button type="button" class="front-game-card front-quads" data-front-game="quads">
-      <span class="front-card-top"><strong>InCommon</strong><span class="front-complete-mark" aria-hidden="true">✓</span></span>
-      <span class="front-preview quads-preview"><img src="assets/home/incommon.webp" alt="InCommon puzzle preview"></span>
-      <span class="front-card-sub">Find four groups of four.</span>
+      <span class="game-icon game-icon-quads front-game-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="front-game-copy"><strong>InCommon</strong><span>Find four groups of four.</span></span>
+      <span class="front-card-arrow" aria-hidden="true">→</span>
     </button>
-
     <button type="button" class="front-game-card front-mini" data-front-game="mini">
-      <span class="front-card-top"><strong>Daily Crossword</strong><span class="front-complete-mark" aria-hidden="true">✓</span></span>
-      <span class="front-preview mini-preview"><img src="assets/home/daily-crossword.webp" alt="Daily Crossword puzzle preview"></span>
-      <span class="front-card-sub">A quick daily crossword.</span>
+      <span class="game-icon game-icon-mini front-game-icon" aria-hidden="true"><i></i><i></i><i class="dark"></i><i></i><i class="dark"></i><i></i><i></i><i></i><i class="dark"></i></span>
+      <span class="front-game-copy"><strong>Short &amp; Cross</strong><span>A quick daily crossword.</span></span>
+      <span class="front-card-arrow" aria-hidden="true">→</span>
     </button>
-
     <button type="button" class="front-game-card front-trail" data-front-game="trail">
-      <span class="front-card-top"><strong>Unscrumble</strong><span class="front-complete-mark" aria-hidden="true">✓</span></span>
-      <span class="front-preview trail-preview"><img src="assets/home/unscrumble.webp" alt="Unscrumble puzzle preview"></span>
-      <span class="front-card-sub">Trace themed words through the grid.</span>
+      <span class="game-icon game-icon-trail front-game-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 9H24V24L39 39"/><g><polygon points="9,4 13,6 14,10 11,14 7,14 4,10 5,6" class="end"/><polygon points="24,4 28,6 29,10 26,14 22,14 19,10 20,6"/><polygon points="39,4 43,6 44,10 41,14 37,14 34,10 35,6"/><polygon points="9,19 13,21 14,25 11,29 7,29 4,25 5,21"/><polygon points="24,19 28,21 29,25 26,29 22,29 19,25 20,21"/><polygon points="39,19 43,21 44,25 41,29 37,29 34,25 35,21"/><polygon points="9,34 13,36 14,40 11,44 7,44 4,40 5,36"/><polygon points="24,34 28,36 29,40 26,44 22,44 19,40 20,36"/><polygon points="39,34 43,36 44,40 41,44 37,44 34,40 35,36" class="end"/></g></svg></span>
+      <span class="front-game-copy"><strong>Unscrumble</strong><span>Trace themed words through the grid.</span></span>
+      <span class="front-card-arrow" aria-hidden="true">→</span>
     </button>
-
     <button type="button" class="front-game-card front-ell" data-front-game="ell">
-      <span class="front-card-top"><strong>Every Last Letter</strong><span class="front-complete-mark" aria-hidden="true">✓</span></span>
-      <span class="front-preview ell-preview"><img src="assets/home/every-last-letter.webp" alt="Every Last Letter puzzle preview"></span>
-      <span class="front-card-sub">Make words. Use every last letter.</span>
+      <span class="game-icon game-icon-ell front-game-icon" aria-hidden="true"><i>E</i><i>L</i><i>L</i><i></i></span>
+      <span class="front-game-copy"><strong>Every Last Letter</strong><span>Make words. Use every last letter.</span></span>
+      <span class="front-card-arrow" aria-hidden="true">→</span>
     </button>
-  </div>
-
-  <div class="home-after">
-    <div class="home-archive"><span>Want another puzzle?</span><a href="#" id="homeArchiveLink">Explore past puzzles →</a></div>
-    <p>Free players can complete up to 3 puzzles per game per day.</p>
+    <button type="button" class="front-game-card front-same" data-front-game="same">
+      <span class="game-icon game-icon-same front-game-icon" aria-hidden="true"><i>1</i><i>=</i><i>1</i></span>
+      <span class="front-game-copy"><strong>One and the Same</strong><span>Different clues. One answer.</span></span>
+      <span class="front-card-arrow" aria-hidden="true">→</span>
+    </button>
   </div>
 </section>
 
@@ -246,7 +247,7 @@
   </div>
 </section>
 
-<section id="fivePanel" class="game-panel game-hidden">
+<section id="fivePanel" class="game-hidden">
   <div class="game-clean-head five-clean-head">
     <h2 class="game-name-title">Six to Five</h2>
     <div class="game-head-actions">
@@ -262,4 +263,4 @@
   <div id="keyboard" class="keyboard"></div>
 </section></div>
 
-<section class="ad"><div><small>ADVERTISEMENT</small><br>Reserved for future ad placement</div></section></main><div id="fiveEndgameOverlay" class="five-endgame-overlay" hidden aria-hidden="true"><section class="five-endgame-card" role="dialog" aria-modal="true" aria-labelledby="fiveEndgameTitle"><button type="button" id="fiveEndgameClose" class="five-endgame-close" aria-label="Close results">×</button><div class="five-endgame-content"><div class="five-endgame-kicker">SIX TO FIVE</div><div id="fiveEndgameMiniGrid" class="five-endgame-mini-grid" aria-hidden="true"></div><h2 id="fiveEndgameTitle">Solved in 3.</h2><div id="fiveEndgameAnswer" class="five-endgame-answer" hidden></div><div id="fiveEndgameMessage" class="five-endgame-message"></div><img class="five-endgame-art" src="assets/six-to-five-endgame-target.png" alt=""><div id="fiveEndgameStats" class="five-endgame-stats"></div><div id="fiveEndgameShareSection" class="five-endgame-share-section"><button type="button" class="five-endgame-primary-share" data-share="native">Share result <span aria-hidden="true">↗</span></button><button type="button" class="five-endgame-copy" data-share="copy">Copy result</button><div id="fiveEndgameResultLine" class="five-endgame-result-line"></div></div><div id="fiveEndgameDailyLine" class="five-endgame-daily-line"></div><button type="button" id="fiveTryAnother" class="five-endgame-next" aria-label="Try another Six to Five puzzle"><span>Try another one</span><strong aria-hidden="true">→</strong></button></div></section></div><div id="globalEndgameOverlay" class="global-endgame-overlay" hidden aria-hidden="true"><section class="global-endgame-card" role="dialog" aria-modal="true" aria-labelledby="globalEndgameTitle"><button type="button" id="globalEndgameClose" class="global-endgame-close" aria-label="Close results">×</button><div class="global-endgame-content"><div id="globalEndgameKicker" class="global-endgame-kicker"></div><div id="globalEndgameVisual" class="global-endgame-visual" aria-hidden="true"></div><h2 id="globalEndgameTitle"></h2><div id="globalEndgameAnswer" class="global-endgame-answer" hidden></div><div id="globalEndgameMessage" class="global-endgame-message"></div><div id="globalEndgameStats" class="global-endgame-stats"></div><div id="globalEndgameShareSection" class="global-endgame-share-section"><button type="button" id="globalEndgameShare" class="global-endgame-primary-share">Share result <span aria-hidden="true">↗</span></button><button type="button" id="globalEndgameCopy" class="global-endgame-copy">Copy result</button><div id="globalEndgameResultLine" class="global-endgame-result-line"></div></div><button type="button" id="globalEndgameHome" class="global-endgame-next"><span>Back to Front Page</span><strong aria-hidden="true">→</strong></button></div></section></div><script src="static-data-adapter.js?v=100.8"></script><script src="app.js?v=100.8"></script></body></html>
+<section class="ad"><div><small>ADVERTISEMENT</small><br>Reserved for future ad placement</div></section></main><div id="fiveEndgameOverlay" class="five-endgame-overlay" hidden aria-hidden="true"><section class="five-endgame-card" role="dialog" aria-modal="true" aria-labelledby="fiveEndgameTitle"><button type="button" id="fiveEndgameClose" class="five-endgame-close" aria-label="Close results">×</button><div class="five-endgame-content"><div class="five-endgame-kicker">SIX TO FIVE</div><div id="fiveEndgameMiniGrid" class="five-endgame-mini-grid" aria-hidden="true"></div><h2 id="fiveEndgameTitle">Solved in 3.</h2><div id="fiveEndgameAnswer" class="five-endgame-answer" hidden></div><div id="fiveEndgameMessage" class="five-endgame-message"></div><img class="five-endgame-art" src="assets/six-to-five-endgame-target.png" alt=""><div id="fiveEndgameStats" class="five-endgame-stats"></div><div id="fiveEndgameShareSection" class="five-endgame-share-section"><button type="button" class="five-endgame-primary-share" data-share="native">Share result <span aria-hidden="true">↗</span></button><button type="button" class="five-endgame-copy" data-share="copy">Copy result</button><div id="fiveEndgameResultLine" class="five-endgame-result-line"></div></div><div id="fiveEndgameDailyLine" class="five-endgame-daily-line"></div><button type="button" id="fiveTryAnother" class="five-endgame-next" aria-label="Try another Six to Five puzzle"><span>Try another one</span><strong aria-hidden="true">→</strong></button></div></section></div><script src="static-data-adapter.js?v=89"></script><script src="app.js?v=89"></script></body></html>

@@ -4149,3 +4149,1135 @@ main{max-width:1040px;padding:0 24px 24px}
   82%{transform:translateY(1px);opacity:1}
   100%{transform:translateY(0);opacity:1}
 }
+
+/* ========================================================= V90 GLOBAL PUBLIC POLISH ========================================================= */
+@media(min-width:701px){#playArea>#fivePanel,#playArea>#quadsPanel,#playArea>#wordTrailPanel,#playArea>#miniPanel,#playArea>#ellPanel,#playArea>#samePanel{width:100%!important;max-width:760px!important;margin:0 auto!important;padding:18px 22px 22px!important;background:#fff!important;border:1px solid #e1e4df!important;border-radius:18px!important;box-shadow:0 8px 24px rgba(31,39,34,.045)!important}#playArea .game-clean-head{min-height:46px;padding-left:4px!important;padding-right:4px!important}}
+@media(max-width:700px){#playArea>#fivePanel,#playArea>#quadsPanel,#playArea>#wordTrailPanel,#playArea>#miniPanel,#playArea>#ellPanel,#playArea>#samePanel{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;padding-left:10px!important;padding-right:10px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#fff!important}#playArea .game-clean-head{padding-left:4px!important;padding-right:4px!important}}
+@media(min-width:701px){#fivePanel .key{min-height:48px!important;padding-top:10px!important;padding-bottom:10px!important}}
+@media(max-width:700px){#fivePanel .key,#miniPanel .mini-keyboard .key,#samePanel .same-keyboard .key{min-height:51px!important}#fivePanel{padding-bottom:calc(184px + env(safe-area-inset-bottom))!important}#miniPanel{padding-bottom:calc(174px + env(safe-area-inset-bottom))!important}#samePanel{padding-bottom:calc(184px + env(safe-area-inset-bottom))!important}}
+.global-endgame-overlay[hidden]{display:none!important}.global-endgame-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;background:rgba(17,21,19,.46);backdrop-filter:blur(2px);animation:globalOverlayIn .18s ease-out}.global-endgame-card{position:relative;width:min(500px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border-radius:18px;box-shadow:0 18px 48px rgba(16,22,18,.18);padding:27px 34px 25px;animation:globalCardIn .22s cubic-bezier(.2,.75,.25,1)}.global-endgame-close{position:absolute;top:14px;right:15px;width:32px;height:32px;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:#7c837f!important;font:400 25px/1 Lato,system-ui,sans-serif!important}.global-endgame-content{text-align:center}.global-endgame-kicker{color:#767d78;font-size:10px;font-weight:900;letter-spacing:.19em}.global-endgame-visual{min-height:76px;display:grid;place-items:center;margin:15px auto 17px}.global-endgame-content h2{margin:0;color:#1f2421;font:900 30px/1.1 Lato,system-ui,sans-serif;letter-spacing:-.025em}.global-endgame-answer{margin-top:8px;color:#424844;font-size:15px}.global-endgame-message{min-height:24px;margin:10px 0 16px;color:#59605c;font-size:15px;font-weight:700}.global-endgame-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:1px;overflow:hidden;margin:0 auto 18px;border:1px solid #e7e9e6;border-radius:12px;background:#e7e9e6}.global-endgame-stats>div{min-height:68px;display:grid;place-items:center;align-content:center;gap:4px;background:#fff;padding:9px 6px}.global-endgame-stats strong{color:#222723;font-size:22px;font-weight:900;line-height:1.05;overflow-wrap:anywhere}.global-endgame-stats span{color:#858b87;font-size:9px;font-weight:900;letter-spacing:.12em}.global-endgame-share-section{display:grid;grid-template-columns:1fr auto;gap:8px}.global-endgame-primary-share,.global-endgame-copy{min-height:44px!important;border-radius:10px!important;font-size:13px!important;font-weight:900!important}.global-endgame-primary-share{background:#2f684f!important;color:#fff!important}.global-endgame-copy{background:#f2f4f2!important;color:#313733!important;border:1px solid #e2e5e2!important}.global-endgame-result-line{grid-column:1/-1;margin:3px 0 2px;color:#8a8f8c;font-size:11px;font-weight:700}.global-endgame-next{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:space-between;min-height:44px;background:transparent!important;border:1px solid #e2e5e2!important;color:#313733!important;box-shadow:none!important;border-radius:10px!important;padding:10px 13px!important;font-size:13px!important}.global-emblem{width:72px;height:72px}.global-emblem-quads{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:7px;border-radius:17px;background:#f5f4ef}.global-emblem-quads i{border-radius:6px}.global-emblem-quads i:nth-child(1){background:#8db7a1}.global-emblem-quads i:nth-child(2){background:#7e9eb5}.global-emblem-quads i:nth-child(3){background:#bd7158}.global-emblem-quads i:nth-child(4){background:#8c77a4}.global-emblem-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:7px;border-radius:16px;background:#f2f5f3}.global-emblem-mini i{background:#fff;border-radius:4px;box-shadow:0 1px 4px rgba(20,30,24,.12)}.global-emblem-mini i.dark{background:#6284a0}.global-emblem-trail{display:grid;place-items:center;border-radius:20px;background:#eee9f6;color:#7765a0;font-size:40px;font-weight:900}.global-emblem-ell{display:grid;grid-template-columns:1fr 1fr;gap:4px}.global-emblem-ell i{display:grid;place-items:center;border-radius:6px;background:#3c8d88;color:#fff;font-style:normal;font-weight:900}.global-emblem-ell i:last-child{background:#eef2ef}.global-emblem-same{width:auto;height:auto;display:flex;align-items:center;gap:5px}.global-emblem-same i{display:grid;place-items:center;width:29px;height:40px;border-radius:8px;background:#e7c898;color:#594123;font-style:normal;font-weight:900;font-size:18px}.global-emblem-same i:nth-child(2){background:#a8703d;color:#fff}.global-quads-result{width:min(330px,100%);display:grid;gap:4px}.global-quads-result span{display:block;padding:6px 10px;border-radius:7px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.045em}.global-mini-result{display:grid;grid-template-columns:repeat(var(--ge-cols),22px);gap:2px;padding:7px;border-radius:9px;background:#e6eae7}.global-mini-result i{width:22px;height:22px;display:grid;place-items:center;background:#fff;color:#222;font-style:normal;font-size:10px;font-weight:900}.global-mini-result i.black{background:#232624}@keyframes globalOverlayIn{from{opacity:0}to{opacity:1}}@keyframes globalCardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:700px){.global-endgame-overlay{padding:16px}.global-endgame-card{width:min(460px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:24px 20px 20px}.global-endgame-content h2{font-size:27px}.global-endgame-stats strong{font-size:19px}}@media(prefers-reduced-motion:reduce){.global-endgame-overlay,.global-endgame-card{animation:none!important}}
+
+
+/* =========================================================
+   V91 — GLOBAL CONTAINER + MOBILE HEADER REFINEMENT
+   ========================================================= */
+
+/* 1) Desktop game container: 30% wider than V90 (760px -> 988px). */
+@media(min-width:701px){
+  #playArea > #fivePanel,
+  #playArea > #quadsPanel,
+  #playArea > #wordTrailPanel,
+  #playArea > #miniPanel,
+  #playArea > #ellPanel,
+  #playArea > #samePanel{
+    max-width:988px!important;
+  }
+}
+
+/* 2) Mobile game headers: consistent typography and vertical rhythm. */
+@media(max-width:700px){
+  #playArea .game-clean-head,
+  #playArea .five-clean-head,
+  #playArea .ell-clean-head,
+  #playArea .same-clean-head{
+    min-height:44px!important;
+    margin:0!important;
+    padding:0 12px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+  }
+
+  #playArea .game-name-title{
+    margin:0!important;
+    font-size:21px!important;
+    line-height:1.08!important;
+    font-weight:900!important;
+    letter-spacing:-0.02em!important;
+  }
+
+  #playArea .game-clean-head .status-pill,
+  #playArea .game-head-actions .status-pill{
+    font-size:11px!important;
+    line-height:1!important;
+    min-height:24px!important;
+    padding:6px 9px!important;
+    white-space:nowrap!important;
+  }
+
+  #playArea .game-head-actions{
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+
+  #fivePanel .hard-toggle{
+    font-size:12px!important;
+    line-height:1!important;
+  }
+}
+
+/* 3) Mobile containers span the full viewport width.
+      Individual puzzles keep their own internal spacing. */
+@media(max-width:700px){
+  main{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  #playArea{
+    width:100%!important;
+    max-width:none!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  #playArea > #fivePanel,
+  #playArea > #quadsPanel,
+  #playArea > #wordTrailPanel,
+  #playArea > #miniPanel,
+  #playArea > #ellPanel,
+  #playArea > #samePanel{
+    box-sizing:border-box!important;
+    width:100vw!important;
+    max-width:100vw!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  /* Restore intentional inner breathing room below the shared header,
+     without shrinking the outer game container itself. */
+  #fivePanel > .simple-instructions,
+  #fivePanel > #fiveStatus,
+  #fivePanel > .five-board-stage,
+  #fivePanel > #keyboard,
+  #quadsPanel > .simple-instructions,
+  #quadsPanel > #quadsStatus,
+  #quadsPanel > #quadsSolved,
+  #quadsPanel > #quadsGrid,
+  #quadsPanel > .quads-footer,
+  #wordTrailPanel > #wordTrailGameplay,
+  #wordTrailPanel > #wordTrailFound,
+  #miniPanel > #miniStatus,
+  #miniPanel > .mini-layout,
+  #ellPanel > .simple-instructions,
+  #ellPanel > #ellStatus,
+  #ellPanel > .ell-player,
+  #samePanel > #sameGame{
+    margin-left:10px!important;
+    margin-right:10px!important;
+  }
+}
+
+/* 4) Every Last Letter: remove any extra top gap on mobile. */
+@media(max-width:700px){
+  #ellPanel{
+    margin-top:0!important;
+    padding-top:0!important;
+  }
+  #ellPanel > .ell-clean-head{
+    margin-top:0!important;
+  }
+}
+
+
+/* =========================================================
+   V92 — MOBILE FULL-WIDTH OVERFLOW FIX
+   V91 used viewport-width panels plus child margins. On real phones,
+   several 100%-wide game elements therefore became wider than the
+   viewport and appeared shifted/cropped on the right.
+   ========================================================= */
+@media(max-width:700px){
+  html,
+  body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+  }
+
+  main,
+  #playArea{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+
+  /* The container itself spans the screen; breathing room belongs
+     inside the container rather than being added as child margins. */
+  #playArea > #fivePanel,
+  #playArea > #quadsPanel,
+  #playArea > #wordTrailPanel,
+  #playArea > #miniPanel,
+  #playArea > #ellPanel,
+  #playArea > #samePanel{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+
+  /* Undo V91's child-side margins. Width:100% children plus those
+     margins were the source of the right-side overflow. */
+  #fivePanel > .simple-instructions,
+  #fivePanel > #fiveStatus,
+  #fivePanel > .five-board-stage,
+  #fivePanel > #keyboard,
+  #quadsPanel > .simple-instructions,
+  #quadsPanel > #quadsStatus,
+  #quadsPanel > #quadsSolved,
+  #quadsPanel > #quadsGrid,
+  #quadsPanel > .quads-footer,
+  #wordTrailPanel > #wordTrailGameplay,
+  #wordTrailPanel > #wordTrailFound,
+  #miniPanel > #miniStatus,
+  #miniPanel > .mini-layout,
+  #ellPanel > .simple-instructions,
+  #ellPanel > #ellStatus,
+  #ellPanel > .ell-player,
+  #samePanel > #sameGame{
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  /* Fixed keyboards should be viewport anchored, not participate in
+     the panel's inner padding or margins. */
+  #fivePanel > #keyboard,
+  #miniPanel .mini-keyboard,
+  #samePanel .same-keyboard{
+    box-sizing:border-box!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
+
+
+/* =========================================================
+   V93 — MOBILE HEIGHT RECALIBRATION
+   - Recalibrate Six to Five + Crossword for taller keyboards
+   - Lock Crossword clue box to keyboard top edge
+   - Add One and the Same inner side margins
+   ========================================================= */
+
+@media(max-width:700px){
+
+  /* Shared reference height for the taller mobile keyboards. */
+  :root{
+    --mobile-word-keyboard-height: 184px;
+  }
+
+  /* -------------------------------------------------------
+     1) SIX TO FIVE
+     Short-screen scaling now accounts for the taller keyboard.
+     ------------------------------------------------------- */
+  #fivePanel{
+    min-height:calc(100dvh - 50px)!important;
+    padding-bottom:calc(var(--mobile-word-keyboard-height) + env(safe-area-inset-bottom))!important;
+  }
+
+  #fivePanel .five-board-stage{
+    max-height:calc(100dvh - var(--mobile-word-keyboard-height) - 166px)!important;
+    overflow:visible!important;
+  }
+
+  @media(max-height:760px){
+    #fivePanel .five-board-stage{
+      transform:scale(.94);
+      transform-origin:top center;
+      margin-bottom:-18px!important;
+    }
+  }
+
+  @media(max-height:700px){
+    #fivePanel .five-board-stage{
+      transform:scale(.88);
+      margin-bottom:-34px!important;
+    }
+    #fivePanel .simple-instructions{
+      margin-top:2px!important;
+      margin-bottom:4px!important;
+      font-size:13px!important;
+      line-height:1.2!important;
+    }
+    #fivePanel .game-clean-head{
+      min-height:40px!important;
+    }
+  }
+
+  @media(max-height:640px){
+    #fivePanel .five-board-stage{
+      transform:scale(.82);
+      margin-bottom:-52px!important;
+    }
+  }
+
+  /* -------------------------------------------------------
+     2) DAILY CROSSWORD
+     Reserve exact keyboard space and attach active clue directly
+     to the keyboard's top edge.
+     ------------------------------------------------------- */
+  #miniPanel{
+    min-height:calc(100dvh - 50px)!important;
+    padding-bottom:calc(var(--mobile-word-keyboard-height) + env(safe-area-inset-bottom))!important;
+  }
+
+  #miniPanel .mini-play-column{
+    min-height:0!important;
+  }
+
+  #miniPanel .mini-grid-stage{
+    max-height:calc(100dvh - var(--mobile-word-keyboard-height) - 174px)!important;
+  }
+
+  #miniPanel .mini-active-clue{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    bottom:calc(var(--mobile-word-keyboard-height) + env(safe-area-inset-bottom))!important;
+    z-index:88!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    border-radius:0!important;
+  }
+
+  #miniPanel .mini-keyboard{
+    height:var(--mobile-word-keyboard-height)!important;
+    min-height:var(--mobile-word-keyboard-height)!important;
+    max-height:var(--mobile-word-keyboard-height)!important;
+    bottom:0!important;
+  }
+
+  @media(max-height:760px){
+    #miniPanel .mini-grid-stage{
+      transform:scale(.94);
+      transform-origin:top center;
+      margin-bottom:-18px!important;
+    }
+  }
+
+  @media(max-height:700px){
+    #miniPanel .mini-grid-stage{
+      transform:scale(.88);
+      margin-bottom:-34px!important;
+    }
+    #miniPanel .game-clean-head{
+      min-height:40px!important;
+    }
+  }
+
+  @media(max-height:640px){
+    #miniPanel .mini-grid-stage{
+      transform:scale(.82);
+      margin-bottom:-50px!important;
+    }
+  }
+
+  /* -------------------------------------------------------
+     3) ONE AND THE SAME
+     Keep the full-width outer container, but give the game itself
+     consistent inner side breathing room.
+     ------------------------------------------------------- */
+  #samePanel > #sameGame{
+    margin-left:15px!important;
+    margin-right:15px!important;
+  }
+}
+
+
+/* =========================================================
+   V94 — MOBILE CROSSWORD CLIPPING + ONE AND THE SAME WIDTH FIX
+   ========================================================= */
+
+@media(max-width:700px){
+
+  /* -------------------------------------------------------
+     DAILY CROSSWORD
+     V93 scaled the stage with transform while its parent still clipped
+     the stage's original layout box. On short screens that made the
+     crossword's top/bottom border disappear under white clipping.
+     Size the grid itself instead of transforming it.
+     ------------------------------------------------------- */
+
+  #miniPanel .mini-grid-stage{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:visible!important;
+    transform:none!important;
+    margin-bottom:0!important;
+    padding:4px 15px 8px!important;
+  }
+
+  #miniPanel .mini-player-grid{
+    /*
+      50px  = site header
+      44px  = game header
+      16px  = status allowance
+      56px  = fixed active clue
+      184px = taller keyboard
+      28px  = stage/panel breathing room
+      The clamp prevents pathological tiny sizing while keeping the
+      entire square—including its outer borders—inside the free space.
+    */
+    width:min(
+      calc(100vw - 30px),
+      clamp(150px, calc(100dvh - 378px - env(safe-area-inset-bottom)), 520px)
+    )!important;
+    height:auto!important;
+    max-height:none!important;
+    aspect-ratio:1 / 1!important;
+    transform:none!important;
+    margin:0 auto!important;
+  }
+
+  /* The clue remains physically attached to the keyboard top. */
+  #miniPanel .mini-active-clue{
+    bottom:calc(var(--mobile-word-keyboard-height) + env(safe-area-inset-bottom))!important;
+    height:56px!important;
+    min-height:56px!important;
+  }
+
+  /* Remove the V93 transform-based short-screen rules entirely. */
+  @media(max-height:760px){
+    #miniPanel .mini-grid-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+  @media(max-height:700px){
+    #miniPanel .mini-grid-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+  @media(max-height:640px){
+    #miniPanel .mini-grid-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+
+  /* -------------------------------------------------------
+     ONE AND THE SAME
+     V93 added 15px side margins to a 100%-wide game element.
+     That recreated the same width-overflow pattern fixed in V92.
+     Keep the outer game at 100% and create the requested breathing
+     room with internal padding instead.
+     ------------------------------------------------------- */
+
+  #samePanel > #sameGame{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:15px!important;
+    padding-right:15px!important;
+  }
+
+  #samePanel .same-active-area,
+  #samePanel .same-history,
+  #samePanel .same-guess-area{
+    box-sizing:border-box!important;
+    max-width:100%!important;
+  }
+
+  #samePanel .same-guess-input{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  #samePanel .same-history-row{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  #samePanel .same-history-clue,
+  #samePanel .same-history-guess,
+  #samePanel .same-history-guess-text{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  #samePanel .same-history-guess{
+    overflow:hidden!important;
+  }
+
+  #samePanel .same-history-guess-text{
+    overflow-wrap:anywhere!important;
+    word-break:break-word;
+  }
+}
+
+
+/* =========================================================
+   V95 — SIX TO FIVE MOBILE HEIGHT CLEANUP
+   Match the Daily Crossword V94 approach:
+   size the board from real available viewport height instead of
+   shrinking its stage with CSS transforms.
+   ========================================================= */
+
+@media(max-width:700px){
+
+  #fivePanel .five-board-stage{
+    max-height:none!important;
+    overflow:visible!important;
+    transform:none!important;
+    margin-bottom:0!important;
+    padding-top:4px!important;
+    padding-bottom:8px!important;
+  }
+
+  /*
+    Directly scale the Six to Five board from available viewport height.
+    This keeps the full top/bottom edges visible and avoids transform
+    clipping/jumping on short mobile screens.
+
+    Approximate reserved vertical space:
+      50px  site header
+      44px  game header
+      34px  instructions/status allowance
+      184px taller keyboard
+      34px  panel/stage breathing room
+  */
+  #fivePanel #fiveGrid{
+    --five-mobile-max:
+      min(
+        calc(100vw - 30px),
+        clamp(220px, calc(100dvh - 346px - env(safe-area-inset-bottom)), 440px)
+      );
+
+    width:var(--five-mobile-max)!important;
+    max-width:var(--five-mobile-max)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    transform:none!important;
+  }
+
+  /* Remove V93's transform-based short-screen scaling. */
+  @media(max-height:760px){
+    #fivePanel .five-board-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+
+  @media(max-height:700px){
+    #fivePanel .five-board-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+
+  @media(max-height:640px){
+    #fivePanel .five-board-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+}
+
+
+/* =========================================================
+   V96 — SIX TO FIVE TRUE DYNAMIC MOBILE HEIGHT
+   The board width is now supplied from measured free vertical space
+   between the board stage and the actual keyboard top.
+   ========================================================= */
+@media(max-width:700px){
+  #fivePanel .five-board-stage{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:center!important;
+    overflow:visible!important;
+    transform:none!important;
+    margin-bottom:0!important;
+    padding:4px 0 14px!important;
+  }
+
+  #fivePanel #fiveGrid{
+    width:var(--five-dynamic-width, min(410px, calc(100vw - 40px)))!important;
+    max-width:var(--five-dynamic-width, min(410px, calc(100vw - 40px)))!important;
+    margin:0 auto!important;
+    transform:none!important;
+  }
+
+  /* V93/V95 short-screen transform rules remain neutralized. */
+  @media(max-height:760px){
+    #fivePanel .five-board-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+  @media(max-height:700px){
+    #fivePanel .five-board-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+  @media(max-height:640px){
+    #fivePanel .five-board-stage{
+      transform:none!important;
+      margin-bottom:0!important;
+    }
+  }
+}
+
+/* =========================================================
+   V97 — PREMIUM DAILY PUZZLE HOMEPAGE
+   ========================================================= */
+body.home-view{background:#f7f8f6}
+body.home-view .game-ribbon{display:none!important}
+body.home-view .desktop-site-tools{display:none!important}
+body.home-view .mobile-menu-btn{display:flex!important}
+body.home-view .site-header{max-width:1180px;border-bottom:0;padding-top:8px;padding-bottom:8px}
+body.home-view main{max-width:1180px}
+
+.front-page{padding:30px 12px 48px}
+.home-today{
+  max-width:1080px;margin:0 auto 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+}
+.home-eyebrow{font:900 10px/1 Lato,system-ui,sans-serif;letter-spacing:.15em;color:#7b837e;margin-bottom:7px}
+.home-today h2{margin:0;color:#1e2320;font:900 35px/1.02 Lato,system-ui,sans-serif;letter-spacing:-.035em}
+.home-date{margin-top:7px;color:#68706b;font:700 13px/1.2 Lato,system-ui,sans-serif}
+.home-progress{min-width:142px;padding-bottom:3px;text-align:right;color:#68706b;font:800 12px/1.2 Lato,system-ui,sans-serif}
+.home-progress-track{display:block;width:142px;height:4px;margin-top:8px;border-radius:99px;background:#e1e5e1;overflow:hidden}
+.home-progress-track i{display:block;width:0;height:100%;border-radius:inherit;background:#536f60;transition:width .25s ease}
+
+.front-game-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;max-width:1080px;margin:0 auto}
+.front-game-card{
+  position:relative;min-height:258px;padding:20px 21px 18px;border:0!important;border-radius:17px!important;
+  display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;text-align:left;
+  background:#fff!important;color:#202322;box-shadow:0 3px 12px rgba(31,39,34,.085),0 1px 2px rgba(31,39,34,.05);
+  overflow:hidden;cursor:pointer;transition:transform .17s ease,box-shadow .17s ease;
+}
+@media(hover:hover) and (pointer:fine){
+  .front-game-card:hover{transform:translateY(-4px);box-shadow:0 10px 26px rgba(31,39,34,.13),0 2px 5px rgba(31,39,34,.06)}
+}
+.front-game-card:active{transform:translateY(-1px)}
+.front-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.front-card-top strong{font:900 20px/1.1 Lato,system-ui,sans-serif;letter-spacing:-.02em}
+.front-complete-mark{
+  display:none;width:24px;height:24px;border-radius:50%;place-items:center;background:#e7f1ea;color:#3e7650;font-size:13px;font-weight:900;
+}
+.front-game-card.is-complete .front-complete-mark{display:grid}
+.front-card-sub{margin-top:13px;color:#68706b;font:700 12.5px/1.3 Lato,system-ui,sans-serif}
+.front-preview{
+  flex:1;min-height:160px;border-radius:12px;background:#f8f9f7;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* Six to Five preview */
+.five-preview{flex-direction:column;gap:7px;background:#f8faf8}
+.fp-five-row{display:flex;gap:6px}
+.fp-five-row i{
+  width:35px;height:35px;border-radius:5px;display:grid;place-items:center;background:#fff;color:#202322;
+  box-shadow:0 2px 5px rgba(30,38,33,.14);font:900 15px/1 Lato;font-style:normal;
+}
+.fp-five-row i.good{background:#5d946b;color:#fff}.fp-five-row i.present{background:#718ca2;color:#fff}.fp-five-row i.absent{background:#252827;color:#fff}
+
+/* One and the Same preview */
+.same-preview{position:relative;flex-direction:column;align-items:stretch;justify-content:center;gap:7px;padding:18px 24px;background:#faf9f6}
+.same-preview>span:not(.same-answer){padding:8px 10px;border-radius:8px;background:#fff;box-shadow:0 1px 4px rgba(32,35,33,.08);font:700 11px/1.2 Lato;color:#525954}
+.same-preview b{display:inline-grid;place-items:center;width:17px;height:17px;margin-right:6px;border-radius:50%;background:#ede7d8;color:#625a48;font-size:9px}
+.same-preview .same-answer{position:absolute;right:17px;bottom:13px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#b58b3e;color:#fff;font-weight:900}
+
+/* InCommon preview */
+.quads-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:15px;background:#faf9f8}
+.quads-preview i{min-width:0;height:34px;padding:0 4px;border-radius:6px;display:grid;place-items:center;background:#fff;box-shadow:0 1px 4px rgba(35,31,29,.09);font:900 8.5px/1 Lato;font-style:normal;color:#3e403e}
+.quads-preview i:nth-child(-n+4){background:#f0ded6}.quads-preview i:nth-child(n+5):nth-child(-n+8){background:#e5ece0}
+
+/* Crossword preview */
+.mini-preview{background:#f7f9fa}
+.fp-cross-grid{width:156px;height:156px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);border:2px solid #343a3b;background:#343a3b;gap:1px}
+.fp-cross-grid i{position:relative;display:grid;place-items:center;background:#fff;color:#202526;font:900 13px/1 Lato;font-style:normal}
+.fp-cross-grid i.block{background:#24292a}.fp-cross-grid i.word{background:#e6eff4}.fp-cross-grid i.active{background:#a9c3d3}
+.fp-cross-grid small{position:absolute;left:2px;top:2px;font-size:6px;line-height:1;color:#697174}
+
+/* Unscrumble preview */
+.trail-preview{background:#f8f6fb}
+.trail-preview svg{width:90%;height:90%}.trail-preview path{fill:none;stroke:#7359a3;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;opacity:.55}
+.trail-preview polygon{fill:#fbfcfb;filter:drop-shadow(0 3px 2px rgba(31,42,35,.16))}
+.trail-preview text{text-anchor:middle;font:900 13px Lato;fill:#282b29}
+
+/* ELL preview */
+.ell-preview{background:#f8faf9}
+.fp-ell-grid{display:grid;grid-template-columns:repeat(5,29px);gap:6px}
+.fp-ell-grid i{height:29px;border-radius:6px;display:grid;place-items:center;background:#f5f7f7;color:#171a18;box-shadow:0 3px 4px rgba(24,31,28,.18);font:900 11px/1 Lato;font-style:normal}
+.fp-ell-grid i.selected{background:#d8ece9;color:#153f3d;transform:translateY(-1px)}
+
+.home-after{max-width:1080px;margin:30px auto 0;padding-top:22px;border-top:1px solid #e1e4e1}
+.home-archive{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;color:#303632;font:800 14px Lato}
+.home-archive a{color:#486b57;text-decoration:none}.home-archive a:hover{text-decoration:underline}
+.home-after p{margin:10px 0 0;color:#858c87;font:700 11px/1.4 Lato}
+
+@media(max-width:850px) and (min-width:701px){
+  .front-game-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+  body.home-view .site-header{height:54px;min-height:54px;padding:0 14px}
+  .front-page{padding:19px 2px 34px}
+  .home-today{margin:0 2px 15px;align-items:flex-end}
+  .home-eyebrow{font-size:9px;margin-bottom:5px}
+  .home-today h2{font-size:27px}
+  .home-date{font-size:11px;margin-top:5px}
+  .home-progress{min-width:102px;font-size:10.5px}
+  .home-progress-track{width:102px;height:3px;margin-top:6px}
+  .front-game-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .front-game-card{min-height:200px;padding:13px 11px 12px;border-radius:13px!important}
+  .front-card-top{margin-bottom:9px}
+  .front-card-top strong{font-size:15px}
+  .front-complete-mark{width:20px;height:20px;font-size:11px}
+  .front-preview{min-height:122px;border-radius:9px}
+  .front-card-sub{font-size:10px;margin-top:8px}
+  .fp-five-row{gap:4px}.fp-five-row i{width:25px;height:25px;font-size:11px}
+  .same-preview{padding:10px 8px;gap:4px}.same-preview>span:not(.same-answer){padding:5px 6px;font-size:8px}.same-preview b{width:13px;height:13px;font-size:7px}
+  .quads-preview{gap:3px;padding:7px}.quads-preview i{height:25px;font-size:6px;border-radius:4px}
+  .fp-cross-grid{width:116px;height:116px}.fp-cross-grid i{font-size:10px}
+  .fp-ell-grid{grid-template-columns:repeat(5,21px);gap:4px}.fp-ell-grid i{height:21px;font-size:8px;border-radius:4px}
+  .home-after{margin-top:22px;padding:18px 2px 0}
+}
+@media(max-width:370px){
+  .front-game-card{min-height:188px;padding:11px 9px}
+  .front-card-top strong{font-size:14px}
+  .front-card-sub{font-size:9.5px}
+}
+
+
+/* =========================================================
+   V98 — PUZZLENOOK UNIVERSAL SHELL + COMPLETION STATES
+   ========================================================= */
+body{font-family:Lato,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.site-header,body.home-view .site-header{
+  position:relative;z-index:120;max-width:none;width:100%;height:62px;min-height:62px;margin:0;padding:0 max(18px,calc((100vw - 1180px)/2));
+  display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:18px;background:#fff;border-bottom:1px solid #e5e8e5;
+}
+.site-brand-wrap{display:flex;align-items:baseline;gap:13px;min-width:0}
+.brand-home{height:auto!important;display:block!important;appearance:none;background:transparent!important;color:#202322!important;border:0!important;padding:0!important;border-radius:0!important;box-shadow:none!important;text-align:left!important;cursor:pointer}
+.brand-home:hover,.brand-home:focus,.brand-home:active{background:transparent!important;color:#202322!important;box-shadow:none!important;transform:none!important;text-decoration:none!important}
+.site-name{font:900 23px/1 Lato,system-ui,sans-serif;letter-spacing:-.035em;white-space:nowrap}
+.site-tagline{font:italic 400 14px/1.1 Lato,system-ui,sans-serif;color:#737b76;white-space:nowrap}
+.mobile-menu-btn,body.home-view .mobile-menu-btn{
+  display:flex!important;width:40px;height:40px;padding:9px!important;border:0!important;border-radius:9px!important;background:transparent!important;color:#252a27!important;box-shadow:none!important;flex-direction:column;justify-content:center;gap:4px;
+}
+.mobile-menu-btn:hover,.mobile-menu-btn:active{transform:none!important;background:transparent!important;box-shadow:none!important}
+.mobile-menu-btn span{display:block;width:21px;height:2px;border-radius:2px;background:#252a27;margin:0 auto}
+.mobile-site-menu[hidden]{display:none!important}
+.mobile-site-menu:not([hidden]){
+  display:block;position:absolute;top:54px;right:max(14px,calc((100vw - 1180px)/2));width:min(330px,calc(100vw - 28px));padding:10px;background:#fff;border:1px solid #e1e4e1;border-radius:14px;box-shadow:0 14px 34px rgba(25,32,28,.16);
+}
+.mobile-site-nav{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.mobile-site-nav button{min-height:40px;padding:8px 10px;border-radius:8px;background:#f5f6f4;color:#242926;text-align:left;font-size:13px;font-weight:800}
+.mobile-site-nav button:hover{transform:none;background:#ecefeb}
+.mobile-date-tools{display:none}
+
+/* Desktop puzzle switcher: light, text-led, and separate from the site header. */
+.game-ribbon,body.home-view .game-ribbon{
+  display:flex;align-items:center;justify-content:center;gap:4px;width:min(930px,100%);min-height:0;margin:15px auto 10px;padding:5px;border:0;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(28,36,31,.075);overflow:visible;
+}
+body.home-view .game-ribbon{display:none!important}
+.game-tab{
+  position:relative;flex:1 1 0;min-width:0;min-height:42px;padding:9px 10px;border:0!important;border-radius:10px!important;background:transparent!important;color:#717974!important;box-shadow:none!important;font:800 12.5px/1.12 Lato,system-ui,sans-serif;white-space:nowrap;transition:background .14s ease,color .14s ease;
+}
+.game-tab:hover:not(:disabled){transform:none!important;background:#f7f8f6!important;color:#303632!important}
+.game-tab.active{background:#f2f4f1!important;color:#202522!important}
+.game-tab::after{left:50%;right:auto;bottom:4px;width:22px;height:2px;transform:translateX(-50%);border-radius:99px;background:transparent}
+.game-tab[data-game="five"].active::after{background:#4f9164}
+.game-tab[data-game="same"].active::after{background:#b58b3e}
+.game-tab[data-game="quads"].active::after{background:#c66f58}
+.game-tab[data-game="mini"].active::after{background:#587e9b}
+.game-tab[data-game="trail"].active::after{background:#7359a3}
+.game-tab[data-game="ell"].active::after{background:#268d89}
+
+/* Developer controls live outside the consumer game surface on desktop. */
+.desktop-test-palette{display:none}
+@media(min-width:1180px){
+  body:not(.home-view) .desktop-test-palette{
+    display:block;position:fixed;z-index:40;top:132px;left:calc(50% + 430px);width:176px;padding:12px;border-radius:13px;background:rgba(255,255,255,.96);box-shadow:0 4px 16px rgba(27,34,30,.10);border:1px solid #e6e9e6;
+  }
+  .desktop-test-palette .test-palette-label{margin:0 0 8px;color:#929993;font:900 9px/1 Lato;letter-spacing:.15em}
+  .desktop-test-palette .date-tools{display:flex;flex-direction:column;align-items:stretch;gap:6px;width:100%}
+  .desktop-test-palette .date-tools button,.desktop-test-palette .date-tools .status-pill{width:100%;text-align:center;white-space:normal}
+}
+@media(min-width:701px) and (max-width:1179px){
+  body:not(.home-view) .desktop-test-palette{display:flex;justify-content:flex-end;width:min(930px,100%);margin:0 auto 8px}
+  .desktop-test-palette .test-palette-label{display:none}
+  .desktop-test-palette .date-tools{display:flex;justify-content:flex-end;gap:5px;padding:7px;border-radius:11px;background:#fff;box-shadow:0 2px 9px rgba(28,36,31,.07)}
+}
+
+/* Homepage display type: editorial warmth, used strategically. */
+.home-today h2{font-family:"DM Serif Display",Georgia,serif!important;font-weight:400!important;letter-spacing:-.02em!important;font-size:39px}
+
+/* Every card starts with an empty completion ring. Completion fills it. */
+.front-complete-mark{
+  display:grid!important;width:24px;height:24px;border:1.5px solid #c9ceca;border-radius:50%;place-items:center;background:transparent;color:transparent;font-size:13px;font-weight:900;transition:background .18s ease,border-color .18s ease,color .18s ease;
+}
+.front-game-card.is-complete .front-complete-mark{display:grid;background:#4f9164;border-color:#4f9164;color:#fff}
+.front-card-sub{min-height:17px}
+.front-game-card.is-complete .front-card-sub{color:#467252;font-weight:900}
+
+@media(max-width:700px){
+  .site-header,body.home-view .site-header{height:50px;min-height:50px;padding:0 14px;border-bottom:1px solid #e1e4e1}
+  .site-brand-wrap{gap:9px}
+  .site-name{font-size:20px}
+  .site-tagline{font-size:11.5px}
+  .mobile-site-menu:not([hidden]){top:48px;right:10px}
+  .mobile-date-tools{display:block;margin-top:9px;padding-top:9px;border-top:1px solid #e6e8e5}
+  .mobile-date-row{display:grid;grid-template-columns:38px 1fr 38px;align-items:center;gap:7px}
+  .mobile-date-row #mobileTodayLabel{text-align:center;font-size:12px;font-weight:900;color:#535b56}
+  .mobile-icon-action{min-height:36px;padding:5px!important;border-radius:8px!important;background:#eef0ed!important;color:#252a27!important}
+  .mobile-reset-action{width:100%;margin-top:7px;min-height:36px;padding:7px 10px!important;background:#fff!important;color:#4d5550!important;border:1px solid #e0e3df!important;font-size:12px}
+  .game-ribbon{display:none!important}
+  .desktop-test-palette{display:none!important}
+  .home-today h2{font-size:30px}
+  .front-complete-mark{width:20px;height:20px;font-size:11px}
+}
+@media(max-width:390px){.site-tagline{display:none}}
+
+/* =========================================================
+   V99 — PUZZLENOOK SHELL CORRECTIONS
+   ========================================================= */
+
+/* Universal shell: same core header everywhere, visually integrated with the page. */
+.site-header,
+body.home-view .site-header{
+  width:100%;
+  max-width:none;
+  height:62px;
+  min-height:62px;
+  margin:0;
+  padding-left:max(20px,calc((100vw - 1080px)/2));
+  padding-right:max(20px,calc((100vw - 1080px)/2));
+  background:transparent;
+  border-bottom:0;
+  box-shadow:none;
+}
+body.home-view .site-header{background:#f7f8f6}
+.site-brand-wrap{display:flex;align-items:baseline;gap:14px}
+.site-name{font-weight:900}
+.site-tagline{
+  display:inline-block;
+  font-family:Lato,system-ui,sans-serif;
+  font-size:14px;
+  line-height:1.1;
+  font-style:italic!important;
+  font-weight:400!important;
+  color:#747c77;
+}
+
+/* Make the homepage heading an unmistakable editorial display face. */
+.home-today h2{
+  font-family:"DM Serif Display",Georgia,"Times New Roman",serif!important;
+  font-style:normal!important;
+  font-weight:400!important;
+  letter-spacing:-.025em!important;
+  font-size:40px!important;
+  line-height:1.02!important;
+}
+
+/* Testing tools are temporary developer chrome, physically outside the product surface. */
+.desktop-test-palette{display:none!important}
+@media(min-width:1280px){
+  body:not(.home-view) .desktop-test-palette{
+    display:block!important;
+    position:fixed!important;
+    z-index:45;
+    top:152px;
+    right:18px;
+    left:auto!important;
+    width:184px;
+    margin:0!important;
+    padding:12px;
+    border:1px solid #e3e7e3;
+    border-radius:15px;
+    background:#fff;
+    box-shadow:0 10px 28px rgba(28,36,31,.12),0 2px 5px rgba(28,36,31,.05);
+  }
+  body:not(.home-view) .desktop-test-palette .date-tools{
+    display:flex!important;
+    width:100%;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:7px!important;
+    padding:0!important;
+    margin:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  body:not(.home-view) .desktop-test-palette .date-tools button,
+  body:not(.home-view) .desktop-test-palette .date-tools .status-pill{
+    width:100%;
+    min-width:0;
+    margin:0;
+    text-align:center;
+    white-space:normal;
+  }
+}
+/* If there is not enough side room, desktop test chrome disappears rather than crowding the game. */
+@media(min-width:701px) and (max-width:1279px){
+  body:not(.home-view) .desktop-test-palette{display:none!important}
+}
+
+/* Mobile: only PuzzleNook + hamburger in the header. */
+@media(max-width:700px){
+  .site-header,
+  body.home-view .site-header{
+    height:50px!important;
+    min-height:50px!important;
+    padding:0 14px!important;
+    background:#fff;
+    border-bottom:1px solid #e4e7e4;
+  }
+  body.home-view .site-header{background:#f7f8f6;border-bottom-color:transparent}
+  .site-tagline{display:none!important}
+  .site-name{font-size:20px}
+}
+
+
+/* =========================================================
+   V100 — HOMEPAGE ART PREVIEWS + COMPLETED CARD FOOTER
+   ========================================================= */
+.front-preview{
+  padding:0!important;
+  background:transparent!important;
+}
+.front-preview img{
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:160px;
+  object-fit:cover;
+  object-position:center;
+}
+.front-game-card.is-complete .front-card-sub{
+  margin:13px -21px -18px!important;
+  min-height:42px;
+  padding:11px 14px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:#4f9164;
+  color:#fff!important;
+  font-weight:900;
+  border-radius:0;
+}
+@media(max-width:700px){
+  .front-preview img{min-height:122px}
+  .front-game-card.is-complete .front-card-sub{
+    margin:8px -11px -12px!important;
+    min-height:34px;
+    padding:8px 8px 9px;
+    font-size:10px;
+  }
+}
+@media(max-width:370px){
+  .front-game-card.is-complete .front-card-sub{margin-left:-9px!important;margin-right:-9px!important}
+}
+
+/* =========================================================
+   V100.1 — HOMEPAGE ART PREVIEW LAYOUT FIX
+   Prevent legacy per-game preview layouts from constraining
+   the new single-image homepage artwork.
+   ========================================================= */
+.front-game-card .front-preview.home-card-art,
+.front-game-card .front-preview:has(> img.home-card-art-img){
+  display:block!important;
+  grid-template-columns:none!important;
+  grid-template-rows:none!important;
+}
+.front-game-card .front-preview > img.home-card-art-img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+
+/* V100.1 selector correction: current V100 artwork markup */
+.front-game-card .front-preview:has(> img){
+  display:block!important;
+  grid-template-columns:none!important;
+  grid-template-rows:none!important;
+}
+.front-game-card .front-preview > img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+
+/* =========================================================
+   V100.2 — MOBILE HOMEPAGE CONTENT GUTTER
+   Header remains unchanged; only homepage content below it
+   receives additional breathing room from screen edges.
+   ========================================================= */
+@media(max-width:700px){
+  body.home-view main{
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+}
+@media(max-width:360px){
+  body.home-view main{
+    padding-left:16px!important;
+    padding-right:16px!important;
+  }
+}
+
+/* V100.3 — mobile homepage gutter + responsive single-line title */
+@media(max-width:700px){
+  body.home-view main{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+  body.home-view .home-today h2{
+    white-space:nowrap!important;
+    font-size:clamp(29px,10vw,40px)!important;
+    letter-spacing:-.03em!important;
+  }
+}
+@media(max-width:360px){
+  body.home-view main{
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+}
+
+/* =========================================================
+   V100.4 — MOBILE HOME TITLE / PROGRESS LOCKUP
+   Progress stays fixed on the right; title yields and scales.
+   ========================================================= */
+@media(max-width:700px){
+  body.home-view .home-today{
+    display:flex!important;
+    align-items:flex-end!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    width:auto!important;
+  }
+
+  body.home-view .home-today > div:first-child{
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+
+  body.home-view .home-progress{
+    flex:0 0 102px!important;
+    width:102px!important;
+    min-width:102px!important;
+    max-width:102px!important;
+    margin-left:auto!important;
+    text-align:right!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+
+  body.home-view .home-progress-track{
+    width:102px!important;
+    min-width:102px!important;
+    max-width:102px!important;
+    margin-left:auto!important;
+  }
+
+  body.home-view .home-today h2{
+    display:block!important;
+    max-width:100%!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    font-size:clamp(18px,8.3vw,40px)!important;
+    line-height:1.02!important;
+  }
+}
+
+/* =========================================================
+   V100.5 — DESKTOP GAME CONTAINER BOTTOM SPACING
+   Additional interior space below each requested game.
+   Mobile/tablet layouts remain unchanged.
+   ========================================================= */
+@media(min-width:701px){
+  #fivePanel{padding-bottom:calc(22px + 100px)!important;}
+  #samePanel{padding-bottom:calc(22px + 300px)!important;}
+  #quadsPanel{padding-bottom:calc(22px + 100px)!important;}
+  #miniPanel{padding-bottom:calc(22px + 50px)!important;}
+  #ellPanel{padding-bottom:calc(22px + 50px)!important;}
+}
+
+/* =========================================================
+   V100.6 — DESKTOP GAME PANEL RESERVED BOTTOM SPACE
+   Corrects V100.5: extend the bordered white panel below the
+   playable content without moving the existing game content.
+   ========================================================= */
+@media(min-width:701px){
+  #fivePanel,
+  #samePanel,
+  #quadsPanel,
+  #miniPanel,
+  #ellPanel{
+    padding-bottom:22px!important;
+  }
+
+  #fivePanel::after,
+  #samePanel::after,
+  #quadsPanel::after,
+  #miniPanel::after,
+  #ellPanel::after{
+    content:"";
+    display:block;
+    width:100%;
+    flex:0 0 auto;
+    pointer-events:none;
+  }
+
+  #fivePanel::after{height:100px;}
+  #samePanel::after{height:300px;}
+  #quadsPanel::after{height:100px;}
+  #miniPanel::after{height:50px;}
+  #ellPanel::after{height:50px;}
+}
+
+/* V100.7 — refined desktop game panel bottom space */
+@media(min-width:701px){
+  #fivePanel::after{height:50px!important;}
+  #samePanel::after{height:225px!important;}
+  #quadsPanel::after{height:80px!important;}
+  #wordTrailPanel::after{
+    content:"";
+    display:block;
+    width:100%;
+    height:30px!important;
+    flex:0 0 auto;
+    pointer-events:none;
+  }
+}

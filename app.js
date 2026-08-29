@@ -149,6 +149,25 @@ function showFiveEndgame(){
 }
 async function shareFiveResult(kind){const text=fiveShareText();if(kind==="native"&&navigator.share){try{await navigator.share({title:"Six to Five",text})}catch(e){}return}try{await navigator.clipboard.writeText(text);const b=document.querySelector(`[data-share="${kind}"]`);if(b){const old=b.innerHTML;b.textContent="Copied ✓";setTimeout(()=>b.innerHTML=old,1200)}}catch(e){}}
 
+
+/* V90 shared public end-game framework */
+const GLOBAL_ENDGAME_MESSAGES={quads:{win:["Excellent grouping!","You found the connections.","Nicely sorted."],loss:["That set fought back.","A tricky group of connections.","Almost had the board."]},mini:{win:["Clean solve!","Nicely crossed.","Puzzle complete."],loss:["Puzzle revealed.","That one was a tough cross."]},trail:{win:["Every path found.","Beautiful tracing.","The whole grid came together."]},ell:{win:["Every last one!","Nothing left behind.","All 25 letters used."],loss:["A solid word hunt.","That board had more to give.","Good run."]},same:{win:["You saw the connection.","That was the one.","Nice read on the clues."],loss:["That one stayed hidden.","Four clues, one stubborn answer."]}};
+let globalEndgameCurrent=null;const globalEndgameShown=new Set();
+function globalPick(list){return list[Math.floor(Math.random()*list.length)]}
+function globalEndgameKey(game,date,state){return `${game}|${date||currentDateKey()}|${state}`}
+function globalEndgameIcon(game){if(game==="quads")return '<div class="global-emblem global-emblem-quads"><i></i><i></i><i></i><i></i></div>';if(game==="mini")return '<div class="global-emblem global-emblem-mini">'+Array.from({length:9},(_,i)=>`<i class="${[2,4,8].includes(i)?"dark":""}"></i>`).join("")+'</div>';if(game==="trail")return '<div class="global-emblem global-emblem-trail"><span>↗</span></div>';if(game==="ell")return '<div class="global-emblem global-emblem-ell"><i>E</i><i>L</i><i>L</i><i></i></div>';if(game==="same")return '<div class="global-emblem global-emblem-same"><i>1</i><i>=</i><i>1</i></div>';return ""}
+function closeGlobalEndgame(){const o=document.getElementById("globalEndgameOverlay");if(o){o.hidden=true;o.setAttribute("aria-hidden","true")}}
+function globalEndgameShareText(config){return config.shareText||`${config.kicker} — ${config.resultLine||formatPuzzleDate(config.date)}`}
+async function shareGlobalEndgame(kind){if(!globalEndgameCurrent)return;const text=globalEndgameShareText(globalEndgameCurrent);if(kind==="native"&&navigator.share){try{await navigator.share({title:globalEndgameCurrent.kicker,text})}catch(e){}return}try{await navigator.clipboard.writeText(text);const b=document.getElementById(kind==="copy"?"globalEndgameCopy":"globalEndgameShare");if(b){const old=b.innerHTML;b.textContent="Copied ✓";setTimeout(()=>b.innerHTML=old,1200)}}catch(e){}}
+function showGlobalEndgame(config){const key=globalEndgameKey(config.game,config.date,config.state||"complete");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
+function queueGlobalEndgame(config,delay=80){setTimeout(()=>showGlobalEndgame(config),delay)}
+function quadsEndgameConfig(){if(!quadsPuzzle||!quadsComplete)return null;const visual=`<div class="global-quads-result">${quadsSolved.map(g=>`<span class="${difficultyClass(g.difficulty)}">${escapeSameHtml(g.label)}</span>`).join("")}</div>`;const mistakes=Math.min(4,quadsMistakes);return{game:"quads",date:quadsPuzzle.date,state:quadsWon?"win":"loss",kicker:"INCOMMON",title:quadsWon?"All four found.":"Not this time.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.quads[quadsWon?"win":"loss"]),visualHtml:visual,stats:[{value:quadsSolved.length,label:"GROUPS"},{value:mistakes,label:mistakes===1?"MISTAKE":"MISTAKES"}],resultLine:`InCommon · ${formatPuzzleDate(quadsPuzzle.date)} · ${quadsWon?"Solved":`${mistakes}/4 mistakes`}`,shareText:`InCommon — ${formatPuzzleDate(quadsPuzzle.date)} — ${quadsWon?"Solved":"Not solved"} — ${mistakes}/4 mistakes`}}
+function sameEndgameConfig(){if(!samePuzzle||!sameComplete)return null;const tries=Math.max(1,Math.min(4,sameRevealed));return{game:"same",date:samePuzzle.date,state:sameWon?"win":"loss",kicker:"ONE AND THE SAME",title:sameWon?`Solved in ${tries}.`:"Not this time.",answerHtml:`The answer was <strong>${escapeSameHtml(samePuzzle.answer)}</strong>`,message:globalPick(GLOBAL_ENDGAME_MESSAGES.same[sameWon?"win":"loss"]),stats:[{value:sameWon?tries:4,label:"CLUES"},{value:sameWrong.length,label:"WRONG GUESSES"}],resultLine:`One and the Same · ${formatPuzzleDate(samePuzzle.date)} · ${sameWon?`${tries}/4`:"—/4"}`,shareText:`One and the Same — ${formatPuzzleDate(samePuzzle.date)} — ${sameWon?`Solved in ${tries}/4`:"Not solved"}`}}
+function ellEndgameConfig(){if(!ellPuzzle||(!ellComplete&&!ellEnded))return null;const won=ellComplete,used=ellUsed(),score=ellCurrentScore();return{game:"ell",date:ellPuzzle.date,state:won?"win":`end-${ellEndReason||"ended"}`,kicker:"EVERY LAST LETTER",title:won?"Every last letter!":ellEndReason==="giveup"?"Run complete.":"No more words.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.ell[won?"win":"loss"]),stats:[{value:`${used}/25`,label:"LETTERS"},{value:score,label:"SCORE"},{value:ellSubmitted.length,label:"WORDS"}],resultLine:`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · ${used}/25 · ${score} pts`,shareText:`Every Last Letter — ${formatPuzzleDate(ellPuzzle.date)} — ${used}/25 letters — ${score} points — ${ellSubmitted.length} words`}}
+function trailEndgameConfig(){if(!wordTrailPuzzle||!wordTrailComplete)return null;const total=wtAllThemeWords().length;return{game:"trail",date:wordTrailPuzzle.date,state:"win",kicker:"UNSCRUMBLE",title:"Grid complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.trail.win),stats:[{value:`${wordTrailFound.length}/${total}`,label:"THEME WORDS"},{value:wordTrailNonThemeFound.length,label:"BONUS WORDS"},{value:wordTrailPuzzle.theme||"—",label:"THEME"}],resultLine:`Unscrumble · ${formatPuzzleDate(wordTrailPuzzle.date)} · ${wordTrailFound.length}/${total}`,shareText:`Unscrumble — ${formatPuzzleDate(wordTrailPuzzle.date)} — ${wordTrailFound.length}/${total} theme words — ${wordTrailNonThemeFound.length} bonus words`}}
+function miniEndgameVisual(){if(!miniPuzzle)return globalEndgameIcon("mini");return `<div class="global-mini-result" style="--ge-cols:${miniCols()}">${miniPuzzle.grid.flatMap((row,r)=>row.map((solution,c)=>solution==="#"?'<i class="black"></i>':`<i>${escapeSameHtml(miniValues[miniKey(r,c)]||"")}</i>`)).join("")}</div>`}
+function miniEndgameConfig(){if(!miniPuzzle||!miniComplete)return null;const revealed=miniRevealedPuzzle,cells=miniPuzzle.grid.flat().filter(x=>x!=="#").length;return{game:"mini",date:miniPuzzle.date,state:revealed?"revealed":"win",kicker:"DAILY CROSSWORD",title:revealed?"Puzzle revealed.":"Crossword complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.mini[revealed?"loss":"win"]),visualHtml:miniEndgameVisual(),stats:[{value:miniRows()===6?"6×6":"5×5",label:"GRID"},{value:cells,label:"LETTERS"},{value:revealed?"YES":"NO",label:"FULL REVEAL"}],resultLine:`Daily Crossword · ${formatPuzzleDate(miniPuzzle.date)} · ${revealed?"Revealed":"Solved"}`,shareText:`Daily Crossword — ${formatPuzzleDate(miniPuzzle.date)} — ${revealed?"Revealed":"Solved"}`}}
+
 const PLAYER_KEY="puzzlePublicPlayerV3";
 let puzzle=null;
 let guesses=[];
@@ -192,6 +211,7 @@ async function changeDay(delta){
     loadWordTrailForSelectedDate(),
     loadMiniForSelectedDate()
   ]);
+  updateHomeDashboard();
 }
 
 async function loadDictionary(){
@@ -265,6 +285,8 @@ function savePlayerState(){
 
 function setActiveGame(game){
   activeGame=game;
+  document.body.classList.toggle("home-view",game==="home");
+  if(game==="home") updateHomeDashboard();
   const frontPage=document.getElementById("frontPage");
   const playArea=document.getElementById("playArea");
   const isHome=game==="home";
@@ -293,6 +315,48 @@ function setActiveGame(game){
   document.querySelectorAll(".game-tab").forEach(tab=>{
     tab.classList.toggle("active", tab.dataset.game===game);
     tab.setAttribute("aria-current", tab.dataset.game===game ? "page" : "false");
+  });
+}
+function updateHomeDashboard(){
+  const dateHost=document.getElementById("homeDate");
+  if(dateHost){
+    dateHost.textContent=selectedDate.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
+  }
+  const states={
+    five:!!gameComplete,
+    same:!!sameComplete,
+    quads:!!quadsComplete,
+    mini:!!miniComplete,
+    trail:!!wordTrailComplete,
+    ell:!!(ellComplete||ellEnded)
+  };
+  const defaults={
+    five:"Find the five-letter word in six tries.",
+    same:"Different clues. One answer.",
+    quads:"Find four groups of four.",
+    mini:"A quick daily crossword.",
+    trail:"Trace themed words through the grid.",
+    ell:"Make words. Use every last letter."
+  };
+  const stats={
+    five:`${guesses.length} ${guesses.length===1?"guess":"guesses"}`,
+    same:`${Math.max(1,Math.min(4,sameRevealed))} ${sameRevealed===1?"clue":"clues"}`,
+    quads:`${quadsMistakes} ${quadsMistakes===1?"mistake":"mistakes"}`,
+    mini:miniRevealedPuzzle?"Revealed":`${miniRows()}×${miniCols()} solved`,
+    trail:`${wordTrailFound.length} theme ${wordTrailFound.length===1?"word":"words"}`,
+    ell:`${ellCurrentScore()} points`
+  };
+  const count=Object.values(states).filter(Boolean).length;
+  const text=document.getElementById("homeProgressText");
+  const fill=document.getElementById("homeProgressFill");
+  if(text)text.textContent=`${count} / 6 played`;
+  if(fill)fill.style.width=`${(count/6)*100}%`;
+  document.querySelectorAll("[data-front-game]").forEach(card=>{
+    const key=card.dataset.frontGame;
+    const complete=!!states[key];
+    card.classList.toggle("is-complete",complete);
+    const sub=card.querySelector(".front-card-sub");
+    if(sub)sub.textContent=complete?`Completed — ${stats[key]}`:defaults[key];
   });
 }
 function showHomePage(){ setActiveGame("home"); closeMobileSiteMenu(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -374,6 +438,51 @@ function hardModeViolation(guess){
   return null;
 }
 
+
+/* V96 — Six to Five mobile board sizing.
+   Measure the actual free space above the fixed keyboard instead of
+   estimating it from viewport height. This keeps a small guaranteed
+   buffer above the keyboard on short screens. */
+function sizeFiveMobileBoard(){
+  const grid=document.getElementById("fiveGrid");
+  const stage=document.querySelector("#fivePanel .five-board-stage");
+  const keyboard=document.getElementById("keyboard");
+  if(!grid||!stage||!keyboard)return;
+
+  if(window.innerWidth>700){
+    grid.style.removeProperty("--five-dynamic-width");
+    return;
+  }
+
+  const stageRect=stage.getBoundingClientRect();
+  const keyboardRect=keyboard.getBoundingClientRect();
+
+  /* Deliberate visible breathing room between the final row and keyboard. */
+  const bottomBuffer=14;
+  const availableHeight=Math.max(0,keyboardRect.top-stageRect.top-bottomBuffer);
+
+  const computed=getComputedStyle(grid);
+  const gap=parseFloat(computed.rowGap)||7;
+
+  /* Six rows x five columns, square tiles:
+     H = 6t + 5g  =>  t = (H - 5g) / 6
+     W = 5t + 4g
+  */
+  const tileFromHeight=Math.max(0,(availableHeight-(5*gap))/6);
+  const widthFromHeight=(5*tileFromHeight)+(4*gap);
+
+  /* Keep the board comfortably inside the stage so the active-row
+     brackets also remain visible. */
+  const widthFromStage=Math.max(0,stage.clientWidth-12);
+  const target=Math.floor(Math.min(410,widthFromStage,widthFromHeight));
+
+  /* Avoid applying an unusably tiny transient value while mobile layout
+     is still settling. */
+  if(target>=175){
+    grid.style.setProperty("--five-dynamic-width",`${target}px`);
+  }
+}
+
 function drawFive(){
   if(!puzzle) return;
 
@@ -402,6 +511,7 @@ function drawFive(){
   }
 
   drawKeyboard();
+  requestAnimationFrame(sizeFiveMobileBoard);
 
   const status=document.getElementById("fiveStatus");
   if(gameComplete){
@@ -780,38 +890,8 @@ document.addEventListener("click",event=>{
 });
 document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMobileSiteMenu()});
 
-(async function init(){
-  updateDateLabel();
-
-  // The puzzle load is independent from dictionary initialization.
-  // A dictionary problem must never prevent today's puzzle from rendering.
-  const puzzlePromise=Promise.all([
-    loadFiveForSelectedDate(),
-    loadEveryLastLetterForSelectedDate(),
-    loadOneAndTheSameForSelectedDate(),
-    loadQuadsForSelectedDate(),
-    loadWordTrailForSelectedDate(),
-    loadMiniForSelectedDate()
-  ]);
-
-  try{
-    await loadDictionary();
-  }catch(err){
-    console.error(err);
-    document.getElementById("fiveStatus").innerHTML=
-      `<div class="result">Six to Five loaded, but guess validation could not initialize: ${err.message}</div>`;
-  }
-
-  try{
-    await puzzlePromise;
-    setActiveGame(activeGame);
-  }catch(err){
-    console.error(err);
-    document.getElementById("fivePuzzleMeta").textContent="Load error";
-    document.getElementById("fiveStatus").innerHTML=
-      `<div class="result">Could not load the scheduled Six to Five puzzle: ${err.message}</div>`;
-  }
-})();
+/* V100.8 startup moved to end of file.
+   All game state declarations must initialize before any loader runs. */
 
 
 
@@ -1121,6 +1201,8 @@ function drawOneAndTheSame(){
         <div class="same-result-copy">Try another one tomorrow</div>
       </div>`;
     }
+    const cfg=sameEndgameConfig();
+    if(cfg)queueGlobalEndgame(cfg,120);
     return;
   }
 
@@ -1185,6 +1267,11 @@ document.getElementById("sameGuessInput").addEventListener("pointerdown",event=>
   }
 });
 window.addEventListener("resize",configureSameGuessInput);
+window.addEventListener("resize",()=>requestAnimationFrame(sizeFiveMobileBoard));
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize",()=>requestAnimationFrame(sizeFiveMobileBoard));
+}
+
 
 
 
@@ -1384,6 +1471,7 @@ function drawEll(){
   }else if(ellEnded){
     document.getElementById("ellStatus").innerHTML=ellEndGameHtml(ellEndReason||"giveup");
   }
+  if(ellComplete||ellEnded){const cfg=ellEndgameConfig();if(cfg)queueGlobalEndgame(cfg,120);}
 }
 function ellToggle(id){
   if(ellComplete||ellEnded)return;ellReclaimCandidate=null;
@@ -1667,6 +1755,7 @@ function drawQuads(){
   if(quadsComplete){
     document.getElementById("quadsStatus").innerHTML=
       `<div class="completion-note">${quadsWon?"Solved — all four groups found.":"Puzzle complete — no mistakes remaining."}</div>`;
+    const cfg=quadsEndgameConfig();if(cfg)queueGlobalEndgame(cfg,140);
   }
 }
 
@@ -2033,6 +2122,7 @@ function drawWordTrail(){
   if(wordTrailComplete){
     document.getElementById("wordTrailStatus").innerHTML=
       '<div class="completion-note">Solved — every letter in the grid has been used.</div>';
+    const cfg=trailEndgameConfig();if(cfg)queueGlobalEndgame(cfg,160);
   }
 
   updateWordTrailButtons();
@@ -2769,6 +2859,7 @@ function drawMini(){
   drawMiniActiveClue();
   drawMiniKeyboard();
   updateMiniCompletionMessage();
+  if(miniComplete){const cfg=miniEndgameConfig();if(cfg)queueGlobalEndgame(cfg,140);}
 }
 
 function drawMiniClues(){
@@ -3090,3 +3181,60 @@ async function loadAnotherFive(){
 }
 
 document.getElementById("fiveEndgameClose")?.addEventListener("click",closeFiveEndgame);document.getElementById("fiveTryAnother")?.addEventListener("click",loadAnotherFive);document.querySelectorAll("#fiveEndgameOverlay [data-share]").forEach(b=>b.addEventListener("click",()=>shareFiveResult(b.dataset.share)));document.getElementById("fiveEndgameOverlay")?.addEventListener("click",e=>{if(e.target===e.currentTarget)closeFiveEndgame()});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("fiveEndgameOverlay")?.hidden)closeFiveEndgame()});
+/* V90 shared end-game controls */
+{const close=document.getElementById("globalEndgameClose"),overlay=document.getElementById("globalEndgameOverlay"),share=document.getElementById("globalEndgameShare"),copy=document.getElementById("globalEndgameCopy"),home=document.getElementById("globalEndgameHome");if(close)close.onclick=closeGlobalEndgame;if(overlay)overlay.addEventListener("click",e=>{if(e.target===overlay)closeGlobalEndgame()});if(share)share.onclick=()=>shareGlobalEndgame("native");if(copy)copy.onclick=()=>shareGlobalEndgame("copy");if(home)home.onclick=()=>{closeGlobalEndgame();showHomePage()}}
+document.addEventListener("keydown",event=>{if(event.key==="Escape"){const o=document.getElementById("globalEndgameOverlay");if(o&&!o.hidden)closeGlobalEndgame()}});
+
+document.getElementById("homeArchiveLink")?.addEventListener("click",event=>event.preventDefault());
+
+
+/* =========================================================
+   V100.8 — SAFE PUBLIC-SITE STARTUP
+   Run only after every game's let/const state has initialized.
+   One game's load failure must not block or masquerade as another.
+   ========================================================= */
+async function initPublicSite(){
+  document.body.classList.add("home-view");
+  updateDateLabel();
+
+  const loaders=[
+    {name:"Six to Five",load:loadFiveForSelectedDate,meta:"fivePuzzleMeta",status:"fiveStatus"},
+    {name:"Every Last Letter",load:loadEveryLastLetterForSelectedDate,meta:"ellPuzzleMeta",status:"ellStatus"},
+    {name:"One and the Same",load:loadOneAndTheSameForSelectedDate,meta:"samePuzzleMeta",status:"sameStatus"},
+    {name:"InCommon",load:loadQuadsForSelectedDate,meta:"quadsPuzzleMeta",status:"quadsStatus"},
+    {name:"Unscrumble",load:loadWordTrailForSelectedDate,meta:"wordTrailPuzzleMeta",status:"wordTrailStatus"},
+    {name:"Daily Crossword",load:loadMiniForSelectedDate,meta:"miniPuzzleMeta",status:"miniStatus"}
+  ];
+
+  const puzzlePromise=Promise.all(loaders.map(async game=>{
+    try{
+      await game.load();
+      return true;
+    }catch(err){
+      console.error(`${game.name} startup load failed`,err);
+      const meta=document.getElementById(game.meta);
+      const status=document.getElementById(game.status);
+      if(meta)meta.textContent="Load error";
+      if(status)status.innerHTML=
+        `<div class="result">Could not load the scheduled ${game.name} puzzle: ${err.message}</div>`;
+      return false;
+    }
+  }));
+
+  try{
+    await loadDictionary();
+  }catch(err){
+    console.error("Six to Five dictionary initialization failed",err);
+    const status=document.getElementById("fiveStatus");
+    if(status && !status.textContent.trim()){
+      status.innerHTML=
+        `<div class="result">Six to Five loaded, but guess validation could not initialize: ${err.message}</div>`;
+    }
+  }
+
+  await puzzlePromise;
+  updateHomeDashboard();
+  setActiveGame(activeGame);
+}
+
+initPublicSite();

@@ -1,13 +1,13 @@
-# Puzzle Website V89 — GitHub Pages Public Test
+# PuzzleWebsite V100.8 — GitHub Pages Public Test
 
-This is a static GitHub Pages test build generated from the V89 working baseline.
-
-It contains the current public frontend, current scheduled puzzle data, required
-dictionaries, assets, and a static-data adapter that emulates the read-only API
-routes used by the public games.
+Static GitHub Pages testing build generated from the current V100.8 project.
 
 Upload the contents of this folder to the root of the GitHub Pages repository.
-`index.html` should be at the repository root (not inside another folder).
 
-The admin dashboard and Node server are intentionally not included in this
-static public test package.
+- Current V100.8 public HTML, CSS, JavaScript, assets, and data.
+- Reuses the proven V89 static GitHub Pages data adapter.
+- Root-relative public/data paths converted to repository-relative paths.
+- CSS and JavaScript use `?v=100.8` cache-busting for physical-device testing.
+- `.nojekyll` included.
+
+This is a public-site test package only; it does not include the Node admin/server runtime.
