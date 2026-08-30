@@ -87,6 +87,104 @@ function formatElapsed(ms){
 }
 function fiveStateKey(){return puzzle?.date||currentDateKey()}
 
+
+const PUZZLENOOK_TIMER_KEY="puzzleNookUniversalTimersV1";
+const PUZZLENOOK_TIMER_VISIBILITY_KEY="puzzleNookTimerVisibleV1";
+let puzzleNookTimerTick=null;
+function timerPuzzleFor(game){return game==="five"?puzzle:game==="same"?samePuzzle:game==="quads"?quadsPuzzle:game==="mini"?miniPuzzle:game==="trail"?wordTrailPuzzle:game==="ell"?ellPuzzle:null}
+function timerGameComplete(game){return game==="five"?!!gameComplete:game==="same"?!!sameComplete:game==="quads"?!!quadsComplete:game==="mini"?!!miniComplete:game==="trail"?!!wordTrailComplete:game==="ell"?!!(ellComplete||ellEnded):false}
+function timerRecordKey(game,puz){return puz?`${game}|${puz.date||currentDateKey()}|${puz.id}`:""}
+function readPuzzleTimers(){try{return JSON.parse(localStorage.getItem(PUZZLENOOK_TIMER_KEY)||"{}")||{}}catch(e){return {}}}
+function writePuzzleTimers(all){localStorage.setItem(PUZZLENOOK_TIMER_KEY,JSON.stringify(all))}
+function ensurePuzzleTimerStarted(game){
+  const puz=timerPuzzleFor(game);if(!puz||timerGameComplete(game))return;
+  const all=readPuzzleTimers(),key=timerRecordKey(game,puz);
+  if(!all[key])all[key]={startedAt:Date.now(),elapsedMs:null,complete:false};
+  else if(!all[key].startedAt&&!all[key].complete)all[key].startedAt=Date.now();
+  writePuzzleTimers(all);
+}
+function completePuzzleTimer(game){
+  const puz=timerPuzzleFor(game);if(!puz)return;
+  const all=readPuzzleTimers(),key=timerRecordKey(game,puz),rec=all[key];
+  if(!rec)return;
+  if(!rec.complete){
+    rec.elapsedMs=Math.max(0,Date.now()-Number(rec.startedAt||Date.now()));
+    rec.complete=true;rec.completedAt=Date.now();all[key]=rec;writePuzzleTimers(all);
+  }
+}
+function puzzleElapsedMs(game){
+  const puz=timerPuzzleFor(game);if(!puz)return null;
+  const rec=readPuzzleTimers()[timerRecordKey(game,puz)];if(!rec)return null;
+  return rec.complete?Number(rec.elapsedMs)||0:Math.max(0,Date.now()-Number(rec.startedAt||Date.now()));
+}
+function puzzleTimeText(game){const ms=puzzleElapsedMs(game);return ms==null?"—":formatElapsed(ms)}
+let puzzleNookTimerVisibleFallback=false;
+function puzzleTimerVisiblePreference(){
+  try{
+    const stored=localStorage.getItem(PUZZLENOOK_TIMER_VISIBILITY_KEY);
+    if(stored===null)return puzzleNookTimerVisibleFallback;
+    return stored==="true";
+  }catch(e){
+    return puzzleNookTimerVisibleFallback;
+  }
+}
+function setPuzzleTimerVisiblePreference(visible){
+  puzzleNookTimerVisibleFallback=!!visible;
+  try{
+    localStorage.setItem(PUZZLENOOK_TIMER_VISIBILITY_KEY,visible?"true":"false");
+  }catch(e){}
+  updatePuzzleTimerDisplays();
+}
+function togglePuzzleTimerVisibility(){
+  setPuzzleTimerVisiblePreference(!puzzleTimerVisiblePreference());
+}
+function updatePuzzleTimerDisplays(){
+  const visible=puzzleTimerVisiblePreference();
+  ["five","same","quads","mini","trail","ell"].forEach(game=>{
+    if(timerGameComplete(game))completePuzzleTimer(game);
+    const host=document.querySelector(`[data-game-timer="${game}"]`);if(!host)return;
+    const puz=timerPuzzleFor(game);
+    host.classList.toggle("timer-complete",!!puz&&timerGameComplete(game));
+    host.classList.toggle("timer-hidden",!visible);
+    host.setAttribute("aria-label",visible?"Hide elapsed time":"Show elapsed time");
+    host.title=visible?"Hide timer":"Show timer";
+    if(visible){
+      host.textContent=puz?puzzleTimeText(game):"—";
+    }else{
+      host.innerHTML='<span class="puzzle-timer-clock" aria-hidden="true"></span>';
+    }
+  });
+}
+function activatePuzzleTimer(game){if(!["five","same","quads","mini","trail","ell"].includes(game))return;ensurePuzzleTimerStarted(game);updatePuzzleTimerDisplays()}
+function addUniversalTimerHosts(){
+  const panels={five:"fivePanel",same:"samePanel",quads:"quadsPanel",mini:"miniPanel",trail:"wordTrailPanel",ell:"ellPanel"};
+  Object.entries(panels).forEach(([game,id])=>{
+    const panel=document.getElementById(id);
+    const head=panel?.querySelector(".game-clean-head");
+    if(!head||panel.querySelector(`[data-game-timer="${game}"]`))return;
+
+    const row=document.createElement("div");
+    row.className=`puzzle-timer-row puzzle-timer-row-${game}`;
+
+    const timerButton=document.createElement("button");
+    timerButton.type="button";
+    timerButton.className="puzzle-live-timer";
+    timerButton.dataset.gameTimer=game;
+    timerButton.setAttribute("aria-label","Show elapsed time");
+    timerButton.addEventListener("click",(event)=>{
+      event.preventDefault();
+      event.stopPropagation();
+      togglePuzzleTimerVisibility();
+    });
+
+    row.appendChild(timerButton);
+    head.insertAdjacentElement("afterend",row);
+  });
+  updatePuzzleTimerDisplays();
+}
+
+let suppressRestoredEndgames=true;
+
 function closeFiveEndgame(){const o=document.getElementById("fiveEndgameOverlay");if(o){o.hidden=true;o.setAttribute("aria-hidden","true")}}
 function buildFiveEndgameMiniGrid(){
  const host=document.getElementById("fiveEndgameMiniGrid");
@@ -103,7 +201,7 @@ function buildFiveEndgameMiniGrid(){
  });
 }
 function showFiveEndgame(){
- if(!puzzle||!gameComplete)return;
+ if(suppressRestoredEndgames||!puzzle||!gameComplete)return;
  const won=guesses.includes(puzzle.answer);
  const title=document.getElementById("fiveEndgameTitle");
  const answer=document.getElementById("fiveEndgameAnswer");
@@ -121,7 +219,7 @@ function showFiveEndgame(){
    answer.hidden=true;
    message.textContent=sixToFiveResultCache;
    art.hidden=false;
-   stats.innerHTML=`<div><strong>${n}</strong><span>${n===1?"GUESS":"GUESSES"}</span></div><div><strong>${formatElapsed(currentFiveElapsedMs())}</strong><span>TIME</span></div>`;
+   stats.innerHTML=`<div><strong>${n}</strong><span>${n===1?"GUESS":"GUESSES"}</span></div><div><strong>${puzzleTimeText("five")}</strong><span>TIME</span></div>`;
    resultLine.textContent=`Six to Five · ${formatPuzzleDate(puzzle.date)} · ${n}/6`;
    share.hidden=false;
  }else{
@@ -132,7 +230,7 @@ function showFiveEndgame(){
    answer.innerHTML=`The word was <strong>${puzzle.answer}</strong>`;
    message.textContent=sixToFiveResultCache;
    art.hidden=true;
-   stats.innerHTML=`<div><strong>6</strong><span>GUESSES</span></div><div><strong>${formatElapsed(currentFiveElapsedMs())}</strong><span>TIME</span></div>`;
+   stats.innerHTML=`<div><strong>6</strong><span>GUESSES</span></div><div><strong>${puzzleTimeText("five")}</strong><span>TIME</span></div>`;
    share.hidden=true;
  }
  const dailyCount=fiveDailyCount();
@@ -159,14 +257,26 @@ function globalEndgameIcon(game){if(game==="quads")return '<div class="global-em
 function closeGlobalEndgame(){const o=document.getElementById("globalEndgameOverlay");if(o){o.hidden=true;o.setAttribute("aria-hidden","true")}}
 function globalEndgameShareText(config){return config.shareText||`${config.kicker} — ${config.resultLine||formatPuzzleDate(config.date)}`}
 async function shareGlobalEndgame(kind){if(!globalEndgameCurrent)return;const text=globalEndgameShareText(globalEndgameCurrent);if(kind==="native"&&navigator.share){try{await navigator.share({title:globalEndgameCurrent.kicker,text})}catch(e){}return}try{await navigator.clipboard.writeText(text);const b=document.getElementById(kind==="copy"?"globalEndgameCopy":"globalEndgameShare");if(b){const old=b.innerHTML;b.textContent="Copied ✓";setTimeout(()=>b.innerHTML=old,1200)}}catch(e){}}
-function showGlobalEndgame(config){const key=globalEndgameKey(config.game,config.date,config.state||"complete");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
-function queueGlobalEndgame(config,delay=80){setTimeout(()=>showGlobalEndgame(config),delay)}
-function quadsEndgameConfig(){if(!quadsPuzzle||!quadsComplete)return null;const visual=`<div class="global-quads-result">${quadsSolved.map(g=>`<span class="${difficultyClass(g.difficulty)}">${escapeSameHtml(g.label)}</span>`).join("")}</div>`;const mistakes=Math.min(4,quadsMistakes);return{game:"quads",date:quadsPuzzle.date,state:quadsWon?"win":"loss",kicker:"INCOMMON",title:quadsWon?"All four found.":"Not this time.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.quads[quadsWon?"win":"loss"]),visualHtml:visual,stats:[{value:quadsSolved.length,label:"GROUPS"},{value:mistakes,label:mistakes===1?"MISTAKE":"MISTAKES"}],resultLine:`InCommon · ${formatPuzzleDate(quadsPuzzle.date)} · ${quadsWon?"Solved":`${mistakes}/4 mistakes`}`,shareText:`InCommon — ${formatPuzzleDate(quadsPuzzle.date)} — ${quadsWon?"Solved":"Not solved"} — ${mistakes}/4 mistakes`}}
-function sameEndgameConfig(){if(!samePuzzle||!sameComplete)return null;const tries=Math.max(1,Math.min(4,sameRevealed));return{game:"same",date:samePuzzle.date,state:sameWon?"win":"loss",kicker:"ONE AND THE SAME",title:sameWon?`Solved in ${tries}.`:"Not this time.",answerHtml:`The answer was <strong>${escapeSameHtml(samePuzzle.answer)}</strong>`,message:globalPick(GLOBAL_ENDGAME_MESSAGES.same[sameWon?"win":"loss"]),stats:[{value:sameWon?tries:4,label:"CLUES"},{value:sameWrong.length,label:"WRONG GUESSES"}],resultLine:`One and the Same · ${formatPuzzleDate(samePuzzle.date)} · ${sameWon?`${tries}/4`:"—/4"}`,shareText:`One and the Same — ${formatPuzzleDate(samePuzzle.date)} — ${sameWon?`Solved in ${tries}/4`:"Not solved"}`}}
-function ellEndgameConfig(){if(!ellPuzzle||(!ellComplete&&!ellEnded))return null;const won=ellComplete,used=ellUsed(),score=ellCurrentScore();return{game:"ell",date:ellPuzzle.date,state:won?"win":`end-${ellEndReason||"ended"}`,kicker:"EVERY LAST LETTER",title:won?"Every last letter!":ellEndReason==="giveup"?"Run complete.":"No more words.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.ell[won?"win":"loss"]),stats:[{value:`${used}/25`,label:"LETTERS"},{value:score,label:"SCORE"},{value:ellSubmitted.length,label:"WORDS"}],resultLine:`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · ${used}/25 · ${score} pts`,shareText:`Every Last Letter — ${formatPuzzleDate(ellPuzzle.date)} — ${used}/25 letters — ${score} points — ${ellSubmitted.length} words`}}
-function trailEndgameConfig(){if(!wordTrailPuzzle||!wordTrailComplete)return null;const total=wtAllThemeWords().length;return{game:"trail",date:wordTrailPuzzle.date,state:"win",kicker:"UNSCRUMBLE",title:"Grid complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.trail.win),stats:[{value:`${wordTrailFound.length}/${total}`,label:"THEME WORDS"},{value:wordTrailNonThemeFound.length,label:"BONUS WORDS"},{value:wordTrailPuzzle.theme||"—",label:"THEME"}],resultLine:`Unscrumble · ${formatPuzzleDate(wordTrailPuzzle.date)} · ${wordTrailFound.length}/${total}`,shareText:`Unscrumble — ${formatPuzzleDate(wordTrailPuzzle.date)} — ${wordTrailFound.length}/${total} theme words — ${wordTrailNonThemeFound.length} bonus words`}}
+function showGlobalEndgame(config){if(suppressRestoredEndgames)return;const key=globalEndgameKey(config.game,config.date,config.state||"complete");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
+function queueGlobalEndgame(config,delay=80){
+  if(suppressRestoredEndgames)return;
+  setTimeout(()=>{
+    if(!suppressRestoredEndgames)showGlobalEndgame(config);
+  },delay);
+}
+function quadsEndgameConfig(){if(timerGameComplete("quads"))completePuzzleTimer("quads");if(!quadsPuzzle||!quadsComplete)return null;const visual=`<div class="global-quads-result">${quadsSolved.map(g=>`<span class="${difficultyClass(g.difficulty)}">${escapeSameHtml(g.label)}</span>`).join("")}</div>`;const mistakes=Math.min(4,quadsMistakes);return{game:"quads",date:quadsPuzzle.date,state:quadsWon?"win":"loss",kicker:"INCOMMON",title:quadsWon?"All four found.":"Not this time.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.quads[quadsWon?"win":"loss"]),visualHtml:visual,stats:[{value:mistakes,label:"MISTAKES"},{value:puzzleTimeText("quads"),label:"TIME"}],resultLine:`InCommon · ${formatPuzzleDate(quadsPuzzle.date)} · ${quadsWon?"Solved":`${mistakes}/4 mistakes`}`,shareText:`InCommon — ${formatPuzzleDate(quadsPuzzle.date)} — ${quadsWon?"Solved":"Not solved"} — ${mistakes}/4 mistakes`}}
+function sameEndgameConfig(){if(timerGameComplete("same"))completePuzzleTimer("same");if(!samePuzzle||!sameComplete)return null;const tries=Math.max(1,Math.min(4,sameRevealed));return{game:"same",date:samePuzzle.date,state:sameWon?"win":"loss",kicker:"ONE AND THE SAME",title:sameWon?`Solved in ${tries}.`:"Not this time.",answerHtml:`The answer was <strong>${escapeSameHtml(samePuzzle.answer)}</strong>`,message:globalPick(GLOBAL_ENDGAME_MESSAGES.same[sameWon?"win":"loss"]),stats:[{value:sameWon?tries:4,label:"GUESSES"},{value:puzzleTimeText("same"),label:"TIME"}],resultLine:`One and the Same · ${formatPuzzleDate(samePuzzle.date)} · ${sameWon?`${tries}/4`:"—/4"}`,shareText:`One and the Same — ${formatPuzzleDate(samePuzzle.date)} — ${sameWon?`Solved in ${tries}/4`:"Not solved"}`}}
+function ellEndgameConfig(){if(timerGameComplete("ell"))completePuzzleTimer("ell");if(!ellPuzzle||(!ellComplete&&!ellEnded))return null;const won=ellComplete,used=ellUsed(),base=ellCurrentScore(),bonus=ellCompletionBonus(used),score=base+bonus;return{game:"ell",date:ellPuzzle.date,state:won?"win":`end-${ellEndReason||"ended"}`,kicker:"EVERY LAST LETTER",title:won?"Every last letter!":ellEndReason==="giveup"?"Run complete.":"No more words.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.ell[won?"win":"loss"]),stats:[{value:score,label:"SCORE"},{value:`${used}/25`,label:"LETTERS USED"},{value:puzzleTimeText("ell"),label:"TIME"}],resultLine:bonus?`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · Base ${base} + ${bonus} bonus = ${score} pts`:`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · ${used}/25 · ${score} pts`,shareText:`Every Last Letter — ${formatPuzzleDate(ellPuzzle.date)} — ${used}/25 letters — ${score} points${bonus?` (${bonus} bonus)`:""} — ${ellSubmitted.length} words`}}
+function trailEndgameConfig(){if(timerGameComplete("trail"))completePuzzleTimer("trail");if(!wordTrailPuzzle||!wordTrailComplete)return null;const total=wtAllThemeWords().length;return{game:"trail",date:wordTrailPuzzle.date,state:"win",kicker:"UNSCRUMBLE",title:"Grid complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.trail.win),stats:[{value:puzzleTimeText("trail"),label:"TIME"},{value:wordTrailHintsUsed,label:"HINTS USED"},{value:wordTrailNonThemeFound.length,label:"NON-THEME WORDS"}],resultLine:`Unscrumble · ${formatPuzzleDate(wordTrailPuzzle.date)} · ${wordTrailFound.length}/${total}`,shareText:`Unscrumble — ${formatPuzzleDate(wordTrailPuzzle.date)} — ${wordTrailFound.length}/${total} theme words — ${wordTrailNonThemeFound.length} bonus words`}}
 function miniEndgameVisual(){if(!miniPuzzle)return globalEndgameIcon("mini");return `<div class="global-mini-result" style="--ge-cols:${miniCols()}">${miniPuzzle.grid.flatMap((row,r)=>row.map((solution,c)=>solution==="#"?'<i class="black"></i>':`<i>${escapeSameHtml(miniValues[miniKey(r,c)]||"")}</i>`)).join("")}</div>`}
-function miniEndgameConfig(){if(!miniPuzzle||!miniComplete)return null;const revealed=miniRevealedPuzzle,cells=miniPuzzle.grid.flat().filter(x=>x!=="#").length;return{game:"mini",date:miniPuzzle.date,state:revealed?"revealed":"win",kicker:"DAILY CROSSWORD",title:revealed?"Puzzle revealed.":"Crossword complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.mini[revealed?"loss":"win"]),visualHtml:miniEndgameVisual(),stats:[{value:miniRows()===6?"6×6":"5×5",label:"GRID"},{value:cells,label:"LETTERS"},{value:revealed?"YES":"NO",label:"FULL REVEAL"}],resultLine:`Daily Crossword · ${formatPuzzleDate(miniPuzzle.date)} · ${revealed?"Revealed":"Solved"}`,shareText:`Daily Crossword — ${formatPuzzleDate(miniPuzzle.date)} — ${revealed?"Revealed":"Solved"}`}}
+function miniHintSummary(){
+  if(miniRevealedPuzzle)return "Full Reveal";
+  const parts=[];
+  if(miniLetterHintsUsed)parts.push(`${miniLetterHintsUsed} Letter ${miniLetterHintsUsed===1?"Hint":"Hints"}`);
+  if(miniWordHintsUsed)parts.push(`${miniWordHintsUsed} Word ${miniWordHintsUsed===1?"Hint":"Hints"}`);
+  return parts.length?parts.join(" · "):"No hints";
+}
+function miniEndgameConfig(){if(timerGameComplete("mini"))completePuzzleTimer("mini");if(!miniPuzzle||!miniComplete)return null;const revealed=miniRevealedPuzzle;return{game:"mini",date:miniPuzzle.date,state:revealed?"revealed":"win",kicker:"DAILY CROSSWORD",title:revealed?"Puzzle revealed.":"Crossword complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.mini[revealed?"loss":"win"]),visualHtml:miniEndgameVisual(),stats:[{value:puzzleTimeText("mini"),label:"TIME"},{value:miniHintSummary(),label:"HINTS"}],resultLine:`Daily Crossword · ${formatPuzzleDate(miniPuzzle.date)} · ${revealed?"Revealed":"Solved"}`,shareText:`Daily Crossword — ${formatPuzzleDate(miniPuzzle.date)} — ${revealed?"Revealed":"Solved"}`}}
 
 const PLAYER_KEY="puzzlePublicPlayerV3";
 let puzzle=null;
@@ -201,6 +311,10 @@ function updateDateLabel(){
 }
 
 async function changeDay(delta){
+  suppressRestoredEndgames=true;
+  closeFiveEndgame();
+  closeGlobalEndgame();
+
   selectedDate.setDate(selectedDate.getDate()+delta);
   updateDateLabel();
   await Promise.all([
@@ -212,6 +326,7 @@ async function changeDay(delta){
     loadMiniForSelectedDate()
   ]);
   updateHomeDashboard();
+  suppressRestoredEndgames=false;
 }
 
 async function loadDictionary(){
@@ -283,8 +398,132 @@ function savePlayerState(){
   localStorage.setItem(PLAYER_KEY,JSON.stringify(all));
 }
 
+
+/* =========================================================
+   V100.52 — DYNAMIC HOW-TO-PLAY PANEL
+   ========================================================= */
+
+const GAME_INSTRUCTIONS={
+  five:{
+    name:"Six to Five",
+    body:`
+      <p>Guess the five-letter word in six tries. Every guess must be a valid five-letter word.</p>
+      <p>After each guess, we will use different colors to tell you which letters were right and which were wrong.</p>
+      <div class="instructions-legend">
+        <div class="instructions-legend-row"><span class="instructions-swatch five-correct"></span><span><strong>Green</strong> — correct letter, correct spot</span></div>
+        <div class="instructions-legend-row"><span class="instructions-swatch five-present"></span><span><strong>Blue</strong> — correct letter, wrong spot</span></div>
+        <div class="instructions-legend-row"><span class="instructions-swatch five-absent"></span><span><strong>Black</strong> — letter is not in the word</span></div>
+      </div>
+      <p>Letters can appear more than once.</p>
+      <p><strong>Hard Mode:</strong> Any clues revealed by previous guesses must be used in your next guess.</p>
+      <p class="instructions-goal"><strong>Goal:</strong> Find the word in as few guesses as possible.</p>`
+  },
+  quads:{
+    name:"InCommon",
+    body:`
+      <p>Find four groups of four words that share something in common. There is only one complete solution to each puzzle.</p>
+      <p>Select four words and submit your guess. You can make up to <strong>four mistakes</strong>. If three of your four selections belong together, we'll let you know you're close.</p>
+      <p>When you solve a category, its color shows its difficulty:</p>
+      <div class="instructions-legend incommon-legend">
+        <div class="instructions-legend-row"><span class="instructions-swatch quads-easy"></span><span><strong>Yellow</strong> — Easy</span></div>
+        <div class="instructions-legend-row"><span class="instructions-swatch quads-medium"></span><span><strong>Green</strong> — Medium</span></div>
+        <div class="instructions-legend-row"><span class="instructions-swatch quads-hard"></span><span><strong>Blue</strong> — Hard</span></div>
+        <div class="instructions-legend-row"><span class="instructions-swatch quads-very-hard"></span><span><strong>Purple</strong> — Very Hard</span></div>
+      </div>
+      <p>Categories can be straightforward—or a little sneaky. Watch for words that could appear to fit more than one group.</p>
+      <p class="instructions-goal"><strong>Goal:</strong> Find all four groups before your fourth mistake.</p>`
+  },
+  mini:{
+    name:"Daily Crossword",
+    body:`
+      <p>Fill the grid using the Across and Down clues.</p>
+      <p>Select a square to see its clue. Tap the square again to switch between Across and Down. Type a letter to fill the active square, and use the arrow keys or <strong>Enter</strong> to move through the puzzle.</p>
+      <p>The game ends when all of the squares are filled correctly. If you are having trouble, you can use a <strong>Hint</strong> to reveal a word, letter, or the entire puzzle.</p>
+      <p class="instructions-goal"><strong>Goal:</strong> Complete the entire crossword.</p>`
+  },
+  trail:{
+    name:"Unscrumble",
+    body:`
+      <p>Find the hidden theme words in the letter grid.</p>
+      <p>Start on any letter and trace through adjacent letters to make a word. You can move horizontally, vertically, or diagonally. Each theme word follows one continuous path.</p>
+      <p>Alternatively, you can tap connecting letters and then tap <strong>SUBMIT</strong> to submit a word.</p>
+      <p>Non-theme words earn pieces towards a <strong>Hint</strong>. Three pieces gets you one Hint. Spend your Hints to reveal theme words.</p>
+      <p class="instructions-goal"><strong>Goal:</strong> Find every hidden theme word.</p>`
+  },
+  ell:{
+    name:"Every Last Letter",
+    body:`
+      <p>Make words using the 25 letters on the board.</p>
+      <p>Select letters to build a word, then submit it. Each letter tile can be used only once, so every word you make changes what's available for the rest of the puzzle. Longer words are worth more points.</p>
+      <p>Every puzzle has at least one solution that uses all 25 letters, and most puzzles have at least 25 different complete solutions.</p>
+      <p>Longer words are worth more points. You also earn a completion bonus based on how many letters you use: <strong>23 letters = +25 points</strong>, <strong>24 letters = +50 points</strong>, and <strong>all 25 letters = +100 points</strong>.</p>
+      <p class="instructions-goal"><strong>Goal:</strong> Use every last letter—and score as many points as you can.</p>`
+  },
+  same:{
+    name:"One and the Same",
+    body:`
+      <p>Four clues. One answer.</p>
+      <p>You'll start with a single clue. Enter the word you think it describes.</p>
+      <p>Guess incorrectly and another clue is revealed. Each different clue is describing the <strong>same one answer</strong>. You have up to four guesses.</p>
+      <p class="instructions-goal"><strong>Goal:</strong> Find the answer using as few clues as possible.</p>`
+  }
+};
+
+function updateGameInstructionsButton(){
+  const btn=document.getElementById("gameInstructionsBtn");
+  if(!btn)return;
+  const cfg=GAME_INSTRUCTIONS[activeGame];
+  btn.hidden=!cfg;
+  if(cfg){
+    btn.setAttribute("aria-label",`How to play ${cfg.name}`);
+    btn.title=`How to play ${cfg.name}`;
+  }
+}
+
+function openGameInstructions(){
+  const cfg=GAME_INSTRUCTIONS[activeGame];
+  const overlay=document.getElementById("gameInstructionsOverlay");
+  if(!cfg||!overlay)return;
+
+  const kicker=document.getElementById("gameInstructionsKicker");
+  const title=document.getElementById("gameInstructionsTitle");
+  const body=document.getElementById("gameInstructionsBody");
+  if(kicker)kicker.textContent=cfg.name.toUpperCase();
+  if(title)title.textContent="How to play";
+  if(body)body.innerHTML=cfg.body;
+
+  overlay.hidden=false;
+  overlay.setAttribute("aria-hidden","false");
+  document.body.classList.add("instructions-open");
+  requestAnimationFrame(()=>document.getElementById("gameInstructionsClose")?.focus());
+}
+
+function closeGameInstructions(){
+  const overlay=document.getElementById("gameInstructionsOverlay");
+  if(!overlay||overlay.hidden)return;
+  overlay.hidden=true;
+  overlay.setAttribute("aria-hidden","true");
+  document.body.classList.remove("instructions-open");
+  document.getElementById("gameInstructionsBtn")?.focus();
+}
+
+document.getElementById("gameInstructionsBtn")?.addEventListener("click",openGameInstructions);
+document.getElementById("gameInstructionsClose")?.addEventListener("click",closeGameInstructions);
+document.getElementById("gameInstructionsOverlay")?.addEventListener("click",event=>{
+  if(event.target===event.currentTarget)closeGameInstructions();
+});
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&!document.getElementById("gameInstructionsOverlay")?.hidden){
+    closeGameInstructions();
+  }
+});
+
 function setActiveGame(game){
+  closeFiveEndgame();
+  closeGlobalEndgame();
+  closeGameInstructions();
   activeGame=game;
+  updateGameInstructionsButton();
   document.body.classList.toggle("home-view",game==="home");
   if(game==="home") updateHomeDashboard();
   const frontPage=document.getElementById("frontPage");
@@ -308,6 +547,10 @@ function setActiveGame(game){
   if(active){
     active.classList.remove("game-hidden");
     active.classList.add("game-visible");
+  }
+  if(!isHome)activatePuzzleTimer(game);
+  if(game==="five"){
+    queueFiveMobileBoardSize();
   }
   if(game==="trail"){
     requestAnimationFrame(()=>requestAnimationFrame(queueWordTrailMobileBoardSize));
@@ -342,9 +585,9 @@ function updateHomeDashboard(){
     five:`${guesses.length} ${guesses.length===1?"guess":"guesses"}`,
     same:`${Math.max(1,Math.min(4,sameRevealed))} ${sameRevealed===1?"clue":"clues"}`,
     quads:`${quadsMistakes} ${quadsMistakes===1?"mistake":"mistakes"}`,
-    mini:miniRevealedPuzzle?"Revealed":`${miniRows()}×${miniCols()} solved`,
-    trail:`${wordTrailFound.length} theme ${wordTrailFound.length===1?"word":"words"}`,
-    ell:`${ellCurrentScore()} points`
+    mini:puzzleTimeText("mini"),
+    trail:puzzleTimeText("trail"),
+    ell:`${ellFinalScore()} points`
   };
   const count=Object.values(states).filter(Boolean).length;
   const text=document.getElementById("homeProgressText");
@@ -483,6 +726,25 @@ function sizeFiveMobileBoard(){
   }
 }
 
+/* V100.50 — Six to Five initial mobile sizing.
+   The puzzle is preloaded while its panel is hidden, so its first sizing
+   pass can occur before the stage/keyboard have real geometry. Re-measure
+   after the panel becomes visible and again as the mobile viewport settles. */
+let fiveMobileSizeTimers=[];
+function queueFiveMobileBoardSize(){
+  fiveMobileSizeTimers.forEach(clearTimeout);
+  fiveMobileSizeTimers=[];
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      sizeFiveMobileBoard();
+      fiveMobileSizeTimers.push(setTimeout(sizeFiveMobileBoard,80));
+      fiveMobileSizeTimers.push(setTimeout(sizeFiveMobileBoard,220));
+      fiveMobileSizeTimers.push(setTimeout(sizeFiveMobileBoard,450));
+    });
+  });
+}
+
 function drawFive(){
   if(!puzzle) return;
 
@@ -511,7 +773,7 @@ function drawFive(){
   }
 
   drawKeyboard();
-  requestAnimationFrame(sizeFiveMobileBoard);
+  queueFiveMobileBoardSize();
 
   const status=document.getElementById("fiveStatus");
   if(gameComplete){
@@ -1267,10 +1529,14 @@ document.getElementById("sameGuessInput").addEventListener("pointerdown",event=>
   }
 });
 window.addEventListener("resize",configureSameGuessInput);
-window.addEventListener("resize",()=>requestAnimationFrame(sizeFiveMobileBoard));
+window.addEventListener("resize",queueFiveMobileBoardSize);
 if(window.visualViewport){
-  window.visualViewport.addEventListener("resize",()=>requestAnimationFrame(sizeFiveMobileBoard));
+  window.visualViewport.addEventListener("resize",queueFiveMobileBoardSize);
 }
+window.addEventListener("orientationchange",queueFiveMobileBoardSize);
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden && activeGame==="five")queueFiveMobileBoardSize();
+});
 
 
 
@@ -1381,16 +1647,30 @@ function ellScoreForLength(length){
 function ellCurrentScore(){
   return ellSubmitted.reduce((sum,entry)=>sum+(Number(entry.score)||ellScoreForLength(entry.word?.length||0)),0);
 }
+function ellCompletionBonus(lettersUsed=ellUsed()){
+  const used=Number(lettersUsed)||0;
+  if(used>=25)return 100;
+  if(used===24)return 50;
+  if(used===23)return 25;
+  return 0;
+}
+function ellFinalScore(){
+  const base=ellCurrentScore();
+  return (ellComplete||ellEnded) ? base+ellCompletionBonus(ellUsed()) : base;
+}
 
 
 function ellEndGameHtml(reason){
   const used=ellUsed();
-  const score=ellCurrentScore();
+  const base=ellCurrentScore();
+  const bonus=ellCompletionBonus(used);
+  const score=base+bonus;
   const headline=reason==="stuck" ? "No more words." : "You ended your game.";
+  const bonusLine=bonus?` <span class="ell-score-bonus">(${base} + ${bonus} bonus)</span>`:"";
   return `<div class="ell-endgame">
     <div class="ell-endgame-title">${headline}</div>
     <div class="ell-endgame-summary">You used <strong>${used}/25</strong> letters.</div>
-    <div class="ell-endgame-score">Your final score is <strong>${score}</strong>.</div>
+    <div class="ell-endgame-score">Your final score is <strong>${score}</strong>.${bonusLine}</div>
     <button type="button" class="ell-try-again" onclick="ellTryAgain()">Try again?</button>
   </div>`;
 }
@@ -1440,7 +1720,7 @@ function drawEll(){
     grid.appendChild(b);
   });
   document.getElementById("ellCurrentWord").textContent=ellWord()||" ";
-  ellAnimateScoreTo(ellCurrentScore());
+  ellAnimateScoreTo((ellComplete||ellEnded)?ellFinalScore():ellCurrentScore());
   const host=document.getElementById("ellCompletedWords");host.innerHTML="";
   if(ellSubmitted.length){
     const heading=document.createElement("div");
@@ -1465,7 +1745,7 @@ function drawEll(){
     document.getElementById("ellStatus").innerHTML=`<div class="ell-endgame ell-endgame-win">
       <div class="ell-endgame-title">Every Last Letter!</div>
       <div class="ell-endgame-summary">You used <strong>25/25</strong> letters.</div>
-      <div class="ell-endgame-score">Your final score is <strong>${ellCurrentScore()}</strong>.</div>
+      <div class="ell-endgame-score">Your final score is <strong>${ellFinalScore()}</strong>. <span class="ell-score-bonus">(${ellCurrentScore()} + ${ellCompletionBonus()} bonus)</span></div>
       <button type="button" class="ell-try-again" onclick="ellTryAgain()">Try again?</button>
     </div>`;
   }else if(ellEnded){
@@ -1653,10 +1933,12 @@ async function loadQuadsForSelectedDate(){
   quadsSolved=[];
   quadsMistakes=0;
   quadsComplete=false;
+  quadsEndgameSequenceRunning=false;
 
   const date=currentDateKey();
   const meta=document.getElementById("quadsPuzzleMeta");
   const status=document.getElementById("quadsStatus");
+  status.classList.remove("quads-final-sequence");
   status.innerHTML="";
 
   const res=await fetch(`/api/puzzle/today?game=quads&date=${encodeURIComponent(date)}`);
@@ -1724,23 +2006,66 @@ function preserveViewport(fn){
   requestAnimationFrame(()=>window.scrollTo(x,y));
 }
 
-function drawQuads(){
+function updateQuadsInstructions(){
+  const instructions=document.getElementById("quadsInstructions");
+  if(!instructions) return;
+
+  instructions.classList.remove("quads-end-result","quads-win-result","quads-loss-result");
+
+  if(quadsComplete){
+    instructions.innerHTML=quadsWon
+      ? `<strong>SOLVED</strong>`
+      : `<strong>NOT-SOLVED</strong>`;
+    instructions.classList.add(
+      "quads-end-result",
+      quadsWon ? "quads-win-result" : "quads-loss-result"
+    );
+  }else{
+    instructions.textContent="Select four things that have something in common.";
+  }
+}
+
+function drawQuads(animateNewestSolved=false,animateGrid=false){
+  updateQuadsInstructions();
   const solvedHost=document.getElementById("quadsSolved");
   solvedHost.innerHTML=quadsSolved.map((g,i)=>`
-    <div class="quads-solved-row ${difficultyClass(g.difficulty)} ${i===quadsSolved.length-1&&quadsSolved.length>0?"enter":""}">
+    <div class="quads-solved-row ${difficultyClass(g.difficulty)} ${animateNewestSolved&&i===quadsSolved.length-1&&quadsSolved.length>0?"enter":""}">
       <div class="label">${g.label}</div>
       <div class="words">${g.items.join(" · ")}</div>
     </div>`).join("");
 
+  // The landing animation is a one-time event. Remove its class once it has
+  // finished so switching away from InCommon and back cannot replay it.
+  if(animateNewestSolved){
+    const enteringRow=solvedHost.querySelector(".quads-solved-row.enter");
+    if(enteringRow){
+      const clearEnter=()=>enteringRow.classList.remove("enter");
+      enteringRow.addEventListener("animationend",clearEnter,{once:true});
+      setTimeout(clearEnter,650);
+    }
+  }
+
   const grid=document.getElementById("quadsGrid");
   grid.innerHTML="";
   grid.classList.remove("reflow");
-  void grid.offsetWidth;
-  grid.classList.add("reflow");
+  if(animateGrid){
+    void grid.offsetWidth;
+    grid.classList.add("reflow");
+  }
   quadsRemaining.forEach(word=>{
     const b=document.createElement("button");
     b.type="button";
-    b.className=`quads-tile ${quadsSelected.has(word)?"selected":""}`;
+    const tileText=String(word||"").trim();
+    const isPhrase=/\s/.test(tileText);
+    const compactLength=tileText.replace(/\s+/g,"").length;
+    const fitClass=isPhrase
+      ? "quads-tile-phrase"
+      : compactLength>=12
+        ? "quads-tile-very-long"
+        : compactLength>=9
+          ? "quads-tile-long"
+          : "";
+    b.className=`quads-tile ${fitClass} ${quadsSelected.has(word)?"selected":""}`.trim();
     b.textContent=word;
     b.onclick=()=>toggleQuadWord(word);
     grid.appendChild(b);
@@ -1748,15 +2073,47 @@ function drawQuads(){
 
   const mistakesLeft=Math.max(0,4-quadsMistakes);
   document.getElementById("quadsMistakes").innerHTML=
-    `Lives left: <span class="life-stars" aria-label="${mistakesLeft} lives left">${Array.from({length:mistakesLeft},()=>'<span class="mistake-star" aria-hidden="true">★</span>').join("")}</span>`;
+    `Lives left: <span class="life-stars" aria-label="${mistakesLeft} lives left">${Array.from({length:4},(_,i)=>`<span class="mistake-star ${i<mistakesLeft?"active-life":"spent-life"}" aria-hidden="true">★</span>`).join("")}</span>`;
 
   updateQuadsButtons();
 
   if(quadsComplete){
-    document.getElementById("quadsStatus").innerHTML=
-      `<div class="completion-note">${quadsWon?"Solved — all four groups found.":"Puzzle complete — no mistakes remaining."}</div>`;
-    const cfg=quadsEndgameConfig();if(cfg)queueGlobalEndgame(cfg,140);
+    document.getElementById("quadsStatus").innerHTML="";
+    if(!quadsEndgameSequenceRunning){
+      const cfg=quadsEndgameConfig();if(cfg)queueGlobalEndgame(cfg,140);
+    }
   }
+}
+
+function playQuadsWinFinishSequence(){
+  const solvedHost=document.getElementById("quadsSolved");
+  const status=document.getElementById("quadsStatus");
+  if(!solvedHost || !status){
+    quadsEndgameSequenceRunning=false;
+    updateQuadsInstructions();
+    const cfg=quadsEndgameConfig();if(cfg)queueGlobalEndgame(cfg,140);
+    return;
+  }
+
+  // Stage 4: all four solved categories celebrate together in their final positions.
+  const rows=[...solvedHost.querySelectorAll(".quads-solved-row")];
+  rows.forEach(row=>row.classList.add("all-groups-celebrate"));
+
+  setTimeout(()=>{
+    rows.forEach(row=>row.classList.remove("all-groups-celebrate"));
+
+    // Stage 5: replace the instruction line with the final result.
+    quadsEndgameSequenceRunning=false;
+    status.classList.remove("quads-final-sequence");
+    updateQuadsInstructions();
+
+    // Stage 6: open the end-game modal after the board celebration finishes.
+    const cfg=quadsEndgameConfig();
+    if(cfg){
+      globalEndgameShown.delete(globalEndgameKey(cfg.game,cfg.date,cfg.state||"complete"));
+      setTimeout(()=>showGlobalEndgame(cfg),180);
+    }
+  },620);
 }
 
 function updateQuadsButtons(){
@@ -1768,13 +2125,24 @@ function updateQuadsButtons(){
 
 function toggleQuadWord(word){
   if(!quadsPuzzle || quadsComplete) return;
+  const tiles=[...document.querySelectorAll(".quads-tile")];
+  const tile=tiles.find(el=>el.textContent===word);
   if(quadsSelected.has(word)){
     quadsSelected.delete(word);
+    if(tile){
+      tile.classList.remove("selected","select-pop");
+      tile.classList.add("deselect-drop");
+      setTimeout(()=>tile.classList.remove("deselect-drop"),180);
+    }
   }else{
     if(quadsSelected.size>=4) return;
     quadsSelected.add(word);
+    if(tile){
+      tile.classList.add("selected","select-pop");
+      setTimeout(()=>tile.classList.remove("select-pop"),240);
+    }
   }
-  preserveViewport(()=>drawQuads());
+  updateQuadsButtons();
 }
 
 function showQuadsMessage(text,type="warn"){
@@ -1782,11 +2150,27 @@ function showQuadsMessage(text,type="warn"){
     `<div class="quads-message ${type}">${text}</div>`;
 }
 
+const QUADS_WRONG_MESSAGES=[
+  "Not quite.",
+  "Nope — try again.",
+  "Sorry, that’s wrong.",
+  "Incorrect.",
+  "Keep looking."
+];
+let quadsWrongMessageIndex=0;
+let quadsEndgameSequenceRunning=false;
+
+function nextQuadsWrongMessage(){
+  const message=QUADS_WRONG_MESSAGES[quadsWrongMessageIndex%QUADS_WRONG_MESSAGES.length];
+  quadsWrongMessageIndex=(quadsWrongMessageIndex+1)%QUADS_WRONG_MESSAGES.length;
+  return message;
+}
+
 function shuffleQuads(){
   if(!quadsPuzzle || quadsComplete) return;
   quadsRemaining=shuffleArray(quadsRemaining);
   quadsSelected.clear();
-  preserveViewport(()=>drawQuads());
+  preserveViewport(()=>drawQuads(false,true));
 }
 
 function deselectQuads(){
@@ -1799,6 +2183,39 @@ function normalizeQuadGuess(words){
   return [...words].map(w=>String(w).toUpperCase()).sort().join("|");
 }
 
+function quadsAnimateLostLife(done){
+  const stars=[...document.querySelectorAll("#quadsMistakes .mistake-star.active-life")];
+  const lostStar=stars[stars.length-1];
+  if(!lostStar){
+    done();
+    return;
+  }
+  lostStar.classList.add("life-lost");
+  setTimeout(done,360);
+}
+
+function quadsAnimateMiss(oneAway,done){
+  const grid=document.getElementById("quadsGrid");
+  const selected=[...document.querySelectorAll(".quads-tile.selected")];
+  if(oneAway) grid?.classList.add("one-away-motion");
+
+  selected.forEach((el,i)=>{
+    el.style.setProperty("--quads-i",i);
+    el.classList.add(oneAway?"one-away-tile":"wrong-blink");
+    if(oneAway && i===selected.length-1) el.classList.add("one-away-kick");
+  });
+
+  const duration=oneAway?640:520;
+  setTimeout(()=>{
+    grid?.classList.remove("one-away-motion");
+    selected.forEach(el=>{
+      el.classList.remove("one-away-tile","one-away-kick","wrong-blink","selected");
+      el.style.removeProperty("--quads-i");
+    });
+    setTimeout(()=>quadsAnimateLostLife(done),100);
+  },duration);
+}
+
 function submitQuads(){
   if(!quadsPuzzle || quadsComplete || quadsSelected.size!==4) return;
 
@@ -1807,9 +2224,10 @@ function submitQuads(){
   const normalizedGuess=normalizeQuadGuess(selected);
 
   if(quadsIncorrectGuesses.includes(normalizedGuess)){
-    quadsSelected.clear();
+    const selectedTiles=[...document.querySelectorAll(".quads-tile.selected")];
+    selectedTiles.forEach(el=>el.classList.add("wrong-blink"));
+    setTimeout(()=>selectedTiles.forEach(el=>el.classList.remove("wrong-blink")),520);
     showQuadsMessage("Already guessed.","warn");
-    preserveViewport(()=>drawQuads());
     return;
   }
 
@@ -1818,28 +2236,55 @@ function submitQuads(){
   );
 
   if(match){
-    document.querySelectorAll(".quads-tile.selected").forEach(el=>el.classList.add("solve-flash"));
+    const selectedTiles=[...document.querySelectorAll(".quads-tile.selected")];
+
+    // Stage 1: mirror the wrong-answer rhythm, but with a positive green pulse.
+    selectedTiles.forEach(el=>el.classList.add("correct-blink"));
 
     setTimeout(()=>{
-      quadsSolved.push({
-        label:match.label,
-        difficulty:match.difficulty,
-        items:[...match.items]
+      selectedTiles.forEach(el=>{
+        el.classList.remove("correct-blink");
+        el.classList.add("correct-lift");
       });
 
-      quadsRemaining=quadsRemaining.filter(w=>!selectedSet.has(w));
-      quadsRemaining=shuffleArray(quadsRemaining);
-      quadsSelected.clear();
+      // Stage 2: tiles move upward and disappear.
+      setTimeout(()=>{
+        quadsSolved.push({
+          label:match.label,
+          difficulty:match.difficulty,
+          items:[...match.items]
+        });
 
-      if(quadsSolved.length===4){
-        quadsComplete=true;
-        quadsWon=true;
-      }
+        quadsRemaining=quadsRemaining.filter(w=>!selectedSet.has(w));
+        quadsRemaining=shuffleArray(quadsRemaining);
+        quadsSelected.clear();
 
-      saveQuadsState();
-      document.getElementById("quadsStatus").innerHTML="";
-      preserveViewport(()=>drawQuads());
-    },220);
+        const finalGroupSolved=quadsSolved.length===4;
+        if(finalGroupSolved){
+          quadsComplete=true;
+          quadsWon=true;
+          quadsEndgameSequenceRunning=true;
+        }
+
+        saveQuadsState();
+        const quadsStatus=document.getElementById("quadsStatus");
+        quadsStatus.innerHTML="";
+        if(finalGroupSolved) quadsStatus.classList.add("quads-final-sequence");
+
+        // Stage 3: solved category lands immediately after the cards vanish.
+        preserveViewport(()=>drawQuads(true,true));
+
+        // Keep the normal instruction visible until the complete win animation has finished.
+        if(finalGroupSolved){
+          const instructions=document.getElementById("quadsInstructions");
+          if(instructions){
+            instructions.textContent="Select four things that have something in common.";
+            instructions.classList.remove("quads-end-result","quads-win-result","quads-loss-result");
+          }
+          setTimeout(playQuadsWinFinishSequence,560);
+        }
+      },300);
+    },600);
     return;
   }
 
@@ -1853,30 +2298,33 @@ function submitQuads(){
 
   quadsIncorrectGuesses.push(normalizedGuess);
   quadsMistakes++;
-  quadsSelected.clear();
 
   if(quadsMistakes>=4){
-    quadsComplete=true;
-    quadsWon=false;
-
-    // Reveal unsolved categories in difficulty order for clarity.
-    const solvedLabels=new Set(quadsSolved.map(g=>g.label));
-    const remainingGroups=quadsPuzzle.groups.filter(g=>!solvedLabels.has(g.label));
-    quadsSolved.push(...remainingGroups.map(g=>({
-      label:g.label,
-      difficulty:g.difficulty,
-      items:[...g.items]
-    })));
-    quadsRemaining=[];
-    saveQuadsState();
-    showQuadsMessage(oneAway?"One away… but that was your fourth mistake.":"That was your fourth mistake.","bad");
-    preserveViewport(()=>drawQuads());
+    quadsAnimateMiss(oneAway,()=>{
+      quadsSelected.clear();
+      quadsComplete=true;
+      quadsWon=false;
+      const solvedLabels=new Set(quadsSolved.map(g=>g.label));
+      const remainingGroups=quadsPuzzle.groups.filter(g=>!solvedLabels.has(g.label));
+      quadsSolved.push(...remainingGroups.map(g=>({
+        label:g.label,
+        difficulty:g.difficulty,
+        items:[...g.items]
+      })));
+      quadsRemaining=[];
+      saveQuadsState();
+      showQuadsMessage(oneAway?"3 out of 4 — but that was your fourth mistake.":"That was your fourth mistake.","bad");
+      preserveViewport(()=>drawQuads());
+    });
     return;
   }
 
   saveQuadsState();
-  showQuadsMessage(oneAway?"One away…":"Not quite.","warn");
-  preserveViewport(()=>drawQuads());
+  showQuadsMessage(oneAway?"3 out of 4!":nextQuadsWrongMessage(),"warn");
+  quadsAnimateMiss(oneAway,()=>{
+    quadsSelected.clear();
+    preserveViewport(()=>drawQuads());
+  });
 }
 
 document.getElementById("quadsShuffleBtn").onmousedown=e=>e.preventDefault();
@@ -1896,6 +2344,7 @@ let wordTrailPath=[];
 let wordTrailFound=[];
 let wordTrailNonThemeFound=[];
 let wordTrailHintsAvailable=0;
+let wordTrailHintsUsed=0;
 let wordTrailHintProgressCount=0;
 let wordTrailHintedWord=null;
 let wordTrailComplete=false;
@@ -1965,6 +2414,7 @@ async function loadWordTrailForSelectedDate(){
   wordTrailFound=[];
   wordTrailNonThemeFound=[];
   wordTrailHintsAvailable=0;
+  wordTrailHintsUsed=0;
   wordTrailHintProgressCount=0;
   wordTrailHintedWord=null;
   wordTrailComplete=false;
@@ -2004,6 +2454,7 @@ function restoreWordTrailState(){
   wordTrailFound=s.found||[];
   wordTrailNonThemeFound=s.nonThemeFound||[];
   wordTrailHintsAvailable=Math.min(3,Number(s.hintsAvailable)||0);
+  wordTrailHintsUsed=Math.max(0,Number(s.hintsUsed)||0);
   wordTrailHintProgressCount=Number.isInteger(s.hintProgressCount)
     ? Math.max(0,Math.min(2,s.hintProgressCount))
     : ((s.nonThemeFound||[]).length%3);
@@ -2019,6 +2470,7 @@ function saveWordTrailState(){
     found:wordTrailFound,
     nonThemeFound:wordTrailNonThemeFound,
     hintsAvailable:Math.min(3,wordTrailHintsAvailable),
+    hintsUsed:wordTrailHintsUsed,
     hintProgressCount:wordTrailHintProgressCount,
     hintedWord:wordTrailHintedWord,
     complete:wordTrailComplete
@@ -2034,6 +2486,7 @@ function resetWordTrailForSelectedDate(){
   wordTrailFound=[];
   wordTrailNonThemeFound=[];
   wordTrailHintsAvailable=0;
+  wordTrailHintsUsed=0;
   wordTrailHintProgressCount=0;
   wordTrailHintedWord=null;
   wordTrailComplete=false;
@@ -2498,6 +2951,7 @@ function useWordTrailHint(){
 
   wtLater(()=>{
     wordTrailHintsAvailable--;
+    wordTrailHintsUsed++;
     wordTrailMotion.bankSpentIndex=null;
     wordTrailHintedWord=chosen;
     wordTrailMotion.hintRevealPath=(wtSolutionPath(chosen)||[]).map(p=>[...p]);
@@ -2602,6 +3056,8 @@ let miniActiveCell=null;
 let miniDirection="across";
 let miniComplete=false;
 let miniRevealedPuzzle=false;
+let miniLetterHintsUsed=0;
+let miniWordHintsUsed=0;
 
 function miniKey(r,c){return `${r},${c}`;}
 function miniRows(){return miniPuzzle?.grid?.length||0;}
@@ -2692,6 +3148,8 @@ async function loadMiniForSelectedDate(){
   miniDirection="across";
   miniComplete=false;
   miniRevealedPuzzle=false;
+  miniLetterHintsUsed=0;
+  miniWordHintsUsed=0;
 
   const res=await fetch(`/api/puzzle/today?game=mini&date=${encodeURIComponent(currentDateKey())}`);
   const meta=document.getElementById("miniPuzzleMeta");
@@ -2737,6 +3195,8 @@ function restoreMiniState(){
   miniDirection=s.direction||"across";
   miniComplete=!!s.complete;
   miniRevealedPuzzle=!!s.revealedPuzzle;
+  miniLetterHintsUsed=Math.max(0,Number(s.letterHintsUsed)||0);
+  miniWordHintsUsed=Math.max(0,Number(s.wordHintsUsed)||0);
 }
 function saveMiniState(){
   if(!miniPuzzle)return;
@@ -2747,7 +3207,9 @@ function saveMiniState(){
     activeCell:miniActiveCell,
     direction:miniDirection,
     complete:miniComplete,
-    revealedPuzzle:miniRevealedPuzzle
+    revealedPuzzle:miniRevealedPuzzle,
+    letterHintsUsed:miniLetterHintsUsed,
+    wordHintsUsed:miniWordHintsUsed
   };
   localStorage.setItem(MINI_PLAYER_KEY,JSON.stringify(all));
 }
@@ -2760,6 +3222,8 @@ function resetMiniForSelectedDate(){
   miniDirection="across";
   miniComplete=false;
   miniRevealedPuzzle=false;
+  miniLetterHintsUsed=0;
+  miniWordHintsUsed=0;
 }
 function miniSolutionAt(r,c){return String(miniPuzzle.grid[r][c]||"").toUpperCase();}
 function miniCurrentEntry(){
@@ -2809,6 +3273,13 @@ function drawMini(){
 
   const grid=document.getElementById("miniGrid");
   const rows=miniRows(), cols=miniCols();
+
+  const miniPanel=document.getElementById("miniPanel");
+  if(miniPanel){
+    miniPanel.classList.toggle("mini-size-5",cols===5);
+    miniPanel.classList.toggle("mini-size-6",cols===6);
+  }
+
   grid.style.setProperty("--mini-cols",cols);
   grid.style.setProperty("--mini-rows",rows);
   grid.innerHTML="";
@@ -3022,6 +3493,7 @@ function updateMiniCompletionMessage(){
 function miniRevealLetter(){
   if(!miniActiveCell)return;
   const [r,c]=miniActiveCell;
+  miniLetterHintsUsed++;
   miniValues[miniKey(r,c)]=miniSolutionAt(r,c);
   saveMiniState();
   closeMiniRevealMenu();
@@ -3031,6 +3503,7 @@ function miniRevealWord(){
   const entry=miniCurrentEntry();
   if(!entry)return;
   if(!confirm("Reveal the selected word?"))return;
+  miniWordHintsUsed++;
   entry.cells.forEach(([r,c])=>miniValues[miniKey(r,c)]=miniSolutionAt(r,c));
   saveMiniState();
   closeMiniRevealMenu();
@@ -3233,8 +3706,12 @@ async function initPublicSite(){
   }
 
   await puzzlePromise;
+  addUniversalTimerHosts();
   updateHomeDashboard();
   setActiveGame(activeGame);
+  suppressRestoredEndgames=false;
+  if(puzzleNookTimerTick)clearInterval(puzzleNookTimerTick);
+  puzzleNookTimerTick=setInterval(updatePuzzleTimerDisplays,250);
 }
 
 initPublicSite();

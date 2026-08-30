@@ -1,13 +1,15 @@
-# PuzzleWebsite V100.8 — GitHub Pages Public Test
+# PuzzleWebsite V100.60 — GitHub Pages Public Test
 
-Static GitHub Pages testing build generated from the current V100.8 project.
+Static GitHub Pages testing build generated from the official PuzzleWebsite V100.60 baseline.
 
-Upload the contents of this folder to the root of the GitHub Pages repository.
+Upload the **contents of this folder** to the root of the GitHub Pages repository.
 
-- Current V100.8 public HTML, CSS, JavaScript, assets, and data.
-- Reuses the proven V89 static GitHub Pages data adapter.
-- Root-relative public/data paths converted to repository-relative paths.
-- CSS and JavaScript use `?v=100.8` cache-busting for physical-device testing.
-- `.nojekyll` included.
+- Includes the current V100.60 public HTML, CSS, JavaScript, assets, and puzzle data.
+- Includes the proven static GitHub Pages data adapter used by the prior V100.8 public test package.
+- Local `/public/...` asset references are converted to repository-relative paths for GitHub Pages.
+- Root `/data/...` and `/api/...` gameplay requests are handled by the static data adapter.
+- CSS, JavaScript, and the adapter use `?v=100.60` cache-busting for physical-device/browser testing.
+- `.nojekyll` is included.
+- This is a public-site testing package only; it does not include the Node admin/server runtime.
 
-This is a public-site test package only; it does not include the Node admin/server runtime.
+Baseline source: PuzzleWebsite V100.60 — InCommon Arial Black Pill.
