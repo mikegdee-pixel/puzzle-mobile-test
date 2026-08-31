@@ -1,6 +1,25 @@
 
 const SIX_TO_FIVE_LOSS_MESSAGES=["That was a tricky one!","You’ll get the next one!","Almost had it!","That one put up a fight!","Better luck tomorrow!","Six tries just weren’t enough this time!"];
 const SIX_TO_FIVE_SOLVE_MESSAGES={1:["How did you know?!","Are you psychic?!","No way!","Okay, that's suspicious…","On the first try?!"],2:["Brilliant!","Very impressive!","You caught on fast!","Excellent solve!","That was sharp!"],3:["Nice solve!","Well done!","Good thinking!","Nicely done!","You got it!"],4:["Solid work!","Good solve!","Nicely worked out!","Way to stick with it!","Well played!"],5:["Cutting it close!","Clutch solve!","Nice recovery!","You got there!","Just in time!"],6:["By the skin of your teeth!","Phew, that was close!","Last chance, nailed it!","Right at the buzzer!","Now THAT was close!"]};
+
+/* V101 shared public-site configuration.
+   Keep global game identity, panel ownership and storage access in one place. */
+const PUBLIC_GAME_IDS=Object.freeze(["five","same","quads","mini","trail","ell"]);
+const GAME_PANEL_IDS=Object.freeze({
+  five:"fivePanel", same:"samePanel", quads:"quadsPanel",
+  mini:"miniPanel", trail:"wordTrailPanel", ell:"ellPanel"
+});
+function readJsonStorage(key,fallback={}){
+  try{
+    const value=JSON.parse(localStorage.getItem(key)||"null");
+    return value ?? fallback;
+  }catch(e){
+    return fallback;
+  }
+}
+function writeJsonStorage(key,value){
+  try{localStorage.setItem(key,JSON.stringify(value));return true}catch(e){return false}
+}
 function sixToFiveResultMessage(n){const p=SIX_TO_FIVE_SOLVE_MESSAGES[n]||SIX_TO_FIVE_SOLVE_MESSAGES[6];return p[Math.floor(Math.random()*p.length)]}
 function fiveShareText(){if(!puzzle)return "";const rows=guesses.map(g=>scoreWord(g,puzzle.answer).map(s=>s==="good"?"🟩":s==="present"?"🟦":"⬛").join("")).join("\n");return `Six to Five — ${formatPuzzleDate(puzzle.date)} — ${guesses.length}/6\n${rows}`}
 const SIX_TO_FIVE_PLAY_KEY="sixToFivePlayHistoryV2";
@@ -19,7 +38,7 @@ function readFivePlayHistory(){
   let h={completedIds:[],daily:{date:browserTodayKey(),startedIds:[]}};
   let hasV2=false;
   try{
-    const stored=JSON.parse(localStorage.getItem(SIX_TO_FIVE_PLAY_KEY)||"null");
+    const stored=readJsonStorage(SIX_TO_FIVE_PLAY_KEY,null);
     if(stored){h={...h,...stored};hasV2=true}
   }catch(e){}
   if(!Array.isArray(h.completedIds))h.completedIds=[];
@@ -30,7 +49,7 @@ function readFivePlayHistory(){
   // history because V64 incorrectly added puzzles there as soon as they were started.
   if(!hasV2){
     try{
-      const v1=JSON.parse(localStorage.getItem(SIX_TO_FIVE_PLAY_KEY_V1)||"{}");
+      const v1=readJsonStorage(SIX_TO_FIVE_PLAY_KEY_V1,{});
       if(v1?.daily?.date===browserTodayKey()&&Array.isArray(v1.daily.startedIds)){
         h.daily.startedIds=[...new Set(v1.daily.startedIds.map(Number).filter(Number.isFinite))];
       }
@@ -39,7 +58,7 @@ function readFivePlayHistory(){
 
   // Migrate only genuinely completed Six to Five puzzles from existing player state.
   try{
-    const legacy=JSON.parse(localStorage.getItem(PLAYER_KEY)||"{}");
+    const legacy=readJsonStorage(PLAYER_KEY,{});
     for(const [day,entry] of Object.entries(legacy)){
       const five=entry?.five;
       if(!five?.puzzleId)continue;
@@ -51,7 +70,7 @@ function readFivePlayHistory(){
   writeFivePlayHistory(h);
   return h;
 }
-function writeFivePlayHistory(h){localStorage.setItem(SIX_TO_FIVE_PLAY_KEY,JSON.stringify(h))}
+function writeFivePlayHistory(h){writeJsonStorage(SIX_TO_FIVE_PLAY_KEY,h)}
 function registerFiveStarted(){
   if(!puzzle)return false;
   const h=readFivePlayHistory(),id=Number(puzzle.id);
@@ -94,8 +113,8 @@ let puzzleNookTimerTick=null;
 function timerPuzzleFor(game){return game==="five"?puzzle:game==="same"?samePuzzle:game==="quads"?quadsPuzzle:game==="mini"?miniPuzzle:game==="trail"?wordTrailPuzzle:game==="ell"?ellPuzzle:null}
 function timerGameComplete(game){return game==="five"?!!gameComplete:game==="same"?!!sameComplete:game==="quads"?!!quadsComplete:game==="mini"?!!miniComplete:game==="trail"?!!wordTrailComplete:game==="ell"?!!(ellComplete||ellEnded):false}
 function timerRecordKey(game,puz){return puz?`${game}|${puz.date||currentDateKey()}|${puz.id}`:""}
-function readPuzzleTimers(){try{return JSON.parse(localStorage.getItem(PUZZLENOOK_TIMER_KEY)||"{}")||{}}catch(e){return {}}}
-function writePuzzleTimers(all){localStorage.setItem(PUZZLENOOK_TIMER_KEY,JSON.stringify(all))}
+function readPuzzleTimers(){return readJsonStorage(PUZZLENOOK_TIMER_KEY,{})||{}}
+function writePuzzleTimers(all){writeJsonStorage(PUZZLENOOK_TIMER_KEY,all)}
 function ensurePuzzleTimerStarted(game){
   const puz=timerPuzzleFor(game);if(!puz||timerGameComplete(game))return;
   const all=readPuzzleTimers(),key=timerRecordKey(game,puz);
@@ -140,7 +159,7 @@ function togglePuzzleTimerVisibility(){
 }
 function updatePuzzleTimerDisplays(){
   const visible=puzzleTimerVisiblePreference();
-  ["five","same","quads","mini","trail","ell"].forEach(game=>{
+  PUBLIC_GAME_IDS.forEach(game=>{
     if(timerGameComplete(game))completePuzzleTimer(game);
     const host=document.querySelector(`[data-game-timer="${game}"]`);if(!host)return;
     const puz=timerPuzzleFor(game);
@@ -155,10 +174,9 @@ function updatePuzzleTimerDisplays(){
     }
   });
 }
-function activatePuzzleTimer(game){if(!["five","same","quads","mini","trail","ell"].includes(game))return;ensurePuzzleTimerStarted(game);updatePuzzleTimerDisplays()}
+function activatePuzzleTimer(game){if(!PUBLIC_GAME_IDS.includes(game))return;ensurePuzzleTimerStarted(game);updatePuzzleTimerDisplays()}
 function addUniversalTimerHosts(){
-  const panels={five:"fivePanel",same:"samePanel",quads:"quadsPanel",mini:"miniPanel",trail:"wordTrailPanel",ell:"ellPanel"};
-  Object.entries(panels).forEach(([game,id])=>{
+  Object.entries(GAME_PANEL_IDS).forEach(([game,id])=>{
     const panel=document.getElementById(id);
     const head=panel?.querySelector(".game-clean-head");
     if(!head||panel.querySelector(`[data-game-timer="${game}"]`))return;
@@ -177,6 +195,18 @@ function addUniversalTimerHosts(){
       togglePuzzleTimerVisibility();
     });
 
+    const statusHostIds={
+      five:"fivePuzzleStatus",
+      same:"samePuzzleStatus",
+      quads:"quadsPuzzleStatus",
+      mini:"miniPuzzleStatus",
+      trail:"wordTrailPuzzleStatus",
+      ell:"ellPuzzleStatus"
+    };
+    const statusHost=document.getElementById(statusHostIds[game]);
+    const instructionHost=panel.querySelector(`[data-timer-row-instructions="${game}"]`);
+    if(instructionHost)row.appendChild(instructionHost);
+    if(statusHost)row.appendChild(statusHost);
     row.appendChild(timerButton);
     head.insertAdjacentElement("afterend",row);
   });
@@ -293,6 +323,18 @@ let activeGame="home";
 let selectedDate=new Date();
 selectedDate.setHours(12,0,0,0);
 
+const puzzleNookLaunchParams=new URLSearchParams(window.location.search);
+const puzzleNookLaunchDate=puzzleNookLaunchParams.get("date");
+const puzzleNookLaunchGame=puzzleNookLaunchParams.get("game");
+if(/^\d{4}-\d{2}-\d{2}$/.test(puzzleNookLaunchDate||"")){
+  const [launchYear,launchMonth,launchDay]=puzzleNookLaunchDate.split("-").map(Number);
+  const launchDate=new Date(launchYear,launchMonth-1,launchDay,12,0,0,0);
+  if(!Number.isNaN(launchDate.getTime()))selectedDate=launchDate;
+}
+if(PUBLIC_GAME_IDS.includes(puzzleNookLaunchGame)){
+  activeGame=puzzleNookLaunchGame;
+}
+
 function dateKey(d){
   const y=d.getFullYear();
   const m=String(d.getMonth()+1).padStart(2,"0");
@@ -368,8 +410,21 @@ async function loadFiveForSelectedDate(){
   drawFive();
 }
 
+function fiveHardModeEnabled(){
+  return document.getElementById("hardModeToggle")?.getAttribute("aria-pressed")==="true";
+}
+function setFiveHardMode(enabled,{save=false}={}){
+  const button=document.getElementById("hardModeToggle");
+  if(!button)return;
+  const on=!!enabled;
+  button.setAttribute("aria-pressed",String(on));
+  button.classList.toggle("is-active",on);
+  button.textContent=on?"Hard Mode":"Easy Mode";
+  if(save)savePlayerState();
+}
+
 function restorePlayerState(){
-  const all=JSON.parse(localStorage.getItem(PLAYER_KEY)||"{}");
+  const all=readJsonStorage(PLAYER_KEY,{});
   const s=all[fiveStateKey()]?.five;
 
   if(s && s.puzzleId===puzzle.id){
@@ -377,25 +432,25 @@ function restorePlayerState(){
     gameComplete=!!s.complete;
     fiveTimerElapsedMs=Number(s.elapsedMs)||0;
     fiveTimerStartedAt=null;
-    document.getElementById("hardModeToggle").checked=!!s.hardMode;
+    setFiveHardMode(!!s.hardMode);
   }else{
-    document.getElementById("hardModeToggle").checked=false;
+    setFiveHardMode(false);
   }
 }
 
 function savePlayerState(){
   if(!puzzle) return;
-  const all=JSON.parse(localStorage.getItem(PLAYER_KEY)||"{}");
+  const all=readJsonStorage(PLAYER_KEY,{});
   const stateKey=fiveStateKey();
   all[stateKey]??={};
   all[stateKey].five={
     puzzleId:puzzle.id,
     guesses,
     complete:gameComplete,
-    hardMode:document.getElementById("hardModeToggle").checked,
+    hardMode:fiveHardModeEnabled(),
     elapsedMs:currentFiveElapsedMs()
   };
-  localStorage.setItem(PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(PLAYER_KEY,all);
 }
 
 
@@ -531,19 +586,16 @@ function setActiveGame(game){
   const isHome=game==="home";
   if(frontPage) frontPage.classList.toggle("front-page-hidden",!isHome);
   if(playArea) playArea.classList.toggle("play-area-hidden",isHome);
-  const fivePanel=document.getElementById("fivePanel");
-  const ellPanel=document.getElementById("ellPanel");
-  const samePanel=document.getElementById("samePanel");
-  const quadsPanel=document.getElementById("quadsPanel");
-  const wordTrailPanel=document.getElementById("wordTrailPanel");
-  const miniPanel=document.getElementById("miniPanel");
-  [fivePanel,ellPanel,samePanel,quadsPanel,wordTrailPanel,miniPanel].forEach(p=>{
-    if(p){
-      p.classList.add("game-hidden");
-      p.classList.remove("game-visible");
+  const gamePanels=Object.fromEntries(
+    Object.entries(GAME_PANEL_IDS).map(([key,id])=>[key,document.getElementById(id)])
+  );
+  Object.values(gamePanels).forEach(panel=>{
+    if(panel){
+      panel.classList.add("game-hidden");
+      panel.classList.remove("game-visible");
     }
   });
-  const active=isHome?null:(game==="ell"?ellPanel:(game==="same"?samePanel:(game==="quads"?quadsPanel:(game==="trail"?wordTrailPanel:(game==="mini"?miniPanel:fivePanel)))));
+  const active=isHome?null:gamePanels[game];
   if(active){
     active.classList.remove("game-hidden");
     active.classList.add("game-visible");
@@ -581,25 +633,27 @@ function updateHomeDashboard(){
     trail:"Trace themed words through the grid.",
     ell:"Make words. Use every last letter."
   };
+  const fiveSolved=!!(puzzle&&guesses.includes(puzzle.answer));
+  const miniHintsUsed=miniLetterHintsUsed>0||miniWordHintsUsed>0;
   const stats={
-    five:`${guesses.length} ${guesses.length===1?"guess":"guesses"}`,
-    same:`${Math.max(1,Math.min(4,sameRevealed))} ${sameRevealed===1?"clue":"clues"}`,
-    quads:`${quadsMistakes} ${quadsMistakes===1?"mistake":"mistakes"}`,
-    mini:puzzleTimeText("mini"),
+    five:fiveSolved?`${guesses.length} ${guesses.length===1?"guess":"guesses"}`:"Not solved",
+    same:sameWon?`${Math.max(1,Math.min(4,sameRevealed))} ${sameRevealed===1?"clue":"clues"}`:"Not solved",
+    quads:quadsWon?`${quadsMistakes} ${quadsMistakes===1?"mistake":"mistakes"}`:"Not solved",
+    mini:miniRevealedPuzzle?"Reveal Used":`${puzzleTimeText("mini")}${miniHintsUsed?" *Hints used":""}`,
     trail:puzzleTimeText("trail"),
     ell:`${ellFinalScore()} points`
   };
   const count=Object.values(states).filter(Boolean).length;
   const text=document.getElementById("homeProgressText");
   const fill=document.getElementById("homeProgressFill");
-  if(text)text.textContent=`${count} / 6 played`;
+  if(text)text.textContent=`${count} / 6 completed`;
   if(fill)fill.style.width=`${(count/6)*100}%`;
   document.querySelectorAll("[data-front-game]").forEach(card=>{
     const key=card.dataset.frontGame;
     const complete=!!states[key];
     card.classList.toggle("is-complete",complete);
     const sub=card.querySelector(".front-card-sub");
-    if(sub)sub.textContent=complete?`Completed — ${stats[key]}`:defaults[key];
+    if(sub)sub.textContent=complete?`Completed - ${stats[key]}`:defaults[key];
   });
 }
 function showHomePage(){ setActiveGame("home"); closeMobileSiteMenu(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -657,7 +711,7 @@ function buildHardModeConstraints(){
 }
 
 function hardModeViolation(guess){
-  if(!document.getElementById("hardModeToggle").checked || guesses.length===0){
+  if(!fiveHardModeEnabled() || guesses.length===0){
     return null;
   }
 
@@ -745,7 +799,37 @@ function queueFiveMobileBoardSize(){
   });
 }
 
+
+/* =========================================================
+   V100.77 — UNIVERSAL PUZZLE STATUS BADGES
+   ========================================================= */
+function puzzleStatusMarkup(solved){
+  return solved
+    ? `<strong><svg class="puzzle-status-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"></polyline></svg><span>SOLVED</span></strong>`
+    : `<strong><svg class="puzzle-status-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8"></circle><path d="M6.35 17.65 17.65 6.35"></path></svg><span>NOT-SOLVED</span></strong>`;
+}
+function updatePuzzleEndStatus(game){
+  const config={
+    five:{host:"fivePuzzleStatus",panel:"fivePanel",complete:!!gameComplete,solved:!!(puzzle&&guesses.includes(puzzle.answer)),allowLoss:true},
+    same:{host:"samePuzzleStatus",panel:"samePanel",complete:!!sameComplete,solved:!!sameWon,allowLoss:true},
+    quads:{host:"quadsPuzzleStatus",panel:"quadsPanel",complete:!!quadsComplete,solved:!!quadsWon,allowLoss:true},
+    mini:{host:"miniPuzzleStatus",panel:"miniPanel",complete:!!miniComplete,solved:true,allowLoss:false},
+    trail:{host:"wordTrailPuzzleStatus",panel:"wordTrailPanel",complete:!!wordTrailComplete,solved:true,allowLoss:false},
+    ell:{host:"ellPuzzleStatus",panel:"ellPanel",complete:!!ellComplete,solved:true,allowLoss:false}
+  }[game];
+  if(!config)return;
+  const host=document.getElementById(config.host),panel=document.getElementById(config.panel);
+  if(!host)return;
+  const show=config.complete&&(config.solved||config.allowLoss);
+  host.hidden=!show;
+  host.classList.toggle("is-solved",show&&config.solved);
+  host.classList.toggle("is-not-solved",show&&!config.solved);
+  host.innerHTML=show?puzzleStatusMarkup(config.solved):"";
+  if(panel)panel.classList.toggle("has-puzzle-end-status",show);
+}
+
 function drawFive(){
+  updatePuzzleEndStatus("five");
   if(!puzzle) return;
 
   const grid=document.getElementById("fiveGrid");
@@ -778,7 +862,14 @@ function drawFive(){
   const status=document.getElementById("fiveStatus");
   if(gameComplete){
     status.innerHTML="";
-    if(!fiveAnimating)requestAnimationFrame(showFiveEndgame);
+    // Restoring a completed puzzle while navigating dates should update the board
+    // silently. End-game modals are reserved for a completion that happens during
+    // the player's current interaction, not merely for loading stored history.
+    if(!fiveAnimating&&!suppressRestoredEndgames){
+      requestAnimationFrame(()=>{
+        if(!suppressRestoredEndgames)showFiveEndgame();
+      });
+    }
   }else{
     status.innerHTML="";
     closeFiveEndgame();
@@ -1044,16 +1135,16 @@ const nextDayBtn=document.getElementById("nextDayBtn");
 const hardModeToggle=document.getElementById("hardModeToggle");
 if(prevDayBtn) prevDayBtn.onclick=()=>changeDay(-1);
 if(nextDayBtn) nextDayBtn.onclick=()=>changeDay(1);
-if(hardModeToggle) hardModeToggle.addEventListener("change",savePlayerState);
+if(hardModeToggle) hardModeToggle.addEventListener("click",()=>setFiveHardMode(!fiveHardModeEnabled(),{save:true}));
 
 
 function resetFiveForSelectedDate(){
-  const all=JSON.parse(localStorage.getItem(PLAYER_KEY)||"{}");
+  const all=readJsonStorage(PLAYER_KEY,{});
   const stateKey=fiveStateKey();
   if(all[stateKey]?.five){
     delete all[stateKey].five;
     if(Object.keys(all[stateKey]).length===0) delete all[stateKey];
-    localStorage.setItem(PLAYER_KEY,JSON.stringify(all));
+    writeJsonStorage(PLAYER_KEY,all);
   }
   guesses=[];
   sixToFiveResultCache=null;
@@ -1064,13 +1155,13 @@ function resetFiveForSelectedDate(){
   fiveBracketsHeld=false;
   fiveTimerElapsedMs=0;
   fiveTimerStartedAt=null;
-  if(document.getElementById("hardModeToggle")) document.getElementById("hardModeToggle").checked=false;
+  if(document.getElementById("hardModeToggle")) setFiveHardMode(false);
 }
 
 function resetQuadsForSelectedDate(){
-  const all=JSON.parse(localStorage.getItem(QUADS_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(QUADS_PLAYER_KEY,{});
   delete all[currentDateKey()];
-  localStorage.setItem(QUADS_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(QUADS_PLAYER_KEY,all);
   quadsRemaining=[];
   quadsSelected.clear();
   quadsSolved=[];
@@ -1200,7 +1291,7 @@ function sameGuessMatchesAnswer(guess,answer){
 }
 function saveSameState(){
   if(!samePuzzle)return;
-  const all=JSON.parse(localStorage.getItem(SAME_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(SAME_PLAYER_KEY,{});
   all[currentDateKey()]={
     puzzleId:samePuzzle.id,
     revealed:sameRevealed,
@@ -1208,10 +1299,10 @@ function saveSameState(){
     complete:sameComplete,
     won:sameWon
   };
-  localStorage.setItem(SAME_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(SAME_PLAYER_KEY,all);
 }
 function restoreSameState(){
-  const all=JSON.parse(localStorage.getItem(SAME_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(SAME_PLAYER_KEY,{});
   const s=all[currentDateKey()];
   if(!s||s.puzzleId!==samePuzzle.id)return;
   sameRevealed=Math.max(1,Math.min(4,Number(s.revealed)||1));
@@ -1220,9 +1311,9 @@ function restoreSameState(){
   sameWon=!!s.won;
 }
 function resetOneAndTheSameForSelectedDate(){
-  const all=JSON.parse(localStorage.getItem(SAME_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(SAME_PLAYER_KEY,{});
   delete all[currentDateKey()];
-  localStorage.setItem(SAME_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(SAME_PLAYER_KEY,all);
   sameRevealed=1;
   sameWrong=[];
   sameComplete=false;
@@ -1434,6 +1525,7 @@ function sameAnimateWrongToHistory(clueIndex,guess){
 }
 
 function drawOneAndTheSame(){
+  updatePuzzleEndStatus("same");
   if(!samePuzzle)return;
 
   const history=document.getElementById("sameHistory");
@@ -1619,7 +1711,7 @@ async function loadEveryLastLetterForSelectedDate(){
   restoreEllState();drawEll();
 }
 function restoreEllState(){
-  const all=JSON.parse(localStorage.getItem(ELL_PLAYER_KEY)||"{}"),s=all[currentDateKey()];
+  const all=readJsonStorage(ELL_PLAYER_KEY,{}),s=all[currentDateKey()];
   if(!s||s.puzzleId!==ellPuzzle.id)return;
   ellSelected=s.selected||[];ellSubmitted=s.submitted||[];ellComplete=!!s.complete;ellEnded=!!s.ended;ellEndReason=s.endReason||null;
   const used=new Set(ellSubmitted.flatMap(x=>x.tileIds||[]));
@@ -1627,13 +1719,13 @@ function restoreEllState(){
 }
 function saveEllState(){
   if(!ellPuzzle)return;
-  const all=JSON.parse(localStorage.getItem(ELL_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(ELL_PLAYER_KEY,{});
   all[currentDateKey()]={puzzleId:ellPuzzle.id,selected:[...ellSelected],submitted:ellSubmitted,complete:ellComplete,ended:ellEnded,endReason:ellEndReason};
-  localStorage.setItem(ELL_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(ELL_PLAYER_KEY,all);
 }
 function resetEveryLastLetterForSelectedDate(){
-  const all=JSON.parse(localStorage.getItem(ELL_PLAYER_KEY)||"{}");delete all[currentDateKey()];
-  localStorage.setItem(ELL_PLAYER_KEY,JSON.stringify(all));
+  const all=readJsonStorage(ELL_PLAYER_KEY,{});delete all[currentDateKey()];
+  writeJsonStorage(ELL_PLAYER_KEY,all);
   ellSelected=[];ellSubmitted=[];ellReclaimCandidate=null;ellComplete=false;ellEnded=false;ellEndReason=null;ellTiles.forEach(t=>t.used=false);
 }
 function ellWord(){return ellSelected.map(id=>ellTiles.find(t=>t.id===id)?.letter||"").join("");}
@@ -1690,6 +1782,7 @@ function ellGiveUp(){
 }
 
 function drawEll(){
+  updatePuzzleEndStatus("ell");
   if(!ellPuzzle)return;
   const selected=new Set(ellSelected),grid=document.getElementById("ellGrid");grid.innerHTML="";
   ellTiles.forEach(tile=>{
@@ -1964,7 +2057,7 @@ async function loadQuadsForSelectedDate(){
 }
 
 function restoreQuadsState(){
-  const all=JSON.parse(localStorage.getItem(QUADS_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(QUADS_PLAYER_KEY,{});
   const s=all[currentDateKey()];
   if(!s || s.puzzleId!==quadsPuzzle.id) return;
 
@@ -1978,7 +2071,7 @@ function restoreQuadsState(){
 
 function saveQuadsState(){
   if(!quadsPuzzle) return;
-  const all=JSON.parse(localStorage.getItem(QUADS_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(QUADS_PLAYER_KEY,{});
   all[currentDateKey()]={
     puzzleId:quadsPuzzle.id,
     remaining:quadsRemaining,
@@ -1988,7 +2081,7 @@ function saveQuadsState(){
     won:quadsWon,
     incorrectGuesses:quadsIncorrectGuesses
   };
-  localStorage.setItem(QUADS_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(QUADS_PLAYER_KEY,all);
 }
 
 function difficultyClass(difficulty){
@@ -2008,24 +2101,14 @@ function preserveViewport(fn){
 
 function updateQuadsInstructions(){
   const instructions=document.getElementById("quadsInstructions");
-  if(!instructions) return;
-
+  if(!instructions)return;
   instructions.classList.remove("quads-end-result","quads-win-result","quads-loss-result");
-
-  if(quadsComplete){
-    instructions.innerHTML=quadsWon
-      ? `<strong>SOLVED</strong>`
-      : `<strong>NOT-SOLVED</strong>`;
-    instructions.classList.add(
-      "quads-end-result",
-      quadsWon ? "quads-win-result" : "quads-loss-result"
-    );
-  }else{
-    instructions.textContent="Select four things that have something in common.";
-  }
+  instructions.hidden=!!quadsComplete;
+  instructions.textContent=quadsComplete?"":"Select four things that have something in common.";
 }
 
 function drawQuads(animateNewestSolved=false,animateGrid=false){
+  updatePuzzleEndStatus("quads");
   updateQuadsInstructions();
   const solvedHost=document.getElementById("quadsSolved");
   solvedHost.innerHTML=quadsSolved.map((g,i)=>`
@@ -2447,7 +2530,7 @@ async function loadWordTrailForSelectedDate(){
 }
 
 function restoreWordTrailState(){
-  const all=JSON.parse(localStorage.getItem(WORDTRAIL_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(WORDTRAIL_PLAYER_KEY,{});
   const s=all[currentDateKey()];
   if(!s || s.puzzleId!==wordTrailPuzzle.id) return;
 
@@ -2464,7 +2547,7 @@ function restoreWordTrailState(){
 
 function saveWordTrailState(){
   if(!wordTrailPuzzle) return;
-  const all=JSON.parse(localStorage.getItem(WORDTRAIL_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(WORDTRAIL_PLAYER_KEY,{});
   all[currentDateKey()]={
     puzzleId:wordTrailPuzzle.id,
     found:wordTrailFound,
@@ -2475,13 +2558,13 @@ function saveWordTrailState(){
     hintedWord:wordTrailHintedWord,
     complete:wordTrailComplete
   };
-  localStorage.setItem(WORDTRAIL_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(WORDTRAIL_PLAYER_KEY,all);
 }
 
 function resetWordTrailForSelectedDate(){
-  const all=JSON.parse(localStorage.getItem(WORDTRAIL_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(WORDTRAIL_PLAYER_KEY,{});
   delete all[currentDateKey()];
-  localStorage.setItem(WORDTRAIL_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(WORDTRAIL_PLAYER_KEY,all);
   wordTrailPath=[];
   wordTrailFound=[];
   wordTrailNonThemeFound=[];
@@ -2493,6 +2576,7 @@ function resetWordTrailForSelectedDate(){
 }
 
 function drawWordTrail(){
+  updatePuzzleEndStatus("trail");
   const grid=document.getElementById("wordTrailGrid");
   grid.innerHTML="";
 
@@ -2579,7 +2663,6 @@ function drawWordTrail(){
   }
 
   updateWordTrailButtons();
-  queueWordTrailMobileBoardSize();
 }
 
 
@@ -2724,7 +2807,8 @@ function beginWordTrailPointer(e,r,c){
   wordTrailPointerMoved=false;
   wordTrailDragMode=false;
 
-  try{ e.currentTarget.setPointerCapture(e.pointerId); }catch(_){}
+  const grid=document.getElementById("wordTrailGrid");
+  try{ grid?.setPointerCapture(e.pointerId); }catch(_){}
 }
 
 function moveWordTrailPointer(e){
@@ -2770,6 +2854,11 @@ function endWordTrailPointer(e){
 
   const startCell=wordTrailPointerStart;
   const wasDrag=wordTrailDragMode;
+
+  const grid=document.getElementById("wordTrailGrid");
+  try{
+    if(grid?.hasPointerCapture?.(e.pointerId))grid.releasePointerCapture(e.pointerId);
+  }catch(_){}
 
   wordTrailPointerId=null;
   wordTrailPointerStart=null;
@@ -3032,9 +3121,14 @@ window.addEventListener("resize",queueWordTrailMobileBoardSize);
 window.addEventListener("orientationchange",queueWordTrailMobileBoardSize);
 
 const wordTrailBoardStageEl=document.getElementById("wordTrailBoardStage");
+let wordTrailObservedStageWidth=0;
 if(wordTrailBoardStageEl && "ResizeObserver" in window){
-  const wordTrailBoardResizeObserver=new ResizeObserver(()=>{
-    if(activeGame==="trail") queueWordTrailMobileBoardSize();
+  const wordTrailBoardResizeObserver=new ResizeObserver(entries=>{
+    const width=entries?.[0]?.contentRect?.width||0;
+    if(activeGame!=="trail" || width<=0)return;
+    if(Math.abs(width-wordTrailObservedStageWidth)<1)return;
+    wordTrailObservedStageWidth=width;
+    queueWordTrailMobileBoardSize();
   });
   wordTrailBoardResizeObserver.observe(wordTrailBoardStageEl);
 }
@@ -3187,7 +3281,7 @@ async function loadMiniForSelectedDate(){
 }
 
 function restoreMiniState(){
-  const all=JSON.parse(localStorage.getItem(MINI_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(MINI_PLAYER_KEY,{});
   const s=all[currentDateKey()];
   if(!s||s.puzzleId!==miniPuzzle.id)return;
   miniValues=s.values||{};
@@ -3200,7 +3294,7 @@ function restoreMiniState(){
 }
 function saveMiniState(){
   if(!miniPuzzle)return;
-  const all=JSON.parse(localStorage.getItem(MINI_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(MINI_PLAYER_KEY,{});
   all[currentDateKey()]={
     puzzleId:miniPuzzle.id,
     values:miniValues,
@@ -3211,12 +3305,12 @@ function saveMiniState(){
     letterHintsUsed:miniLetterHintsUsed,
     wordHintsUsed:miniWordHintsUsed
   };
-  localStorage.setItem(MINI_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(MINI_PLAYER_KEY,all);
 }
 function resetMiniForSelectedDate(){
-  const all=JSON.parse(localStorage.getItem(MINI_PLAYER_KEY)||"{}");
+  const all=readJsonStorage(MINI_PLAYER_KEY,{});
   delete all[currentDateKey()];
-  localStorage.setItem(MINI_PLAYER_KEY,JSON.stringify(all));
+  writeJsonStorage(MINI_PLAYER_KEY,all);
   miniValues={};
   miniActiveCell=null;
   miniDirection="across";
@@ -3269,6 +3363,7 @@ function drawMiniKeyboard(){
 }
 
 function drawMini(){
+  updatePuzzleEndStatus("mini");
   if(!miniPuzzle)return;
 
   const grid=document.getElementById("miniGrid");
@@ -3352,7 +3447,7 @@ function drawMiniClues(){
         const entry=miniEntryList(dir).find(x=>Number(x.n)===num);
         if(!entry)return;
         miniDirection=dir;
-        miniActiveCell=entry.cells[0];
+        miniActiveCell=miniFirstEmptyCell(entry)||entry.cells[0];
         saveMiniState();
         drawMini();
       };
@@ -3381,6 +3476,12 @@ function miniSelectCell(r,c,toggleIfSame=true){
     const other=miniDirection==="across"?"down":"across";
     if(miniEntryAt(r,c,other)){
       miniDirection=other;
+      const entry=miniEntryAt(r,c,other);
+      if(miniValues[miniKey(r,c)] && entry){
+        const idx=entry.cells.findIndex(([rr,cc])=>rr===r&&cc===c);
+        const nextEmpty=entry.cells.slice(idx+1).find(([rr,cc])=>!miniValues[miniKey(rr,cc)]) || miniFirstEmptyCell(entry);
+        if(nextEmpty)miniActiveCell=nextEmpty;
+      }
     }
   }else{
     // New cell: retain current direction where possible.
@@ -3416,7 +3517,7 @@ function miniBackspace(){
     return;
   }
 
-  miniAdvanceWithinEntry(-1);
+  miniAdvanceWithinEntry(-1,{skipFilled:false});
   if(miniActiveCell){
     const [rr,cc]=miniActiveCell;
     delete miniValues[miniKey(rr,cc)];
@@ -3442,11 +3543,18 @@ function miniMoveCell(dr,dc){
   }
 }
 
-function miniAdvanceWithinEntry(delta){
+function miniAdvanceWithinEntry(delta,{skipFilled=delta>0}={}){
   const entry=miniCurrentEntry();
   if(!entry||!miniActiveCell){drawMini();return;}
   const idx=entry.cells.findIndex(([r,c])=>r===miniActiveCell[0]&&c===miniActiveCell[1]);
-  const next=entry.cells[idx+delta];
+  let next=null;
+  for(let i=idx+delta;i>=0&&i<entry.cells.length;i+=delta){
+    const candidate=entry.cells[i];
+    if(!skipFilled || !miniValues[miniKey(candidate[0],candidate[1])]){
+      next=candidate;
+      break;
+    }
+  }
   if(next)miniActiveCell=next;
   drawMini();
 }
@@ -3480,7 +3588,7 @@ function updateMiniCompletionMessage(){
   if(miniAllFilled()){
     if(miniAllCorrect()){
       miniComplete=true;
-      host.innerHTML='<div class="mini-message good">Solved — the puzzle is correct!</div>';
+      host.innerHTML="";
     }else{
       miniComplete=false;
       host.innerHTML='<div class="mini-message warn">The puzzle is filled, but the solution is not correct. Keep trying!</div>';
@@ -3502,7 +3610,6 @@ function miniRevealLetter(){
 function miniRevealWord(){
   const entry=miniCurrentEntry();
   if(!entry)return;
-  if(!confirm("Reveal the selected word?"))return;
   miniWordHintsUsed++;
   entry.cells.forEach(([r,c])=>miniValues[miniKey(r,c)]=miniSolutionAt(r,c));
   saveMiniState();
@@ -3510,7 +3617,6 @@ function miniRevealWord(){
   miniEvaluateIfFilled();
 }
 function miniRevealPuzzle(){
-  if(!confirm("Reveal the entire puzzle? This is the same as giving up."))return;
   for(let r=0;r<miniRows();r++){
     for(let c=0;c<miniCols();c++){
       if(miniPuzzle.grid[r][c]!=="#"){
@@ -3646,7 +3752,7 @@ async function loadAnotherFive(){
   guesses=[];currentGuess="";gameComplete=false;
   sixToFiveResultCache=null;sixToFiveResultCacheKey="";
   fiveTimerElapsedMs=0;fiveTimerStartedAt=null;
-  document.getElementById("hardModeToggle").checked=false;
+  setFiveHardMode(false);
   document.getElementById("fiveStatus").innerHTML="";
   document.getElementById("fivePuzzleMeta").textContent=`${formatPuzzleDate(puzzle.date)} · ${puzzle.difficulty||"Unrated"}`;
   registerFiveStarted();
@@ -3658,7 +3764,7 @@ document.getElementById("fiveEndgameClose")?.addEventListener("click",closeFiveE
 {const close=document.getElementById("globalEndgameClose"),overlay=document.getElementById("globalEndgameOverlay"),share=document.getElementById("globalEndgameShare"),copy=document.getElementById("globalEndgameCopy"),home=document.getElementById("globalEndgameHome");if(close)close.onclick=closeGlobalEndgame;if(overlay)overlay.addEventListener("click",e=>{if(e.target===overlay)closeGlobalEndgame()});if(share)share.onclick=()=>shareGlobalEndgame("native");if(copy)copy.onclick=()=>shareGlobalEndgame("copy");if(home)home.onclick=()=>{closeGlobalEndgame();showHomePage()}}
 document.addEventListener("keydown",event=>{if(event.key==="Escape"){const o=document.getElementById("globalEndgameOverlay");if(o&&!o.hidden)closeGlobalEndgame()}});
 
-document.getElementById("homeArchiveLink")?.addEventListener("click",event=>event.preventDefault());
+
 
 
 /* =========================================================

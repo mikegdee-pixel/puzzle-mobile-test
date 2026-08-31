@@ -302,8 +302,8 @@
   display:block;
 }
 .mini-cell.black{background:#222;border-color:#222}
-.mini-cell.word-highlight{background:#cfe3f7}
-.mini-cell.active{background:#f5d56a}
+
+
 .mini-letter{
   position:absolute;
   inset:0;
@@ -3940,9 +3940,7 @@ main{max-width:1040px;padding:0 24px 24px}
 
 /* During the draw-in animation, hide the native strike so only the animated
    line is visible. Removing this class restores the persistent strike above. */
-#samePanel .same-history-guess.same-history-strike-in .same-history-guess-text{
-  text-decoration:none!important;
-}
+
 
 
 /* =========================================================
@@ -4902,7 +4900,7 @@ body{font-family:Lato,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans
 .game-ribbon,body.home-view .game-ribbon{
   display:flex;align-items:center;justify-content:center;gap:4px;width:min(930px,100%);min-height:0;margin:15px auto 10px;padding:5px;border:0;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(28,36,31,.075);overflow:visible;
 }
-body.home-view .game-ribbon{display:none!important}
+
 .game-tab{
   position:relative;flex:1 1 0;min-width:0;min-height:42px;padding:9px 10px;border:0!important;border-radius:10px!important;background:transparent!important;color:#717974!important;box-shadow:none!important;font:800 12.5px/1.12 Lato,system-ui,sans-serif;white-space:nowrap;transition:background .14s ease,color .14s ease;
 }
@@ -6590,15 +6588,7 @@ body.home-view .site-header{background:#f7f8f6}
 .puzzle-live-timer.timer-hidden{
   justify-content:flex-end!important;
 }
-.puzzle-timer-clock{
-  position:relative;
-  display:block;
-  width:16px;
-  height:16px;
-  box-sizing:border-box;
-  border:1.8px solid #646b67;
-  border-radius:50%;
-}
+
 .puzzle-timer-clock::before{
   content:"";
   position:absolute;
@@ -6609,18 +6599,7 @@ body.home-view .site-header{background:#f7f8f6}
   border-radius:1px;
   background:#646b67;
 }
-.puzzle-timer-clock::after{
-  content:"";
-  position:absolute;
-  left:6.25px;
-  top:6.5px;
-  width:4px;
-  height:1.6px;
-  border-radius:1px;
-  background:#646b67;
-  transform-origin:0 50%;
-  transform:rotate(24deg);
-}
+
 
 /* Daily Crossword gets the wider header/timer frame so the metadata belongs
    visually to the wide crossword area instead of appearing stranded inward. */
@@ -7229,5 +7208,938 @@ body.instructions-open{overflow:hidden}
     font-weight:900!important;
     font-style:normal!important;
     letter-spacing:.025em!important;
+  }
+}
+
+
+/* =========================================================
+   V100.61 — PUZZLE ARCHIVE HOMEPAGE FEATURE
+   ========================================================= */
+
+.home-after{
+  margin-top:28px!important;
+}
+.home-archive-feature{
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(260px,.75fr);
+  overflow:hidden;
+  border-radius:18px;
+  background:#fff;
+  color:#252a27;
+  text-decoration:none;
+  box-shadow:0 5px 18px rgba(42,47,43,.09),0 1px 3px rgba(42,47,43,.06);
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.home-archive-feature:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(42,47,43,.12),0 2px 5px rgba(42,47,43,.07);
+}
+.home-archive-feature:focus-visible{
+  outline:3px solid rgba(79,145,100,.42);
+  outline-offset:3px;
+}
+.home-archive-art{
+  min-width:0;
+  aspect-ratio:2/1;
+  overflow:hidden;
+  background:#e8e0d1;
+}
+.home-archive-art img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+}
+.home-archive-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  padding:28px 30px;
+}
+.home-archive-eyebrow{
+  margin-bottom:8px;
+  font:900 11px/1 Lato,system-ui,sans-serif;
+  letter-spacing:.13em;
+  color:#6e776f;
+}
+.home-archive-copy strong{
+  margin-bottom:8px;
+  font:900 24px/1.08 Lato,system-ui,sans-serif;
+  color:#28352d;
+}
+.home-archive-copy>span:not(.home-archive-eyebrow):not(.home-archive-cta){
+  font:400 14px/1.45 Lato,system-ui,sans-serif;
+  color:#68706b;
+}
+.home-archive-cta{
+  margin-top:17px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font:900 14px/1 Lato,system-ui,sans-serif;
+  color:#486b57;
+}
+.home-archive-cta b{
+  transition:transform .18s ease;
+}
+.home-archive-feature:hover .home-archive-cta b{
+  transform:translateX(3px);
+}
+@media(max-width:700px){
+  .home-after{margin-top:20px!important}
+  .home-archive-feature{
+    display:block;
+    border-radius:15px;
+  }
+  .home-archive-art{
+    display:block;
+    width:100%;
+    aspect-ratio:2/1;
+  }
+  .home-archive-copy{
+    padding:18px 18px 19px;
+  }
+  .home-archive-copy strong{
+    font-size:21px;
+  }
+  .home-archive-cta{
+    margin-top:13px;
+  }
+}
+
+
+/* =========================================================
+   V100.62 — SHORTER HOMEPAGE ARCHIVE FEATURE
+   ========================================================= */
+
+@media(min-width:701px){
+  .home-archive-feature{
+    height:160px;
+    grid-template-columns:minmax(0,1.55fr) minmax(260px,.75fr);
+  }
+  .home-archive-art{
+    height:100%;
+    aspect-ratio:auto;
+  }
+  .home-archive-copy{
+    padding:18px 26px;
+  }
+  .home-archive-copy strong{
+    font-size:22px;
+  }
+  .home-archive-cta{
+    margin-top:11px;
+  }
+}
+
+@media(max-width:700px){
+  .home-archive-art{
+    height:92px;
+    aspect-ratio:auto;
+  }
+  .home-archive-copy{
+    padding:14px 16px 15px;
+  }
+  .home-archive-copy strong{
+    margin-bottom:5px;
+    font-size:19px;
+  }
+  .home-archive-copy>span:not(.home-archive-eyebrow):not(.home-archive-cta){
+    font-size:13px;
+    line-height:1.35;
+  }
+  .home-archive-eyebrow{
+    margin-bottom:6px;
+  }
+  .home-archive-cta{
+    margin-top:10px;
+  }
+}
+
+
+/* V100.63 — date navigation restores completed puzzles silently.
+   No visual changes in this release. */
+
+
+/* =========================================================
+   V100.64 — HEADER ARCHIVE CALENDAR BUTTON
+   ========================================================= */
+
+.archive-header-btn{
+  appearance:none;
+  -webkit-appearance:none;
+  width:40px;
+  height:40px;
+  min-width:40px;
+  padding:8px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  color:#4e5651;
+  text-decoration:none;
+  box-shadow:none;
+  cursor:pointer;
+}
+.archive-header-btn:hover,
+.archive-header-btn:active{
+  transform:none;
+  background:rgba(50,58,53,.055);
+  box-shadow:none;
+}
+.archive-header-btn:focus-visible{
+  outline:2px solid #747c77;
+  outline-offset:1px;
+}
+.archive-header-icon{
+  display:block;
+  width:21px;
+  height:21px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+@media(max-width:700px){
+  .archive-header-btn{
+    width:38px;
+    height:38px;
+    min-width:38px;
+    padding:8px;
+  }
+  .archive-header-icon{
+    width:20px;
+    height:20px;
+  }
+}
+
+
+/* =========================================================
+   V100.65 — INCOMMON STATUS BANNER REFINEMENT
+   Borrowed only the requested visual ingredients:
+   brighter solved green, clean system UI typography, checkmark.
+   Existing PuzzleNook pill/banner geometry is preserved.
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+  background:#10b981!important;
+  border-color:rgba(16,185,129,.15)!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result strong{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+  font-weight:700!important;
+  letter-spacing:.05em!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result .quads-status-label{
+  display:inline!important;
+  margin:0!important;
+  font:inherit!important;
+  letter-spacing:inherit!important;
+  color:inherit!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result .quads-status-check{
+  display:block!important;
+  width:16px!important;
+  height:16px!important;
+  flex:0 0 auto!important;
+  margin:0!important;
+  overflow:visible;
+  color:#fff;
+}
+
+@media(max-width:700px){
+  #quadsPanel #quadsInstructions.quads-end-result strong{
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;
+    font-weight:700!important;
+    letter-spacing:.05em!important;
+  }
+  #quadsPanel #quadsInstructions.quads-end-result .quads-status-check{
+    width:15px!important;
+    height:15px!important;
+  }
+}
+
+
+/* =========================================================
+   V100.66 — INCOMMON SMALLER STATUS PILL
+   ========================================================= */
+
+/* Roughly 20% smaller overall footprint than V100.65. */
+#quadsPanel #quadsInstructions.quads-end-result{
+  padding-left:58px!important;
+  padding-right:58px!important;
+  padding-top:7px!important;
+  padding-bottom:6px!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result strong{
+  font-size:25px!important; /* 28px -> 25px */
+}
+
+#quadsPanel #quadsInstructions.quads-end-result .quads-status-check{
+  width:13px!important;
+  height:13px!important;
+}
+
+@media(max-width:700px){
+  #quadsPanel #quadsInstructions.quads-end-result{
+    padding-left:46px!important;
+    padding-right:46px!important;
+    padding-top:7px!important;
+    padding-bottom:6px!important;
+  }
+  #quadsPanel #quadsInstructions.quads-end-result strong{
+    font-size:22px!important; /* 25px -> 22px */
+  }
+  #quadsPanel #quadsInstructions.quads-end-result .quads-status-check{
+    width:12px!important;
+    height:12px!important;
+  }
+}
+
+
+/* =========================================================
+   V100.67 — INCOMMON CENTERED + THINNER STATUS PILL
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result{
+  padding-top:5px!important;
+  padding-bottom:4px!important;
+  line-height:1!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result strong{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  line-height:1!important;
+  margin:0!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result .quads-status-label{
+  display:inline-flex!important;
+  align-items:center!important;
+  line-height:1!important;
+  margin:0!important;
+}
+
+@media(max-width:700px){
+  #quadsPanel #quadsInstructions.quads-end-result{
+    padding-top:5px!important;
+    padding-bottom:4px!important;
+  }
+}
+
+
+/* =========================================================
+   V100.68 — INCOMMON DARK GREEN SOLVED TEXT
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result strong,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-label,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-check{
+  color:#064e3b!important;
+}
+
+
+/* =========================================================
+   V100.69 — INCOMMON SOLVED BORDER + 60% BACKFILL
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+  background:rgba(16,185,129,.60)!important;
+  border:2px solid #064e3b!important;
+}
+
+
+/* =========================================================
+   V100.70 — INCOMMON SOLVED BORDER 7% TRANSPARENCY
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+  border-color:rgba(6,78,59,.93)!important;
+}
+
+
+/* =========================================================
+   V100.71 — INCOMMON SOLVED INK AT 55% OPACITY
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+  border-color:rgba(6,78,59,.55)!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result strong,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-label,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-check{
+  color:rgba(6,78,59,.55)!important;
+}
+
+
+/* =========================================================
+   V100.72 — INCOMMON SOLVED INK AT 65% OPACITY
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+  border-color:rgba(6,78,59,.65)!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result strong,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-label,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-check{
+  color:rgba(6,78,59,.65)!important;
+}
+
+
+/* =========================================================
+   V100.73 — INCOMMON STATUS PILL: NO DROP SHADOW
+   ========================================================= */
+
+#quadsPanel #quadsInstructions.quads-end-result{
+  box-shadow:none!important;
+}
+
+
+/* =========================================================
+   V100.74 — INCOMMON STATUS PILL: ARCHIVE BADGE STYLE
+   ========================================================= */
+
+/* Match the visual language of the Archive "COMPLETED" badges:
+   pale tinted fill, subtle 1px border, darkened game-color ink,
+   compact uppercase type, and no drop shadow. */
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+  --status-color:#10b981;
+  background:color-mix(in srgb,var(--status-color) 10%,white)!important;
+  border:1px solid color-mix(in srgb,var(--status-color) 34%,transparent)!important;
+  color:color-mix(in srgb,var(--status-color) 74%,#26302a)!important;
+  box-shadow:none!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result strong,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-label,
+#quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-check{
+  color:color-mix(in srgb,var(--status-color) 74%,#26302a)!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result{
+  padding:5px 14px 4px!important;
+  border-radius:999px!important;
+  min-height:0!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result strong{
+  gap:5px!important;
+  font-family:Lato,system-ui,sans-serif!important;
+  font-size:16px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:.08em!important;
+}
+
+
+
+@media(max-width:700px){
+  #quadsPanel #quadsInstructions.quads-end-result{
+    padding:5px 13px 4px!important;
+  }
+  #quadsPanel #quadsInstructions.quads-end-result strong{
+    font-family:Lato,system-ui,sans-serif!important;
+    font-size:15px!important;
+    font-weight:900!important;
+    letter-spacing:.08em!important;
+  }
+  #quadsPanel #quadsInstructions.quads-end-result .quads-status-check{
+    width:12px!important;
+    height:12px!important;
+  }
+}
+
+@supports not (color:color-mix(in srgb,black,white)){
+  #quadsPanel #quadsInstructions.quads-end-result.quads-win-result{
+    background:#e8f7f1!important;
+    border-color:#a9dec9!important;
+    color:#1f6b57!important;
+  }
+  #quadsPanel #quadsInstructions.quads-end-result.quads-win-result strong,
+  #quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-label,
+  #quadsPanel #quadsInstructions.quads-end-result.quads-win-result .quads-status-check{
+    color:#1f6b57!important;
+  }
+}
+
+
+/* =========================================================
+   V100.75 — INCOMMON NOT-SOLVED ARCHIVE BADGE STYLE
+   ========================================================= */
+
+/* Mirror the approved SOLVED treatment using the existing
+   PuzzleNook loss red as the status color. */
+#quadsPanel #quadsInstructions.quads-end-result.quads-loss-result{
+  --status-color:#a95f52;
+  background:color-mix(in srgb,var(--status-color) 10%,white)!important;
+  border:1px solid color-mix(in srgb,var(--status-color) 34%,transparent)!important;
+  color:color-mix(in srgb,var(--status-color) 74%,#26302a)!important;
+  box-shadow:none!important;
+}
+
+#quadsPanel #quadsInstructions.quads-end-result.quads-loss-result strong,
+#quadsPanel #quadsInstructions.quads-end-result.quads-loss-result .quads-status-label{
+  color:color-mix(in srgb,var(--status-color) 74%,#26302a)!important;
+}
+
+@supports not (color:color-mix(in srgb,black,white)){
+  #quadsPanel #quadsInstructions.quads-end-result.quads-loss-result{
+    background:#f7edeb!important;
+    border-color:#dfc0bb!important;
+    color:#7c4b43!important;
+  }
+  #quadsPanel #quadsInstructions.quads-end-result.quads-loss-result strong,
+  #quadsPanel #quadsInstructions.quads-end-result.quads-loss-result .quads-status-label{
+    color:#7c4b43!important;
+  }
+}
+
+
+/* =========================================================
+   V100.76 — INCOMMON NOT-SOLVED PROHIBITED ICON
+   ========================================================= */
+#quadsPanel #quadsInstructions.quads-end-result .quads-status-not-solved-icon{
+  display:block!important;
+  width:13px!important;
+  height:13px!important;
+  flex:0 0 auto!important;
+  margin:0!important;
+  overflow:visible;
+  color:inherit!important;
+}
+#quadsPanel #quadsInstructions.quads-end-result.quads-loss-result .quads-status-not-solved-icon{
+  color:color-mix(in srgb,var(--status-color) 74%,#26302a)!important;
+}
+@media(max-width:700px){
+  #quadsPanel #quadsInstructions.quads-end-result .quads-status-not-solved-icon{
+    width:12px!important;
+    height:12px!important;
+  }
+}
+@supports not (color:color-mix(in srgb,black,white)){
+  #quadsPanel #quadsInstructions.quads-end-result.quads-loss-result .quads-status-not-solved-icon{
+    color:#7c4b43!important;
+  }
+}
+
+
+/* =========================================================
+   V100.77 — UNIVERSAL PUZZLE STATUS BADGES
+   ========================================================= */
+.puzzle-end-status{
+  --puzzle-status-color:#4f9164;
+  width:max-content;
+  max-width:calc(100% - 24px);
+  margin:8px auto 12px;
+  padding:5px 14px 4px;
+  border:1px solid color-mix(in srgb,var(--puzzle-status-color) 34%,transparent);
+  border-radius:999px;
+  background:color-mix(in srgb,var(--puzzle-status-color) 10%,white);
+  color:color-mix(in srgb,var(--puzzle-status-color) 74%,#26302a);
+  box-shadow:none;
+  line-height:1;
+}
+.puzzle-end-status[hidden]{display:none!important;}
+.puzzle-end-status strong{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;margin:0;
+  color:inherit;font-family:Lato,system-ui,sans-serif;font-size:16px;
+  line-height:1;font-weight:900;letter-spacing:.08em;
+}
+.puzzle-end-status .puzzle-status-icon{
+  display:block;width:13px;height:13px;flex:0 0 auto;margin:0;overflow:visible;color:inherit;
+}
+.puzzle-end-status.is-not-solved{--puzzle-status-color:#a95f52!important;}
+#fivePuzzleStatus{--puzzle-status-color:#4f9164;}
+#samePuzzleStatus{--puzzle-status-color:#b58b3e;}
+#miniPuzzleStatus{--puzzle-status-color:#587e9b;}
+#wordTrailPuzzleStatus{--puzzle-status-color:#7359a3;}
+#ellPuzzleStatus{--puzzle-status-color:#268d89;}
+#fivePanel.has-puzzle-end-status>.simple-instructions,
+#ellPanel.has-puzzle-end-status>.simple-instructions{display:none!important;}
+@media(max-width:700px){
+  .puzzle-end-status{margin-top:7px;margin-bottom:10px;padding:5px 13px 4px;}
+  .puzzle-end-status strong{font-size:15px;}
+  .puzzle-end-status .puzzle-status-icon{width:12px;height:12px;}
+}
+@supports not (color:color-mix(in srgb,black,white)){
+  .puzzle-end-status{background:#eef4ef;border-color:#bfd0c2;color:#355d3f;}
+  .puzzle-end-status.is-not-solved{background:#f7edeb;border-color:#dfc0bb;color:#7c4b43;}
+}
+
+
+/* =========================================================
+   V100.78 — STATUS BADGE IN TIMER ROW
+   ========================================================= */
+
+/* The timer row becomes a three-position lane: the status badge is centered
+   on the game footprint while the clock/time remains anchored to the right. */
+.puzzle-timer-row{
+  position:relative!important;
+  justify-content:flex-end!important;
+}
+
+.puzzle-timer-row>.puzzle-end-status{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  transform:translate(-50%,-50%)!important;
+  margin:0!important;
+  z-index:1;
+  pointer-events:none;
+}
+
+/* Preserve the approved compact Archive-badge dimensions in the tighter row. */
+.puzzle-timer-row>.puzzle-end-status{
+  padding:5px 14px 4px!important;
+}
+@media(max-width:700px){
+  .puzzle-timer-row>.puzzle-end-status{
+    padding:5px 13px 4px!important;
+  }
+}
+
+/* Each game's SOLVED / terminal state replaces simple gameplay instructions.
+   InCommon's own JS also hides its instruction node so its previous end-state
+   banner cannot appear redundantly. */
+#fivePanel.has-puzzle-end-status>.simple-instructions,
+#quadsPanel.has-puzzle-end-status>#quadsInstructions,
+#ellPanel.has-puzzle-end-status>.simple-instructions{
+  display:none!important;
+}
+
+/* InCommon now uses the same universal badge treatment as every other game. */
+#quadsPuzzleStatus{--puzzle-status-color:#c66f58;}
+
+
+/* =========================================================
+   V100.79 — SIX TO FIVE + INCOMMON INSTRUCTIONS IN TIMER ROW
+   ========================================================= */
+
+.puzzle-timer-row>.timer-row-instructions{
+  position:absolute!important;
+  left:0!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  margin:0!important;
+  padding:0!important;
+  max-width:calc(50% - 18px)!important;
+  text-align:left!important;
+  line-height:1.25!important;
+  pointer-events:none;
+}
+
+#fivePanel.has-puzzle-end-status .timer-row-instructions,
+#quadsPanel.has-puzzle-end-status .timer-row-instructions{
+  display:none!important;
+}
+
+/* These instruction nodes now live inside the timer row, so prevent older
+   block-level spacing rules from affecting the row layout. */
+#fivePanel .puzzle-timer-row>.simple-instructions,
+#quadsPanel .puzzle-timer-row>.simple-instructions{
+  width:auto!important;
+  min-height:0!important;
+}
+
+/* On narrower screens, preserve the same three-lane arrangement while
+   keeping the instruction copy compact enough not to collide with status/timer. */
+@media(max-width:700px){
+  .puzzle-timer-row>.timer-row-instructions{
+    max-width:calc(50% - 12px)!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+  }
+}
+
+
+/* =========================================================
+   V100.82 — UNSCRUMBLE INTERACTION STABILITY
+   ========================================================= */
+#wordTrailPanel .wordtrail-board-stage,
+#wordTrailPanel .wordtrail-board-wrap,
+#wordTrailPanel .wordtrail-player-grid{
+  touch-action:none!important;
+  overscroll-behavior:contain;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+
+/* The board's containing geometry must not animate while tracing. Individual
+   tile feedback may animate, but the 6×8 board itself remains fixed. */
+#wordTrailPanel .wordtrail-board-stage,
+#wordTrailPanel .wordtrail-board-wrap,
+#wordTrailPanel .wordtrail-player-grid{
+  transition:none!important;
+  animation:none!important;
+}
+
+
+/* =========================================================
+   V100.83 — UNSCRUMBLE FIXED MESSAGE LANE
+   ========================================================= */
+
+/*
+  Gameplay messages used to add/remove vertical margin inside #wordTrailStatus.
+  Because the board stage is part of the same flex column, that changed the
+  board's vertical position whenever a warning appeared or cleared. Reserve a
+  fixed message lane instead, so message state never changes grid geometry.
+*/
+#wordTrailPanel #wordTrailStatus{
+  box-sizing:border-box!important;
+  height:28px!important;
+  min-height:28px!important;
+  max-height:28px!important;
+  flex:0 0 28px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  overflow:visible;
+}
+
+#wordTrailPanel #wordTrailStatus .wordtrail-message{
+  margin:0 auto!important;
+  padding:0!important;
+  line-height:1.2!important;
+}
+
+@media(max-width:700px){
+  #wordTrailPanel #wordTrailStatus{
+    height:24px!important;
+    min-height:24px!important;
+    max-height:24px!important;
+    flex-basis:24px!important;
+  }
+  #wordTrailPanel #wordTrailStatus .wordtrail-message{
+    font-size:12px!important;
+  }
+}
+
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel #wordTrailStatus{
+    height:18px!important;
+    min-height:18px!important;
+    max-height:18px!important;
+    flex-basis:18px!important;
+  }
+  #wordTrailPanel #wordTrailStatus .wordtrail-message{
+    font-size:11px!important;
+    line-height:1.1!important;
+  }
+}
+
+
+/* V100.85 — restrained consumer site menu */
+.restrained-site-nav{grid-template-columns:1fr!important;}
+.restrained-site-nav a{display:flex;align-items:center;min-height:40px;padding:8px 10px;border-radius:8px;background:#f5f6f4;color:#242926;text-align:left;font-size:13px;font-weight:800;text-decoration:none;}
+.restrained-site-nav a:hover{background:#ecefeb;}
+
+
+/* =========================================================
+   V101.1 — QA refinement: headers, controls, crossword entry
+   ========================================================= */
+
+/* One and the Same: its played-state history/game footprint is 760px wide.
+   Match the clean header and timer row to that true desktop width. */
+@media(min-width:701px){
+  #samePanel{--game-meta-width:760px;}
+}
+
+/* Shared left-aligned instruction treatment when an instruction is moved into
+   the timer row. The timer remains pinned to the right. */
+.puzzle-timer-row .timer-row-instructions{
+  flex:1 1 auto!important;
+  width:auto!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0 12px 0 0!important;
+  text-align:left!important;
+  align-self:center!important;
+}
+#ellPanel .puzzle-timer-row .timer-row-instructions{
+  color:#59615c!important;
+  font:700 14px/1.35 Lato,system-ui,sans-serif!important;
+}
+
+/* Daily Crossword Hint control: compact plain button, no arrow. */
+#miniPanel .mini-header-reveal #miniRevealBtn{
+  min-height:0!important;
+  padding:5px 10px!important;
+  border-radius:7px!important;
+  font-size:12px!important;
+  line-height:1.2!important;
+}
+#miniPanel .mini-header-reveal .reveal-menu{
+  padding:0!important;
+  overflow:hidden!important;
+}
+#miniPanel .mini-header-reveal .reveal-menu button{
+  border-radius:0!important;
+  padding:10px 12px!important;
+}
+#miniPanel .mini-header-reveal .reveal-menu button + button{
+  border-top:1px solid var(--line)!important;
+}
+@media(max-width:700px){
+  #miniPanel .mini-header-reveal #miniRevealBtn{
+    padding:4px 8px!important;
+    font-size:11px!important;
+  }
+}
+
+/* Six to Five Hard Mode: compact pressable control rather than checkbox. */
+#fivePanel .hard-mode-button{
+  -webkit-appearance:none;
+  appearance:none;
+  min-height:0!important;
+  padding:5px 10px!important;
+  border:1px solid #c9cec9!important;
+  border-radius:7px!important;
+  background:#fff!important;
+  color:#3e4541!important;
+  box-shadow:none!important;
+  font:800 12px/1.2 Lato,system-ui,sans-serif!important;
+  white-space:nowrap;
+}
+#fivePanel .hard-mode-button:hover{background:#f2f4f1!important;}
+#fivePanel .hard-mode-button[aria-pressed="true"],
+#fivePanel .hard-mode-button.is-active{
+  background:#252a27!important;
+  border-color:#252a27!important;
+  color:#fff!important;
+}
+#fivePanel .hard-mode-button:focus-visible{
+  outline:2px solid #78817b!important;
+  outline-offset:2px!important;
+}
+
+
+/* =========================================================
+   V101.2 — MOBILE CLEARANCE + CONTROL ALIGNMENT
+   ========================================================= */
+
+/* Center the Daily Crossword Hint menu on the Hint control itself. */
+#miniPanel .mini-header-reveal .reveal-menu{
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%)!important;
+}
+
+@media(max-width:700px){
+  /* Give short mobile viewports a little more room above the fixed clue/
+     keyboard dock. This reduces the grid ceiling by 12px versus V94. */
+  #miniPanel .mini-player-grid{
+    width:min(
+      calc(100vw - 30px),
+      clamp(150px, calc(100dvh - 390px - env(safe-area-inset-bottom)), 520px)
+    )!important;
+  }
+
+  /* Keep Every Last Letter's white game surface extending through the
+     visible mobile viewport, including phones taller than its content. */
+  #ellPanel{
+    min-height:calc(100dvh - 50px)!important;
+    padding-bottom:calc(24px + env(safe-area-inset-bottom))!important;
+  }
+
+  /* Timer-row instructions share the game-title/header left inset rather
+     than starting at the timer row's expanded outer edge. */
+  #fivePanel .puzzle-timer-row > .timer-row-instructions,
+  #quadsPanel .puzzle-timer-row > .timer-row-instructions,
+  #ellPanel .puzzle-timer-row > .timer-row-instructions{
+    left:12px!important;
+  }
+}
+
+/* =========================================================
+   V101.3 — QA REFINEMENTS
+   - ELL mobile board +7%
+   - ELL end-state summary floats over the board
+   ========================================================= */
+
+/* The board and its end-state card now share one positioning stage so the
+   summary never consumes vertical flow space between the timer and score. */
+#ellPanel .ell-grid-stage{
+  position:relative;
+  display:grid;
+  place-items:center;
+}
+
+#ellPanel .ell-grid-overlay{
+  position:absolute;
+  inset:0;
+  z-index:20;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+}
+
+#ellPanel .ell-grid-overlay:empty{
+  display:none;
+}
+
+#ellPanel .ell-grid-overlay .ell-endgame{
+  width:min(calc(100% - 20px), 440px);
+  margin:0;
+  pointer-events:auto;
+  box-shadow:0 12px 32px rgba(0,0,0,.20);
+}
+
+/* Increase the actual mobile board footprint by 7% rather than visually
+   scaling it, so layout, hit targets and overlay geometry all remain true. */
+@media(min-width:521px) and (max-width:700px){
+  #ellPanel .ell-grid{
+    grid-template-columns:repeat(5,68.48px);
+    gap:8.56px;
+  }
+  #ellPanel .ell-tile{
+    width:68.48px;
+    height:68.48px;
+    font-size:32.1px;
+  }
+}
+
+@media(max-width:520px){
+  #ellPanel .ell-grid{
+    grid-template-columns:repeat(5,55.64px);
+    gap:8.56px;
+  }
+  #ellPanel .ell-tile{
+    width:55.64px;
+    height:55.64px;
+    font-size:26.75px;
+  }
+}
+
+/* Preserve fit on the very narrowest supported phones. */
+@media(max-width:330px){
+  #ellPanel .ell-grid{
+    grid-template-columns:repeat(5,min(55.64px,calc((100vw - 60px)/5)));
+    gap:min(8.56px,1.8vw);
+  }
+  #ellPanel .ell-tile{
+    width:min(55.64px,calc((100vw - 60px)/5));
+    height:min(55.64px,calc((100vw - 60px)/5));
+    font-size:clamp(22px,8vw,26.75px);
   }
 }

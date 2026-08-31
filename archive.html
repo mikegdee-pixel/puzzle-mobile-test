@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Puzzle Archive · PuzzleNook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="archive.css?v=101.4">
+</head>
+<body>
+<header class="archive-site-header">
+  <a class="archive-brand" href="index.html" aria-label="PuzzleNook home">PuzzleNook</a>
+  <span class="archive-tagline">Your little escape.</span>
+  <a class="archive-home-link" href="index.html">Today’s puzzles <span class="archive-today-arrow" aria-hidden="true">→</span></a>
+</header>
+
+<main class="archive-main">
+  <section class="archive-intro">
+    <div class="archive-eyebrow">PUZZLE ARCHIVE</div>
+    <h1>Play older puzzles.</h1>
+    <p>Browse older puzzles by date. Dots shown represent puzzles that have already been completed.</p>
+  </section>
+
+  <section class="archive-calendar-card" aria-labelledby="archiveMonthLabel">
+    <div class="archive-month-nav">
+      <button type="button" id="archivePrevMonth" class="month-arrow" aria-label="Previous month">←</button>
+      <div>
+        <div id="archiveMonthLabel" class="archive-month-label"></div>
+              </div>
+      <button type="button" id="archiveNextMonth" class="month-arrow" aria-label="Next month">→</button>
+    </div>
+
+    <div class="archive-weekdays" aria-hidden="true">
+      <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+    </div>
+    <div id="archiveCalendar" class="archive-calendar" role="grid" aria-label="Archived puzzle dates"></div>
+  </section>
+
+  <section id="archiveDayPanel" class="archive-day-panel" hidden aria-live="polite">
+    <div class="archive-day-head">
+      <div>
+        <div class="archive-day-kicker">SELECTED DAY</div>
+        <h2 id="archiveDayTitle"></h2>
+      </div>
+      <button type="button" id="archiveDayClose" class="archive-day-close" aria-label="Close selected day">×</button>
+    </div>
+    <div id="archiveGameList" class="archive-game-list"></div>
+  </section>
+
+  <div id="archiveEmpty" class="archive-empty" hidden>
+    <strong>No archived puzzles here yet.</strong>
+    <span>Use the arrows above to browse another month.</span>
+  </div>
+</main>
+<script src="static-data-adapter.js?v=101.4"></script>
+<script src="archive.js?v=101.4"></script>
+</body>
+</html>
