@@ -1,3 +1,8 @@
+# Cache-fix revision: V101.4.1
+
+This GitHub Pages QA package uses physically versioned CSS/JS filenames in addition to no-cache HTML meta directives.
+This is intended to reduce stale physical-phone caching during QA.
+
 # PuzzleNook GitHub Pages Public Test — V101.4
 
 This package is the static GitHub Pages QA build derived from PuzzleWebsite V101.4.

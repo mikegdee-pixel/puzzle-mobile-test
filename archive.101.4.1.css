@@ -1,0 +1,322 @@
+
+:root{
+  --ink:#273029;
+  --muted:#707872;
+  --green:#4f9164;
+  --paper:#f7f8f6;
+  --line:#e4e7e2;
+  --white:#fff;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:Lato,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+button,a{font:inherit}
+.archive-site-header{
+  height:58px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  max-width:1080px;
+  margin:0 auto;
+}
+.archive-brand{
+  color:#252b27;
+  text-decoration:none;
+  font-size:20px;
+  line-height:1;
+  font-weight:900;
+}
+.archive-tagline{
+  display:none;
+  color:#747c77;
+  font-size:14px;
+  font-style:italic;
+}
+.archive-home-link{
+  margin-left:auto;
+  color:#59635d;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:800;
+}
+.archive-main{
+  width:min(100% - 20px,760px);
+  margin:0 auto;
+  padding:22px 0 56px;
+}
+.archive-intro{
+  padding:8px 4px 22px;
+}
+.archive-eyebrow,.archive-day-kicker{
+  color:#718077;
+  font-size:11px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.14em;
+}
+.archive-intro h1{
+  margin:8px 0 8px;
+  font-family:"DM Serif Display",Georgia,serif;
+  font-size:clamp(32px,9vw,46px);
+  line-height:1.02;
+  font-weight:400;
+  letter-spacing:-.025em;
+}
+.archive-intro p{
+  max-width:540px;
+  margin:0;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.48;
+}
+.archive-calendar-card{
+  padding:15px 12px 13px;
+  border-radius:18px;
+  background:var(--white);
+  box-shadow:0 5px 18px rgba(42,47,43,.08),0 1px 3px rgba(42,47,43,.05);
+}
+.archive-month-nav{
+  min-height:52px;
+  display:grid;
+  grid-template-columns:44px 1fr 44px;
+  align-items:center;
+  gap:6px;
+  padding:0 1px 10px;
+}
+.archive-month-nav>div{text-align:center}
+.archive-month-label{
+  font-size:19px;
+  line-height:1.15;
+  font-weight:900;
+}
+.month-arrow{
+  width:42px;height:42px;
+  border:0;
+  border-radius:50%;
+  background:#f2f4f1;
+  color:#455048;
+  font-size:20px;
+  cursor:pointer;
+}
+.month-arrow:disabled{opacity:.25;cursor:default}
+.month-arrow:not(:disabled):active{transform:scale(.96)}
+.archive-weekdays,.archive-calendar{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+}
+.archive-weekdays{
+  padding:4px 0 5px;
+  color:#949a96;
+  font-size:10px;
+  font-weight:900;
+  text-align:center;
+}
+.archive-weekdays span{padding:5px 0}
+.archive-calendar{gap:3px}
+.archive-day{
+  position:relative;
+  aspect-ratio:1/1;
+  min-width:0;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:#a0a5a1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  cursor:default;
+}
+.archive-day.is-available{
+  background:#f1f5f1;
+  color:#314238;
+  cursor:pointer;
+  font-weight:900;
+}
+.archive-day.is-available:hover{background:#e8f0e9}
+.archive-day.is-selected{
+  background:#496f57;
+  color:#fff;
+  box-shadow:0 4px 9px rgba(43,75,55,.20);
+}
+.archive-day.is-today{outline:1px solid #cfd8d1;outline-offset:-2px}
+.archive-day-number{font-size:14px;line-height:1}
+.archive-day-dots{
+  height:5px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+}
+.archive-day-dots i{
+  width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.58;
+}
+.archive-day-panel{
+  margin-top:14px;
+  padding:18px 15px 15px;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 5px 18px rgba(42,47,43,.08),0 1px 3px rgba(42,47,43,.05);
+  animation:dayPanelIn .18s ease both;
+}
+@keyframes dayPanelIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.archive-day-head{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:13px;
+}
+.archive-day-head h2{
+  margin:5px 0 0;
+  font-size:21px;
+  line-height:1.1;
+  font-weight:900;
+}
+.archive-day-close{
+  margin-left:auto;
+  width:34px;height:34px;
+  border:0;border-radius:50%;
+  background:#f1f3f0;color:#69716c;
+  font-size:23px;line-height:1;cursor:pointer;
+}
+.archive-game-list{display:grid;gap:7px}
+.archive-game{
+  min-height:58px;
+  padding:10px 12px 10px 14px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  border-radius:13px;
+  background:#f7f8f6;
+  color:#29302b;
+  text-decoration:none;
+  transition:background .15s ease,transform .15s ease;
+}
+.archive-game:hover{background:#f0f3ef;transform:translateX(2px)}
+.archive-game-mark{
+  width:9px;height:34px;border-radius:999px;flex:0 0 auto;
+  background:var(--game-color,#6b766f);
+}
+.archive-game-copy{min-width:0}
+.archive-game-name{display:block;font-size:14px;font-weight:900}
+.archive-game-sub{display:block;margin-top:2px;color:#818782;font-size:11px;font-weight:700}
+.archive-game-arrow{margin-left:auto;color:#69756d;font-size:18px;font-weight:900}
+.archive-empty{
+  padding:26px 12px;
+  color:#737b76;
+  text-align:center;
+  font-size:13px;
+}
+.archive-empty strong{display:block;color:#4b544e;font-size:14px;margin-bottom:4px}
+.archive-empty span{display:block}
+@media(min-width:560px){
+  .archive-site-header{height:62px;padding:0 20px}
+  .archive-tagline{display:inline}
+  .archive-main{width:min(100% - 36px,760px);padding-top:34px}
+  .archive-calendar-card{padding:20px 20px 18px}
+  .archive-calendar{gap:6px}
+  .archive-day{border-radius:14px}
+  .archive-day-number{font-size:15px}
+  .archive-day-panel{padding:21px 20px 18px}
+  .archive-game-list{grid-template-columns:1fr 1fr}
+}
+@media(min-width:800px){
+  .archive-main{padding-top:44px}
+  .archive-intro{padding-bottom:28px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important}
+  .archive-day-panel{animation:none}
+}
+
+
+/* =========================================================
+   V100.62 — ARCHIVE COMPLETION AT-A-GLANCE
+   ========================================================= */
+
+.archive-day-dots{
+  min-width:24px;
+  height:6px;
+  gap:2px;
+}
+.archive-day-dots i{
+  width:4px;
+  height:4px;
+  opacity:1;
+  background:var(--dot-color);
+  box-shadow:0 0 0 .5px rgba(0,0,0,.08);
+}
+.archive-day.is-selected .archive-day-dots i{
+  box-shadow:0 0 0 1px rgba(255,255,255,.72);
+}
+.archive-completed-badge{
+  flex:0 0 auto;
+  margin-left:auto;
+  padding:5px 7px 4px;
+  border:1px solid color-mix(in srgb,var(--game-color) 34%,transparent);
+  border-radius:999px;
+  background:color-mix(in srgb,var(--game-color) 10%,white);
+  color:color-mix(in srgb,var(--game-color) 74%,#26302a);
+  font-size:9px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.archive-game.is-completed{
+  background:#fafbf9;
+}
+.archive-game.is-completed .archive-game-sub{
+  color:#8b918d;
+}
+.archive-game.is-completed .archive-game-arrow{
+  margin-left:0;
+}
+@supports not (color:color-mix(in srgb,black,white)){
+  .archive-completed-badge{
+    border-color:#cfd5d0;
+    background:#f1f4f1;
+    color:#59645d;
+  }
+}
+@media(max-width:400px){
+  .archive-game{
+    gap:9px;
+    padding-left:12px;
+    padding-right:10px;
+  }
+  .archive-completed-badge{
+    padding:5px 6px 4px;
+    font-size:8px;
+  }
+  .archive-game-arrow{
+    font-size:16px;
+  }
+}
+
+/* V100.80 — clarify Today’s puzzles as navigation */
+.archive-today-arrow{
+  display:inline-block;
+  margin-left:5px;
+  font-size:1.08em;
+  line-height:1;
+  transform:translateY(.02em);
+}
+
+
+/* =========================================================
+   V100.82 — DESKTOP ARCHIVE CONTENT POSITION
+   ========================================================= */
+@media(min-width:800px){
+  .archive-main{
+    transform:translateY(-25px);
+    margin-bottom:-25px;
+  }
+}
