@@ -26,7 +26,7 @@
   const flatten=p=>({id:p.id,game:p.game,date:p.date,...(p.data||{})});
 
   async function ellPossible(letters){
-    const set=await loadSet("data/every-last-letter-guesses.json","ell");
+    const set=await loadSet("data/puzzlenook-playable-words.json","ell");
     const available={};
     for(const ch of letters)available[ch]=(available[ch]||0)+1;
     for(const word of set){
@@ -73,7 +73,7 @@
       if(u.pathname==="/api/ell/validate"){
         const word=String(u.searchParams.get("word")||"").trim().toUpperCase();
         if(!/^[A-Z]+$/.test(word)||word.length<3)return jsonResponse({word,valid:false,reason:"minimum_length"});
-        const set=await loadSet("data/every-last-letter-guesses.json","ell"),valid=set.has(word);
+        const set=await loadSet("data/puzzlenook-playable-words.json","ell"),valid=set.has(word);
         return jsonResponse({word,valid,reason:valid?null:"not_in_dictionary"});
       }
       if(u.pathname==="/api/ell/can-form-word"){

@@ -108,11 +108,13 @@ function selectDay(key,button){
   const puzzles=archiveByDate.get(key)||[];
   const available=new Map(puzzles.map(p=>[p.game,p]));
   document.getElementById("archiveDayTitle").textContent=prettyDate(key);
+  const viewDate=document.getElementById("archiveViewDate");
+  if(viewDate)viewDate.href=`/?date=${encodeURIComponent(key)}`;
   const list=document.getElementById("archiveGameList");
   list.innerHTML=GAME_ORDER.filter(game=>available.has(game)).map(game=>{
     const meta=GAME_META[game];
     const completed=archiveGameCompleted(game,key);
-    return `<a class="archive-game${completed?" is-completed":""}" href="index.html?date=${encodeURIComponent(key)}&game=${encodeURIComponent(game)}" style="--game-color:${meta.color}">
+    return `<a class="archive-game${completed?" is-completed":""}" href="/?date=${encodeURIComponent(key)}&game=${encodeURIComponent(game)}" style="--game-color:${meta.color}">
       <span class="archive-game-mark" aria-hidden="true"></span>
       <span class="archive-game-copy"><span class="archive-game-name">${meta.name}</span><span class="archive-game-sub">${meta.sub}</span></span>
       ${completed?'<span class="archive-completed-badge">COMPLETED</span>':""}

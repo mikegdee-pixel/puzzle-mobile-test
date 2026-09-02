@@ -22,6 +22,80 @@ function writeJsonStorage(key,value){
 }
 function sixToFiveResultMessage(n){const p=SIX_TO_FIVE_SOLVE_MESSAGES[n]||SIX_TO_FIVE_SOLVE_MESSAGES[6];return p[Math.floor(Math.random()*p.length)]}
 function fiveShareText(){if(!puzzle)return "";const rows=guesses.map(g=>scoreWord(g,puzzle.answer).map(s=>s==="good"?"🟩":s==="present"?"🟦":"⬛").join("")).join("\n");return `Six to Five — ${formatPuzzleDate(puzzle.date)} — ${guesses.length}/6\n${rows}`}
+
+
+/* V102.3 — universal per-game completion allowance (3 completed puzzles per game/day). */
+const PUZZLENOOK_PLAY_ALLOWANCE_KEY="puzzleNookDailyGamePlaysV1";
+const PUZZLENOOK_DAILY_GAME_LIMIT=3;
+const PUBLIC_GAME_NAMES={five:"Six to Five",same:"One and the Same",quads:"InCommon",mini:"Daily Crossword",trail:"Unscrumble",ell:"Every Last Letter"};
+function readDailyGamePlays(){
+  const today=browserTodayKey();
+  const all=readJsonStorage(PUZZLENOOK_PLAY_ALLOWANCE_KEY,{});
+  if(all.date!==today)return {date:today,games:{}};
+  all.games=all.games||{};return all;
+}
+function writeDailyGamePlays(all){writeJsonStorage(PUZZLENOOK_PLAY_ALLOWANCE_KEY,all)}
+function dailyGamePuzzleKeys(game){return readDailyGamePlays().games?.[game]||[]}
+function dailyGamePlaysUsed(game){return dailyGamePuzzleKeys(game).length}
+function dailyGamePlaysLeft(game){return Math.max(0,PUZZLENOOK_DAILY_GAME_LIMIT-dailyGamePlaysUsed(game))}
+function puzzleAllowanceKey(game,puz=timerPuzzleFor(game)){return puz?`${puz.date||currentDateKey()}|${puz.id}`:""}
+function puzzleAlreadyCountedToday(game,puz=timerPuzzleFor(game)){const key=puzzleAllowanceKey(game,puz);return !!key&&dailyGamePuzzleKeys(game).includes(key)}
+function registerDailyGameCompletion(game,puz=timerPuzzleFor(game)){
+  const key=puzzleAllowanceKey(game,puz);if(!key)return false;
+  const all=readDailyGamePlays();all.games[game]=all.games[game]||[];
+  if(all.games[game].includes(key)){renderPlayDots();return false}
+  if(all.games[game].length>=PUZZLENOOK_DAILY_GAME_LIMIT)return false;
+  all.games[game].push(key);writeDailyGamePlays(all);renderPlayDots();return true;
+}
+window.addEventListener("resize",()=>{
+  if(activeGame==="home"&&!isTodaySelected())updateHomeDashboard();
+});
+function renderPlayDots(){
+  PUBLIC_GAME_IDS.forEach(game=>{
+    const left=dailyGamePlaysLeft(game);
+    document.querySelectorAll(`[data-play-dots="${game}"]`).forEach(host=>{
+      host.innerHTML=[0,1,2].map(i=>`<i class="${i<left?"is-filled":""}"></i>`).join("");
+      host.setAttribute("aria-label",`${left} ${left===1?"play":"plays"} remaining today`);
+    });
+  });
+}
+function openPlayLimit(game){
+  const overlay=document.getElementById("playLimitOverlay"),msg=document.getElementById("playLimitMessage");
+  if(msg)msg.textContent=`You've used today's 3 ${PUBLIC_GAME_NAMES[game]||"game"} plays.`;
+  if(overlay)overlay.hidden=false;
+}
+function closePlayLimit(){const overlay=document.getElementById("playLimitOverlay");if(overlay)overlay.hidden=true}
+function canOpenGameUnderAllowance(game){
+  const puz=timerPuzzleFor(game);
+  if(!puz)return true;
+  if(timerGameComplete(game)||puzzleAlreadyCountedToday(game,puz))return true;
+  return dailyGamePlaysLeft(game)>0;
+}
+function isTodaySelected(){return currentDateKey()===browserTodayKey()}
+function navigateTodayHome(){
+  const now=new Date();now.setHours(12,0,0,0);selectedDate=now;
+  updateDateLabel();
+  Promise.all([loadFiveForSelectedDate(),loadEveryLastLetterForSelectedDate(),loadOneAndTheSameForSelectedDate(),loadQuadsForSelectedDate(),loadWordTrailForSelectedDate(),loadMiniForSelectedDate()]).then(()=>{updateHomeDashboard();navigatePublicView("home");});
+}
+function updatePuzzleMetaLinks(){
+  ["fivePuzzleMeta","samePuzzleMeta","quadsPuzzleMeta","miniPuzzleMeta","wordTrailPuzzleMeta","ellPuzzleMeta"].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const puz=puzzleForMetaId(id);el.classList.add("puzzle-date-link");el.classList.toggle("is-archived-puzzle",!!puz?.date&&puz.date!==browserTodayKey());el.setAttribute("role","link");el.tabIndex=0;
+  });
+}
+function puzzleForMetaId(id){return id==="fivePuzzleMeta"?puzzle:id==="samePuzzleMeta"?samePuzzle:id==="quadsPuzzleMeta"?quadsPuzzle:id==="miniPuzzleMeta"?miniPuzzle:id==="wordTrailPuzzleMeta"?wordTrailPuzzle:id==="ellPuzzleMeta"?ellPuzzle:null}
+async function goToPuzzleDateHome(id){
+  const puz=puzzleForMetaId(id);if(!puz?.date){navigatePublicView("home");return}
+  if(puz.date!==currentDateKey()){const [y,m,d]=puz.date.split("-").map(Number);selectedDate=new Date(y,m-1,d,12);updateDateLabel();await Promise.all([loadFiveForSelectedDate(),loadEveryLastLetterForSelectedDate(),loadOneAndTheSameForSelectedDate(),loadQuadsForSelectedDate(),loadWordTrailForSelectedDate(),loadMiniForSelectedDate()]);updateHomeDashboard()}
+  navigatePublicView("home");
+}
+function wirePuzzleMetaLinks(){
+  ["fivePuzzleMeta","samePuzzleMeta","quadsPuzzleMeta","miniPuzzleMeta","wordTrailPuzzleMeta","ellPuzzleMeta"].forEach(id=>{
+    const el=document.getElementById(id);if(!el||el.dataset.dateLinkWired)return;el.dataset.dateLinkWired="1";
+    el.addEventListener("click",()=>goToPuzzleDateHome(id));el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();goToPuzzleDateHome(id)}});
+  });
+}
+
 const SIX_TO_FIVE_PLAY_KEY="sixToFivePlayHistoryV2";
 const SIX_TO_FIVE_PLAY_KEY_V1="sixToFivePlayHistoryV1";
 const SIX_TO_FIVE_DAILY_LIMIT=3;
@@ -71,27 +145,19 @@ function readFivePlayHistory(){
   return h;
 }
 function writeFivePlayHistory(h){writeJsonStorage(SIX_TO_FIVE_PLAY_KEY,h)}
-function registerFiveStarted(){
-  if(!puzzle)return false;
-  const h=readFivePlayHistory(),id=Number(puzzle.id);
-  if(!h.daily.startedIds.includes(id)){
-    if(h.daily.startedIds.length>=SIX_TO_FIVE_DAILY_LIMIT)return false;
-    h.daily.startedIds.push(id);
-    writeFivePlayHistory(h);
-  }
-  return true;
-}
+function registerFiveStarted(){return true}
 function registerFiveCompleted(){
   if(!puzzle)return;
   const h=readFivePlayHistory(),id=Number(puzzle.id);
-  if(!h.completedIds.includes(id)){
-    h.completedIds.push(id);
-    writeFivePlayHistory(h);
-  }
+  if(!h.completedIds.includes(id)){h.completedIds.push(id);writeFivePlayHistory(h)}
 }
-function fiveDailyCount(){return readFivePlayHistory().daily.startedIds.length}
-function fiveCanPlayAnother(){return fiveDailyCount()<SIX_TO_FIVE_DAILY_LIMIT}
+function fiveDailyCount(){return dailyGamePlaysUsed("five")}
+function fiveCanPlayAnother(){return dailyGamePlaysLeft("five")>0}
+function puzzlePageIsForeground(){
+  return document.visibilityState==="visible" && (typeof document.hasFocus!=="function" || document.hasFocus());
+}
 function ensureFiveTimerRunning(){
+  if(activeGame!=="five" || gameComplete || !puzzlePageIsForeground())return;
   if(!fiveTimerStartedAt)fiveTimerStartedAt=Date.now();
 }
 function currentFiveElapsedMs(){return fiveTimerElapsedMs+(fiveTimerStartedAt?Date.now()-fiveTimerStartedAt:0)}
@@ -115,26 +181,71 @@ function timerGameComplete(game){return game==="five"?!!gameComplete:game==="sam
 function timerRecordKey(game,puz){return puz?`${game}|${puz.date||currentDateKey()}|${puz.id}`:""}
 function readPuzzleTimers(){return readJsonStorage(PUZZLENOOK_TIMER_KEY,{})||{}}
 function writePuzzleTimers(all){writeJsonStorage(PUZZLENOOK_TIMER_KEY,all)}
+function normalizePuzzleTimerRecord(rec){
+  if(!rec)return null;
+  if(rec.timerModel!=="foreground-v2"){
+    /* Old incomplete records used wall-clock time from startedAt, which may include
+       background/tab-closed time. Do not carry that unreliable delta forward. */
+    const preserved=Number.isFinite(Number(rec.elapsedMs))?Math.max(0,Number(rec.elapsedMs)):0;
+    rec.elapsedMs=preserved;
+    rec.runningSince=null;
+    rec.startedAt=null;
+    rec.timerModel="foreground-v2";
+  }
+  if(!Number.isFinite(Number(rec.elapsedMs)))rec.elapsedMs=0;
+  return rec;
+}
+function puzzleTimerCanRun(game){
+  return activeGame===game && puzzlePageIsForeground() && !!timerPuzzleFor(game) && !timerGameComplete(game);
+}
+function pausePuzzleTimer(game){
+  const puz=timerPuzzleFor(game);if(!puz)return;
+  const all=readPuzzleTimers(),key=timerRecordKey(game,puz);
+  let rec=normalizePuzzleTimerRecord(all[key]);if(!rec)return;
+  if(rec.runningSince){
+    rec.elapsedMs=Math.max(0,Number(rec.elapsedMs)||0)+Math.max(0,Date.now()-Number(rec.runningSince));
+    rec.runningSince=null;
+    all[key]=rec;writePuzzleTimers(all);
+  }
+}
 function ensurePuzzleTimerStarted(game){
   const puz=timerPuzzleFor(game);if(!puz||timerGameComplete(game))return;
   const all=readPuzzleTimers(),key=timerRecordKey(game,puz);
-  if(!all[key])all[key]={startedAt:Date.now(),elapsedMs:null,complete:false};
-  else if(!all[key].startedAt&&!all[key].complete)all[key].startedAt=Date.now();
-  writePuzzleTimers(all);
+  let rec=normalizePuzzleTimerRecord(all[key]);
+  if(!rec)rec={elapsedMs:0,runningSince:null,complete:false,timerModel:"foreground-v2"};
+  if(puzzleTimerCanRun(game)&&!rec.runningSince)rec.runningSince=Date.now();
+  all[key]=rec;writePuzzleTimers(all);
 }
 function completePuzzleTimer(game){
   const puz=timerPuzzleFor(game);if(!puz)return;
-  const all=readPuzzleTimers(),key=timerRecordKey(game,puz),rec=all[key];
-  if(!rec)return;
+  const all=readPuzzleTimers(),key=timerRecordKey(game,puz);
+  let rec=normalizePuzzleTimerRecord(all[key]);if(!rec)return;
   if(!rec.complete){
-    rec.elapsedMs=Math.max(0,Date.now()-Number(rec.startedAt||Date.now()));
+    if(rec.runningSince){
+      rec.elapsedMs=Math.max(0,Number(rec.elapsedMs)||0)+Math.max(0,Date.now()-Number(rec.runningSince));
+      rec.runningSince=null;
+    }
     rec.complete=true;rec.completedAt=Date.now();all[key]=rec;writePuzzleTimers(all);
   }
 }
 function puzzleElapsedMs(game){
   const puz=timerPuzzleFor(game);if(!puz)return null;
-  const rec=readPuzzleTimers()[timerRecordKey(game,puz)];if(!rec)return null;
-  return rec.complete?Number(rec.elapsedMs)||0:Math.max(0,Date.now()-Number(rec.startedAt||Date.now()));
+  const rec=normalizePuzzleTimerRecord(readPuzzleTimers()[timerRecordKey(game,puz)]);if(!rec)return null;
+  const runningDelta=rec.runningSince&&puzzleTimerCanRun(game)?Math.max(0,Date.now()-Number(rec.runningSince)):0;
+  return Math.max(0,Number(rec.elapsedMs)||0)+runningDelta;
+}
+function syncActivePuzzleTimer(){
+  PUBLIC_GAME_IDS.forEach(game=>{
+    if(game===activeGame && puzzleTimerCanRun(game))ensurePuzzleTimerStarted(game);
+    else pausePuzzleTimer(game);
+  });
+  if(activeGame==="five"){
+    if(puzzlePageIsForeground()&&!gameComplete&&fiveTimerStartedAt){} 
+    else if(!puzzlePageIsForeground()||gameComplete)stopFiveTimer();
+  }else{
+    stopFiveTimer();
+  }
+  updatePuzzleTimerDisplays();
 }
 function puzzleTimeText(game){const ms=puzzleElapsedMs(game);return ms==null?"—":formatElapsed(ms)}
 let puzzleNookTimerVisibleFallback=false;
@@ -231,7 +342,7 @@ function buildFiveEndgameMiniGrid(){
  });
 }
 function showFiveEndgame(){
- if(suppressRestoredEndgames||!puzzle||!gameComplete)return;
+ if(suppressRestoredEndgames||activeGame!=="five"||!puzzle||!gameComplete)return;
  const won=guesses.includes(puzzle.answer);
  const title=document.getElementById("fiveEndgameTitle");
  const answer=document.getElementById("fiveEndgameAnswer");
@@ -281,17 +392,24 @@ async function shareFiveResult(kind){const text=fiveShareText();if(kind==="nativ
 /* V90 shared public end-game framework */
 const GLOBAL_ENDGAME_MESSAGES={quads:{win:["Excellent grouping!","You found the connections.","Nicely sorted."],loss:["That set fought back.","A tricky group of connections.","Almost had the board."]},mini:{win:["Clean solve!","Nicely crossed.","Puzzle complete."],loss:["Puzzle revealed.","That one was a tough cross."]},trail:{win:["Every path found.","Beautiful tracing.","The whole grid came together."]},ell:{win:["Every last one!","Nothing left behind.","All 25 letters used."],loss:["A solid word hunt.","That board had more to give.","Good run."]},same:{win:["You saw the connection.","That was the one.","Nice read on the clues."],loss:["That one stayed hidden.","Four clues, one stubborn answer."]}};
 let globalEndgameCurrent=null;const globalEndgameShown=new Set();
+/* V103.2: Any navigation invalidates end-game callbacks that were queued
+   for the previous view. This prevents a completed/restored puzzle from
+   opening its modal after the player has returned Home or switched games. */
+let endgameNavigationEpoch=0;
 function globalPick(list){return list[Math.floor(Math.random()*list.length)]}
 function globalEndgameKey(game,date,state){return `${game}|${date||currentDateKey()}|${state}`}
 function globalEndgameIcon(game){if(game==="quads")return '<div class="global-emblem global-emblem-quads"><i></i><i></i><i></i><i></i></div>';if(game==="mini")return '<div class="global-emblem global-emblem-mini">'+Array.from({length:9},(_,i)=>`<i class="${[2,4,8].includes(i)?"dark":""}"></i>`).join("")+'</div>';if(game==="trail")return '<div class="global-emblem global-emblem-trail"><span>↗</span></div>';if(game==="ell")return '<div class="global-emblem global-emblem-ell"><i>E</i><i>L</i><i>L</i><i></i></div>';if(game==="same")return '<div class="global-emblem global-emblem-same"><i>1</i><i>=</i><i>1</i></div>';return ""}
 function closeGlobalEndgame(){const o=document.getElementById("globalEndgameOverlay");if(o){o.hidden=true;o.setAttribute("aria-hidden","true")}}
 function globalEndgameShareText(config){return config.shareText||`${config.kicker} — ${config.resultLine||formatPuzzleDate(config.date)}`}
 async function shareGlobalEndgame(kind){if(!globalEndgameCurrent)return;const text=globalEndgameShareText(globalEndgameCurrent);if(kind==="native"&&navigator.share){try{await navigator.share({title:globalEndgameCurrent.kicker,text})}catch(e){}return}try{await navigator.clipboard.writeText(text);const b=document.getElementById(kind==="copy"?"globalEndgameCopy":"globalEndgameShare");if(b){const old=b.innerHTML;b.textContent="Copied ✓";setTimeout(()=>b.innerHTML=old,1200)}}catch(e){}}
-function showGlobalEndgame(config){if(suppressRestoredEndgames)return;const key=globalEndgameKey(config.game,config.date,config.state||"complete");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
+function showGlobalEndgame(config){if(suppressRestoredEndgames||activeGame!==config.game)return;const key=globalEndgameKey(config.game,config.date,config.state||"complete");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
 function queueGlobalEndgame(config,delay=80){
-  if(suppressRestoredEndgames)return;
+  if(suppressRestoredEndgames||activeGame!==config.game)return;
+  const queuedEpoch=endgameNavigationEpoch;
   setTimeout(()=>{
-    if(!suppressRestoredEndgames)showGlobalEndgame(config);
+    if(!suppressRestoredEndgames && activeGame===config.game && queuedEpoch===endgameNavigationEpoch){
+      showGlobalEndgame(config);
+    }
   },delay);
 }
 function quadsEndgameConfig(){if(timerGameComplete("quads"))completePuzzleTimer("quads");if(!quadsPuzzle||!quadsComplete)return null;const visual=`<div class="global-quads-result">${quadsSolved.map(g=>`<span class="${difficultyClass(g.difficulty)}">${escapeSameHtml(g.label)}</span>`).join("")}</div>`;const mistakes=Math.min(4,quadsMistakes);return{game:"quads",date:quadsPuzzle.date,state:quadsWon?"win":"loss",kicker:"INCOMMON",title:quadsWon?"All four found.":"Not this time.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.quads[quadsWon?"win":"loss"]),visualHtml:visual,stats:[{value:mistakes,label:"MISTAKES"},{value:puzzleTimeText("quads"),label:"TIME"}],resultLine:`InCommon · ${formatPuzzleDate(quadsPuzzle.date)} · ${quadsWon?"Solved":`${mistakes}/4 mistakes`}`,shareText:`InCommon — ${formatPuzzleDate(quadsPuzzle.date)} — ${quadsWon?"Solved":"Not solved"} — ${mistakes}/4 mistakes`}}
@@ -352,12 +470,63 @@ function updateDateLabel(){
   if(mobile)mobile.textContent=compact;
 }
 
+let mainPageAvailableDateKeys=null;
+async function getMainPageAvailableDateKeys(){
+  if(mainPageAvailableDateKeys)return mainPageAvailableDateKeys;
+  try{
+    const res=await fetch("/data/puzzles.json",{cache:"no-store"});
+    if(!res.ok)throw new Error("Could not load puzzle dates");
+    const db=await res.json();
+    const today=browserTodayKey();
+    mainPageAvailableDateKeys=[...new Set((db.puzzles||[])
+      .filter(p=>p.status==="scheduled"&&p.date&&p.date<=today&&PUBLIC_GAME_IDS.includes(p.game))
+      .map(p=>p.date))].sort();
+  }catch(err){
+    console.warn("Could not determine available Main Page dates",err);
+    mainPageAvailableDateKeys=[currentDateKey()];
+  }
+  return mainPageAvailableDateKeys;
+}
+async function adjacentMainPageDateKey(delta){
+  const keys=await getMainPageAvailableDateKeys();
+  const current=currentDateKey();
+  if(!keys.length)return null;
+  if(delta<0){
+    for(let i=keys.length-1;i>=0;i--)if(keys[i]<current)return keys[i];
+  }else{
+    for(let i=0;i<keys.length;i++)if(keys[i]>current)return keys[i];
+  }
+  return null;
+}
+async function navigateMainPageDate(delta){
+  if(activeGame!=="home")return;
+  const key=await adjacentMainPageDateKey(delta);
+  if(!key)return;
+  const [y,m,d]=key.split("-").map(Number);
+  selectedDate=new Date(y,m-1,d,12);
+  updateDateLabel();
+  suppressRestoredEndgames=true;closeFiveEndgame();closeGlobalEndgame();
+  await Promise.all([loadFiveForSelectedDate(),loadEveryLastLetterForSelectedDate(),loadOneAndTheSameForSelectedDate(),loadQuadsForSelectedDate(),loadWordTrailForSelectedDate(),loadMiniForSelectedDate()]);
+  suppressRestoredEndgames=false;
+  updateHomeDashboard();
+  navigatePublicView("home",{replace:true});
+}
+async function updateMainPageDateNavigation(){
+  const prev=document.getElementById("mainDatePrev");
+  const next=document.getElementById("mainDateNext");
+  const [prevKey,nextKey]=await Promise.all([adjacentMainPageDateKey(-1),adjacentMainPageDateKey(1)]);
+  if(prev)prev.disabled=!prevKey;
+  if(next)next.disabled=!nextKey;
+}
+
 async function changeDay(delta){
   suppressRestoredEndgames=true;
   closeFiveEndgame();
   closeGlobalEndgame();
 
-  selectedDate.setDate(selectedDate.getDate()+delta);
+  const target=new Date(selectedDate);target.setDate(target.getDate()+delta);target.setHours(12,0,0,0);
+  const today=new Date();today.setHours(12,0,0,0);if(target>today)return;
+  selectedDate=target;
   updateDateLabel();
   await Promise.all([
     loadFiveForSelectedDate(),
@@ -368,6 +537,7 @@ async function changeDay(delta){
     loadMiniForSelectedDate()
   ]);
   updateHomeDashboard();
+  history.replaceState(publicHistoryState(activeGame),"",publicViewUrl(activeGame));
   suppressRestoredEndgames=false;
 }
 
@@ -574,6 +744,10 @@ document.addEventListener("keydown",event=>{
 });
 
 function setActiveGame(game){
+  /* V103.3: commit elapsed foreground time before leaving the current puzzle. */
+  if(PUBLIC_GAME_IDS.includes(activeGame))pausePuzzleTimer(activeGame);
+  if(activeGame==="five")stopFiveTimer();
+  endgameNavigationEpoch++;
   closeFiveEndgame();
   closeGlobalEndgame();
   closeGameInstructions();
@@ -581,6 +755,7 @@ function setActiveGame(game){
   updateGameInstructionsButton();
   document.body.classList.toggle("home-view",game==="home");
   if(game==="home") updateHomeDashboard();
+  renderPlayDots();updatePuzzleMetaLinks();wirePuzzleMetaLinks();
   const frontPage=document.getElementById("frontPage");
   const playArea=document.getElementById("playArea");
   const isHome=game==="home";
@@ -601,6 +776,7 @@ function setActiveGame(game){
     active.classList.add("game-visible");
   }
   if(!isHome)activatePuzzleTimer(game);
+  else syncActivePuzzleTimer();
   if(game==="five"){
     queueFiveMobileBoardSize();
   }
@@ -613,17 +789,19 @@ function setActiveGame(game){
   });
 }
 function updateHomeDashboard(){
-  const dateHost=document.getElementById("homeDate");
-  if(dateHost){
-    dateHost.textContent=selectedDate.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
-  }
+  const archived=!isTodaySelected();
+  const front=document.getElementById("frontPage");if(front)front.classList.toggle("is-archived",archived);
+  const eyebrow=document.getElementById("homeEyebrow"),title=document.getElementById("homeTitle"),dateHost=document.getElementById("homeDate");
+  if(eyebrow)eyebrow.textContent=archived?"ARCHIVED PUZZLE":"DAILY PUZZLES";
+  if(title)title.textContent=archived?`${selectedDate.toLocaleDateString(undefined,{weekday:window.matchMedia("(max-width: 700px)").matches?"short":"long",month:"long",day:"numeric"})}`:"Today’s Puzzles";
+  if(dateHost)dateHost.textContent=archived?String(selectedDate.getFullYear()):selectedDate.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric"});
   const states={
     five:!!gameComplete,
     same:!!sameComplete,
     quads:!!quadsComplete,
     mini:!!miniComplete,
     trail:!!wordTrailComplete,
-    ell:!!(ellComplete||ellEnded)
+    ell:!!(ellComplete||ellEnded||ellHistoricalRecord()?.completed)
   };
   const defaults={
     five:"Find the five-letter word in six tries.",
@@ -641,13 +819,14 @@ function updateHomeDashboard(){
     quads:quadsWon?`${quadsMistakes} ${quadsMistakes===1?"mistake":"mistakes"}`:"Not solved",
     mini:miniRevealedPuzzle?"Reveal Used":`${puzzleTimeText("mini")}${miniHintsUsed?" *Hints used":""}`,
     trail:puzzleTimeText("trail"),
-    ell:`${ellFinalScore()} points`
+    ell:`High Score: ${ellHighestScoreForCurrentPuzzle()} points`
   };
   const count=Object.values(states).filter(Boolean).length;
   const text=document.getElementById("homeProgressText");
   const fill=document.getElementById("homeProgressFill");
   if(text)text.textContent=`${count} / 6 completed`;
   if(fill)fill.style.width=`${(count/6)*100}%`;
+  renderPlayDots();updatePuzzleMetaLinks();wirePuzzleMetaLinks();updateMainPageDateNavigation();
   document.querySelectorAll("[data-front-game]").forEach(card=>{
     const key=card.dataset.frontGame;
     const complete=!!states[key];
@@ -656,10 +835,69 @@ function updateHomeDashboard(){
     if(sub)sub.textContent=complete?`Completed - ${stats[key]}`:defaults[key];
   });
 }
-function showHomePage(){ setActiveGame("home"); closeMobileSiteMenu(); window.scrollTo({top:0,behavior:"smooth"}); }
-function showFive(){ setActiveGame("five"); closeMobileSiteMenu(); }
-function showEveryLastLetter(){ setActiveGame("ell"); closeMobileSiteMenu(); }
-function showOneAndTheSame(){ setActiveGame("same"); closeMobileSiteMenu(); }
+function publicViewUrl(game=activeGame,date=selectedDate){
+  const url=new URL(window.location.href);
+  const key=dateKey(date);
+  const today=new Date();today.setHours(12,0,0,0);
+  if(key===dateKey(today))url.searchParams.delete("date");
+  else url.searchParams.set("date",key);
+  if(game==="home")url.searchParams.delete("game");
+  else url.searchParams.set("game",game);
+  return `${url.pathname}${url.search}${url.hash}`;
+}
+function publicHistoryState(game=activeGame,date=selectedDate){
+  return {puzzleNook:true,game,date:dateKey(date)};
+}
+function navigatePublicView(game,{replace=false}={}){
+  const next=game==="home"?"home":(PUBLIC_GAME_IDS.includes(game)?game:"home");
+  if(next!=="home"&&!canOpenGameUnderAllowance(next)){openPlayLimit(next);return;}
+  const sameView=next===activeGame;
+  setActiveGame(next);
+  closeMobileSiteMenu();
+  if(next==="home")window.scrollTo({top:0,behavior:"smooth"});
+  const state=publicHistoryState(next);
+  const url=publicViewUrl(next);
+  if(replace||sameView)history.replaceState(state,"",url);
+  else history.pushState(state,"",url);
+}
+async function restorePublicHistoryState(state){
+  closeMobileSiteMenu();
+  const params=new URLSearchParams(window.location.search);
+  const stateGame=state?.puzzleNook?state.game:null;
+  const requestedGame=stateGame==="home"||PUBLIC_GAME_IDS.includes(stateGame)
+    ? stateGame
+    : (PUBLIC_GAME_IDS.includes(params.get("game"))?params.get("game"):"home");
+  const rawDate=(state?.puzzleNook&&/^\d{4}-\d{2}-\d{2}$/.test(state.date||""))
+    ? state.date
+    : params.get("date");
+
+  if(/^\d{4}-\d{2}-\d{2}$/.test(rawDate||"") && rawDate!==currentDateKey()){
+    suppressRestoredEndgames=true;
+    closeFiveEndgame();
+    closeGlobalEndgame();
+    const [y,m,d]=rawDate.split("-").map(Number);
+    selectedDate=new Date(y,m-1,d,12,0,0,0);
+    updateDateLabel();
+    await Promise.all([
+      loadFiveForSelectedDate(),
+      loadEveryLastLetterForSelectedDate(),
+      loadOneAndTheSameForSelectedDate(),
+      loadQuadsForSelectedDate(),
+      loadWordTrailForSelectedDate(),
+      loadMiniForSelectedDate()
+    ]);
+    updateHomeDashboard();
+    suppressRestoredEndgames=false;
+  }
+  setActiveGame(requestedGame);
+  window.scrollTo({top:0,behavior:"auto"});
+}
+window.addEventListener("popstate",event=>{restorePublicHistoryState(event.state).catch(err=>console.error("Could not restore PuzzleNook browser history:",err));});
+
+function showHomePage(){ navigatePublicView("home"); }
+function showFive(){ navigatePublicView("five"); }
+function showEveryLastLetter(){ navigatePublicView("ell"); }
+function showOneAndTheSame(){ navigatePublicView("same"); }
 
 function scoreWord(guess,answer){
   const result=Array(5).fill("absent");
@@ -923,7 +1161,7 @@ function drawKeyboard(){
     if(index===2){
       const enter=document.createElement("button");
       enter.type="button";
-      enter.className="key key-action";
+      enter.className="key key-action submit-action";
       enter.textContent="Submit";
       enter.onclick=submitGuess;
       wrap.appendChild(enter);
@@ -1106,6 +1344,7 @@ function submitGuess(){
     gameComplete=true;
     stopFiveTimer();
     registerFiveCompleted();
+    registerDailyGameCompletion("five",puzzle);
   }
 
   currentGuess="";
@@ -1135,6 +1374,12 @@ const nextDayBtn=document.getElementById("nextDayBtn");
 const hardModeToggle=document.getElementById("hardModeToggle");
 if(prevDayBtn) prevDayBtn.onclick=()=>changeDay(-1);
 if(nextDayBtn) nextDayBtn.onclick=()=>changeDay(1);
+const mainDatePrev=document.getElementById("mainDatePrev");
+const mainDateNext=document.getElementById("mainDateNext");
+if(mainDatePrev)mainDatePrev.onclick=()=>navigateMainPageDate(-1);
+if(mainDateNext)mainDateNext.onclick=()=>navigateMainPageDate(1);
+document.getElementById("playLimitClose")?.addEventListener("click",closePlayLimit);
+document.getElementById("playLimitOverlay")?.addEventListener("click",e=>{if(e.target===e.currentTarget)closePlayLimit()});
 if(hardModeToggle) hardModeToggle.addEventListener("click",()=>setFiveHardMode(!fiveHardModeEnabled(),{save:true}));
 
 
@@ -1228,7 +1473,7 @@ function navigateToGame(game){
   if(game==="mini")return showMini();
 }
 
-document.getElementById("brandHomeBtn")?.addEventListener("click",showHomePage);
+document.getElementById("brandHomeBtn")?.addEventListener("click",navigateTodayHome);
 document.getElementById("mobileMenuBtn")?.addEventListener("click",toggleMobileSiteMenu);
 document.getElementById("mobilePrevDayBtn")?.addEventListener("click",async()=>{await changeDay(-1)});
 document.getElementById("mobileNextDayBtn")?.addEventListener("click",async()=>{await changeDay(1)});
@@ -1242,6 +1487,67 @@ document.addEventListener("click",event=>{
   closeMobileSiteMenu();
 });
 document.addEventListener("keydown",event=>{if(event.key==="Escape")closeMobileSiteMenu()});
+
+
+/* V103.0 utility menu. Feedback storage is browser-local for testing only.
+   At public launch, replace these helpers with the secure production feedback API. */
+const LOCAL_FEEDBACK_KEY="puzzlenookFeedbackPrototypeV1";
+const HOW_TO_ORDER=["five","quads","mini","trail","ell","same"];
+function openSiteUtility(title,kicker,html){
+  closeMobileSiteMenu();const o=document.getElementById("siteUtilityOverlay");if(!o)return;
+  document.getElementById("siteUtilityTitle").textContent=title;document.getElementById("siteUtilityKicker").textContent=kicker||"PUZZLENOOK";
+  document.getElementById("siteUtilityBody").innerHTML=html;o.hidden=false;o.setAttribute("aria-hidden","false");document.body.classList.add("site-utility-open");
+}
+function closeSiteUtility(){const o=document.getElementById("siteUtilityOverlay");if(!o||o.hidden)return;o.hidden=true;o.setAttribute("aria-hidden","true");document.body.classList.remove("site-utility-open")}
+function openMenuHowTo(){
+  openSiteUtility("How to Play","PUZZLE GUIDE",`<div class="utility-choice-list">${HOW_TO_ORDER.map(g=>`<button type="button" class="utility-choice" data-howto-game="${g}"><strong>${GAME_INSTRUCTIONS[g].name}</strong><span>View instructions</span></button>`).join("")}</div>`);
+  document.querySelectorAll("[data-howto-game]").forEach(b=>b.onclick=()=>{const c=GAME_INSTRUCTIONS[b.dataset.howtoGame];openSiteUtility("How to play",c.name.toUpperCase(),c.body)});
+}
+function openMenuAbout(){openSiteUtility("About PuzzleNook","YOUR LITTLE ESCAPE",`<div class="utility-copy"><p>PuzzleNook is a collection of quick daily word and logic puzzles designed to give you a satisfying little break in your day.</p><p>Play today’s six puzzles, revisit previous days in the Archive, and come back whenever you feel like another challenge.</p></div>`)}
+function localFeedbackRead(){try{const v=JSON.parse(localStorage.getItem(LOCAL_FEEDBACK_KEY)||"[]");return Array.isArray(v)?v:[]}catch{return[]}}
+function localFeedbackWrite(v){localStorage.setItem(LOCAL_FEEDBACK_KEY,JSON.stringify(v))}
+function feedbackContext(){const p=activePuzzleForGame(activeGame);return{game:GAME_INSTRUCTIONS[activeGame]?.name||null,gameKey:GAME_INSTRUCTIONS[activeGame]?activeGame:null,puzzleId:p?.id||null,puzzleDate:p?.date||null,page:activeGame==="home"?"home":"game",userAgent:navigator.userAgent}}
+function feedbackForm(type){
+  const c=feedbackContext(),word=type==="word",label=type==="bug"?"Report a Bug":word?"Request a Word":"Suggestion / Feedback";
+  openSiteUtility(label,"FEEDBACK & REQUESTS",`<form id="feedbackForm" class="feedback-form">${word?`<label>Word<input id="feedbackWord" maxlength="40" autocomplete="off" required></label>`:""}<label>${type==="bug"?"What happened?":"Message"}<textarea id="feedbackMessage" rows="5" maxlength="1500" ${word?"":"required"}></textarea></label><div class="feedback-context">${c.game?`${c.game}${c.puzzleDate?` · ${c.puzzleDate}`:""}`:"PuzzleNook"}</div><button type="submit" class="feedback-submit">Submit</button><p class="feedback-dev-note">Testing mode: saved to this browser’s PuzzleNook dashboard. Central delivery will be connected at public launch.</p></form>`);
+  document.getElementById("feedbackForm").onsubmit=e=>{e.preventDefault();const a=localFeedbackRead();a.unshift({id:`fb-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,type,word:(document.getElementById("feedbackWord")?.value||"").trim().toUpperCase(),message:(document.getElementById("feedbackMessage")?.value||"").trim(),status:"new",createdAt:new Date().toISOString(),context:c});localFeedbackWrite(a);openSiteUtility("Thank you","FEEDBACK & REQUESTS",`<div class="utility-copy"><p>Your ${word?"word request":"feedback"} has been saved to the PuzzleNook testing inbox.</p></div>`)};
+}
+function openMenuFeedback(){
+  openSiteUtility("Feedback & Requests","PUZZLENOOK",`<div class="utility-choice-list"><button type="button" class="utility-choice" data-feedback-type="bug"><strong>Report a Bug</strong><span>Something isn’t working correctly.</span></button><button type="button" class="utility-choice" data-feedback-type="word"><strong>Request a Word</strong><span>Tell us about a word PuzzleNook should accept.</span></button><button type="button" class="utility-choice" data-feedback-type="feedback"><strong>Suggestion / Feedback</strong><span>Share an idea or comment.</span></button></div>`);
+  document.querySelectorAll("[data-feedback-type]").forEach(b=>b.onclick=()=>feedbackForm(b.dataset.feedbackType));
+}
+document.getElementById("menuTodayBtn")?.addEventListener("click",()=>{closeMobileSiteMenu();navigateTodayHome()});
+document.getElementById("menuHowToBtn")?.addEventListener("click",openMenuHowTo);
+document.getElementById("menuFeedbackBtn")?.addEventListener("click",openMenuFeedback);
+document.getElementById("menuAboutBtn")?.addEventListener("click",openMenuAbout);
+document.getElementById("siteUtilityClose")?.addEventListener("click",closeSiteUtility);
+document.getElementById("siteUtilityOverlay")?.addEventListener("click",e=>{if(e.target===e.currentTarget)closeSiteUtility()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!document.getElementById("siteUtilityOverlay")?.hidden)closeSiteUtility()});
+
+/* V103.3 — timers run only while the selected puzzle is actually in front of the player. */
+document.addEventListener("visibilitychange",()=>{
+  if(document.visibilityState==="hidden"){
+    if(PUBLIC_GAME_IDS.includes(activeGame))pausePuzzleTimer(activeGame);
+    if(activeGame==="five")stopFiveTimer();
+    updatePuzzleTimerDisplays();
+  }else{
+    syncActivePuzzleTimer();
+    if(activeGame==="five" && currentGuess.length>0 && !gameComplete)ensureFiveTimerRunning();
+  }
+});
+window.addEventListener("blur",()=>{
+  if(PUBLIC_GAME_IDS.includes(activeGame))pausePuzzleTimer(activeGame);
+  if(activeGame==="five")stopFiveTimer();
+  updatePuzzleTimerDisplays();
+});
+window.addEventListener("focus",()=>{
+  syncActivePuzzleTimer();
+  if(activeGame==="five" && currentGuess.length>0 && !gameComplete)ensureFiveTimerRunning();
+});
+window.addEventListener("pagehide",()=>{
+  if(PUBLIC_GAME_IDS.includes(activeGame))pausePuzzleTimer(activeGame);
+  if(activeGame==="five")stopFiveTimer();
+});
 
 /* V100.8 startup moved to end of file.
    All game state declarations must initialize before any loader runs. */
@@ -1448,6 +1754,7 @@ function sameCommitWrongGuess(clueIndex,guess){
   if(sameRevealed>=4){
     sameComplete=true;
     sameWon=false;
+    registerDailyGameCompletion("same",samePuzzle);
   }else{
     sameRevealed++;
   }
@@ -1591,6 +1898,7 @@ function submitSameGuess(){
     const finish=()=>{
       sameComplete=true;
       sameWon=true;
+      registerDailyGameCompletion("same",samePuzzle);
       saveSameState();
       drawOneAndTheSame();
     };
@@ -1638,6 +1946,9 @@ document.addEventListener("visibilitychange",()=>{
 ------------------------------ */
 const ELL_PLAYER_KEY="puzzlePublicEveryLastLetterV1";
 let ellPuzzle=null,ellTiles=[],ellSelected=[],ellSubmitted=[],ellReclaimCandidate=null,ellComplete=false,ellEnded=false,ellEndReason=null;
+let ellInteractionLocked=false;
+let ellInlineNotice="";
+let ellConfirmAction=null;
 let ellMotion={
   pressedId:null,
   submittingIds:[],
@@ -1655,6 +1966,27 @@ function ellLater(fn,ms){
 function ellClearMotionTimers(){
   ellMotionTimers.forEach(clearTimeout);
   ellMotionTimers=[];
+}
+function ellResetTransientState(){
+  ellClearMotionTimers();
+  ellInteractionLocked=false;
+  ellInlineNotice="";
+  ellMotion.pressedId=null;
+  ellMotion.submittingIds=[];
+  ellMotion.newWordIndex=null;
+  ellMotion.scoreRevealIndex=null;
+  ellMotion.reclaimingIndex=null;
+  ellMotion.returningIds=[];
+}
+function ellBeginInteractionLock(){
+  ellInteractionLocked=true;
+}
+function ellEndInteractionLock(){
+  ellInteractionLocked=false;
+}
+function ellClearInlineNoticeForNewWord(){
+  if(!ellInlineNotice)return;
+  ellInlineNotice="";
 }
 let ellDisplayedScore=null;
 let ellScoreAnimFrame=null;
@@ -1692,6 +2024,8 @@ function ellAnimateScoreTo(target){
 
 
 async function loadEveryLastLetterForSelectedDate(){
+  ellResetTransientState();
+  closeEllConfirm();
   ellPuzzle=null;ellTiles=[];ellSelected=[];ellSubmitted=[];ellReclaimCandidate=null;ellComplete=false;ellEnded=false;ellEndReason=null;
   const meta=document.getElementById("ellPuzzleMeta"),status=document.getElementById("ellStatus");
   if(!meta||!status)return;
@@ -1723,7 +2057,20 @@ function saveEllState(){
   all[currentDateKey()]={puzzleId:ellPuzzle.id,selected:[...ellSelected],submitted:ellSubmitted,complete:ellComplete,ended:ellEnded,endReason:ellEndReason};
   writeJsonStorage(ELL_PLAYER_KEY,all);
 }
+
+const ELL_HISTORY_KEY="puzzleNookEllHistoryV1";
+function readEllHistory(){return readJsonStorage(ELL_HISTORY_KEY,{})}
+function ellHistoryKey(puz=ellPuzzle){return puz?`${puz.date||currentDateKey()}|${puz.id}`:""}
+function ellHistoricalRecord(puz=ellPuzzle){return readEllHistory()[ellHistoryKey(puz)]||null}
+function recordEllCompletion(){
+  if(!ellPuzzle)return;const all=readEllHistory(),key=ellHistoryKey(),score=ellFinalScore(),prior=all[key]||{completed:false,highestScore:0};
+  prior.completed=true;prior.highestScore=Math.max(Number(prior.highestScore)||0,score);all[key]=prior;writeJsonStorage(ELL_HISTORY_KEY,all);
+  registerDailyGameCompletion("ell",ellPuzzle);
+}
+function ellHighestScoreForCurrentPuzzle(){const rec=ellHistoricalRecord();return Math.max(Number(rec?.highestScore)||0,(ellComplete||ellEnded)?ellFinalScore():0)}
+
 function resetEveryLastLetterForSelectedDate(){
+  ellResetTransientState();
   const all=readJsonStorage(ELL_PLAYER_KEY,{});delete all[currentDateKey()];
   writeJsonStorage(ELL_PLAYER_KEY,all);
   ellSelected=[];ellSubmitted=[];ellReclaimCandidate=null;ellComplete=false;ellEnded=false;ellEndReason=null;ellTiles.forEach(t=>t.used=false);
@@ -1771,14 +2118,64 @@ function ellTryAgain(){
   document.getElementById("ellStatus").innerHTML="";
   drawEll();
 }
-function ellGiveUp(){
+function ellExecuteGiveUp(){
   if(!ellPuzzle||ellComplete||ellEnded)return;
+  ellResetTransientState();
   ellSelected=[];
   ellReclaimCandidate=null;
   ellEnded=true;
   ellEndReason="giveup";
   saveEllState();
+  recordEllCompletion();
   drawEll();
+}
+function ellGiveUp(){
+  if(!ellPuzzle||ellComplete||ellEnded||ellInteractionLocked)return;
+  openEllConfirm("giveup");
+}
+
+function openEllConfirm(action){
+  if(ellInteractionLocked)return;
+  const overlay=document.getElementById("ellConfirmOverlay");
+  const title=document.getElementById("ellConfirmTitle");
+  const message=document.getElementById("ellConfirmMessage");
+  const confirmBtn=document.getElementById("ellConfirmPrimary");
+  if(!overlay||!title||!message||!confirmBtn)return;
+
+  ellConfirmAction=action;
+  if(action==="startover"){
+    title.textContent="Start over?";
+    message.textContent="This will restore all 25 letters and erase your progress in this puzzle.";
+    confirmBtn.textContent="Start Over";
+  }else{
+    title.textContent="Give up?";
+    message.textContent="Are you sure you want to give up and end this puzzle?";
+    confirmBtn.textContent="Give Up";
+  }
+
+  overlay.hidden=false;
+  overlay.setAttribute("aria-hidden","false");
+  document.body.classList.add("ell-confirm-open");
+  requestAnimationFrame(()=>confirmBtn.focus());
+}
+function closeEllConfirm(){
+  const overlay=document.getElementById("ellConfirmOverlay");
+  if(!overlay||overlay.hidden)return;
+  overlay.hidden=true;
+  overlay.setAttribute("aria-hidden","true");
+  document.body.classList.remove("ell-confirm-open");
+  ellConfirmAction=null;
+}
+function confirmEllAction(){
+  const action=ellConfirmAction;
+  closeEllConfirm();
+  if(action==="startover"){
+    resetEveryLastLetterForSelectedDate();
+    document.getElementById("ellStatus").innerHTML="";
+    drawEll();
+  }else if(action==="giveup"){
+    ellExecuteGiveUp();
+  }
 }
 
 function drawEll(){
@@ -1790,7 +2187,7 @@ function drawEll(){
     if(tile.used){b.classList.add("empty");b.disabled=true;b.setAttribute("aria-label","Used tile");}
     else{
       b.textContent=tile.letter;
-      if(ellEnded){b.disabled=true;b.classList.add("ended");}
+      if(ellEnded||ellInteractionLocked){b.disabled=true;if(ellEnded)b.classList.add("ended");}
       if(selected.has(tile.id)){b.classList.add("selected");b.dataset.order=ellSelected.indexOf(tile.id)+1;}
       const submitIndex=ellMotion.submittingIds.indexOf(tile.id);
       if(submitIndex>=0){
@@ -1812,7 +2209,19 @@ function drawEll(){
     }
     grid.appendChild(b);
   });
-  document.getElementById("ellCurrentWord").textContent=ellWord()||" ";
+  const currentWordHost=document.getElementById("ellCurrentWord");
+  if(currentWordHost){
+    const current=ellWord();
+    const showNotice=!current&&!!ellInlineNotice;
+    currentWordHost.textContent=showNotice?ellInlineNotice:(current||" ");
+    currentWordHost.classList.toggle("is-invalid",showNotice);
+  }
+  const ellControls=["ellStartOverBtn","ellClearBtn","ellGiveUpBtn","ellSubmitBtn"];
+  ellControls.forEach(id=>{
+    const control=document.getElementById(id);
+    if(control)control.disabled=ellInteractionLocked;
+  });
+  grid.classList.toggle("interaction-locked",ellInteractionLocked);
   ellAnimateScoreTo((ellComplete||ellEnded)?ellFinalScore():ellCurrentScore());
   const host=document.getElementById("ellCompletedWords");host.innerHTML="";
   if(ellSubmitted.length){
@@ -1847,19 +2256,30 @@ function drawEll(){
   if(ellComplete||ellEnded){const cfg=ellEndgameConfig();if(cfg)queueGlobalEndgame(cfg,120);}
 }
 function ellToggle(id){
-  if(ellComplete||ellEnded)return;ellReclaimCandidate=null;
+  if(ellComplete||ellEnded||ellInteractionLocked)return;
+  ellReclaimCandidate=null;
   const t=ellTiles.find(x=>x.id===id);if(!t||t.used)return;
-  const i=ellSelected.indexOf(id);if(i>=0)ellSelected.splice(i,1);else ellSelected.push(id);
+  const i=ellSelected.indexOf(id);
+  if(i>=0){
+    ellSelected.splice(i,1);
+  }else{
+    if(ellSelected.length===0)ellClearInlineNoticeForNewWord();
+    ellSelected.push(id);
+  }
   saveEllState();drawEll();
 }
 function ellTypeLetter(letter){
-  if(ellComplete||ellEnded)return;ellReclaimCandidate=null;
+  if(ellComplete||ellEnded||ellInteractionLocked)return;
+  ellReclaimCandidate=null;
   const chosen=new Set(ellSelected);
   const t=ellTiles.find(x=>!x.used&&!chosen.has(x.id)&&x.letter===letter);
-  if(t){ellSelected.push(t.id);saveEllState();drawEll();}
+  if(t){
+    if(ellSelected.length===0)ellClearInlineNoticeForNewWord();
+    ellSelected.push(t.id);saveEllState();drawEll();
+  }
 }
-function ellBackspace(){if(ellSelected.length){ellSelected.pop();saveEllState();drawEll();}}
-function ellClear(){ellSelected=[];ellReclaimCandidate=null;saveEllState();drawEll();}
+function ellBackspace(){if(ellInteractionLocked)return;if(ellSelected.length){ellSelected.pop();saveEllState();drawEll();}}
+function ellClear(){if(ellInteractionLocked)return;ellSelected=[];ellReclaimCandidate=null;saveEllState();drawEll();}
 
 function ellRemainingLetters(){
   return ellTiles.filter(t=>!t.used).map(t=>t.letter).join("");
@@ -1889,17 +2309,49 @@ function ellEndStuck(){
   ellEnded=true;
   ellEndReason="stuck";
   saveEllState();
+  recordEllCompletion();
   drawEll();
 }
 
 async function ellSubmit(){
-  if(ellComplete||ellEnded)return;
+  if(ellComplete||ellEnded||ellInteractionLocked)return;
   const word=ellWord();
-  if(word.length<3){document.getElementById("ellStatus").innerHTML='<div class="result">Words must be at least 3 letters.</div>';return;}
-  const res=await fetch(`/api/ell/validate?word=${encodeURIComponent(word)}`);
-  const result=res.ok?await res.json():{valid:false};
-  if(!result.valid){document.getElementById("ellStatus").innerHTML='<div class="result">Not a valid word.</div>';return;}
+  if(!word)return;
+
   const tileIds=[...ellSelected];
+  ellBeginInteractionLock();
+  drawEll();
+
+  if(word.length<3){
+    ellSelected=[];
+    ellReclaimCandidate=null;
+    ellInlineNotice=`'${word}' is not a valid word.`;
+    ellEndInteractionLock();
+    saveEllState();
+    drawEll();
+    return;
+  }
+
+  let result={valid:false};
+  try{
+    const res=await fetch(`/api/ell/validate?word=${encodeURIComponent(word)}`);
+    result=res.ok?await res.json():{valid:false};
+  }catch(err){
+    console.error("Could not validate Every Last Letter word:",err);
+  }
+
+  // The captured tileIds/word are authoritative for this submission.
+  if(!result.valid){
+    ellSelected=[];
+    ellReclaimCandidate=null;
+    ellInlineNotice=`'${word}' is not a valid word.`;
+    ellEndInteractionLock();
+    saveEllState();
+    drawEll();
+    return;
+  }
+
+  ellInlineNotice="";
   ellMotion.submittingIds=[...tileIds];
   document.getElementById("ellStatus").innerHTML="";
   drawEll();
@@ -1911,21 +2363,24 @@ async function ellSubmit(){
     ellSelected=[];ellReclaimCandidate=null;
     ellComplete=ellUsed()===25;if(ellComplete)ellEnded=false;
     ellEndReason=null;
+    if(ellComplete)recordEllCompletion();
     ellMotion.submittingIds=[];
     ellMotion.newWordIndex=newIndex;
     ellMotion.scoreRevealIndex=newIndex;
     saveEllState();drawEll();
 
+    if(!ellComplete)await ellCheckDeadBoard();
+
     ellLater(()=>{
       ellMotion.newWordIndex=null;
       ellMotion.scoreRevealIndex=null;
+      ellEndInteractionLock();
       drawEll();
     },520);
-
-    if(!ellComplete) await ellCheckDeadBoard();
   },Math.min(420,190+tileIds.length*38));
 }
 function ellReturnSubmittedWord(index){
+  if(ellInteractionLocked)return;
   const entry=ellSubmitted[index];if(!entry)return;
   (entry.tileIds||[]).forEach(id=>{const t=ellTiles.find(x=>x.id===id);if(t)t.used=false;});
   ellSubmitted.splice(index,1);
@@ -1938,12 +2393,15 @@ function ellReturnSubmittedWord(index){
   drawEll();
 }
 function ellReclaim(index){
-  if(ellComplete)return;
+  if(ellComplete||ellInteractionLocked)return;
   if(ellReclaimCandidate!==index){ellReclaimCandidate=index;drawEll();return;}
   const entry=ellSubmitted[index];
   if(!entry)return;
+
+  ellBeginInteractionLock();
   ellMotion.reclaimingIndex=index;
   drawEll();
+
   ellLater(()=>{
     const returning=[...(entry.tileIds||[])];
     (entry.tileIds||[]).forEach(id=>{const t=ellTiles.find(x=>x.id===id);if(t)t.used=false;});
@@ -1957,20 +2415,34 @@ function ellReclaim(index){
     document.getElementById("ellStatus").innerHTML="";
     saveEllState();
     drawEll();
-    ellLater(()=>{ellMotion.returningIds=[];drawEll();},420);
+    ellLater(()=>{
+      ellMotion.returningIds=[];
+      ellEndInteractionLock();
+      drawEll();
+    },420);
   },220);
 }
 function ellStartOver(){
-  if(!ellPuzzle)return;
-  if((ellSubmitted.length||ellSelected.length)&&!confirm("Start over and restore all 25 letters?"))return;
-  resetEveryLastLetterForSelectedDate();document.getElementById("ellStatus").innerHTML="";drawEll();
+  if(!ellPuzzle||ellInteractionLocked)return;
+  openEllConfirm("startover");
 }
 document.getElementById("ellStartOverBtn").onclick=ellStartOver;
 document.getElementById("ellClearBtn").onclick=ellClear;
 document.getElementById("ellGiveUpBtn").onclick=ellGiveUp;
 document.getElementById("ellSubmitBtn").onclick=ellSubmit;
+document.getElementById("ellConfirmPrimary")?.addEventListener("click",confirmEllAction);
+document.getElementById("ellConfirmCancel")?.addEventListener("click",closeEllConfirm);
+document.getElementById("ellConfirmOverlay")?.addEventListener("click",event=>{
+  if(event.target===event.currentTarget)closeEllConfirm();
+});
 document.addEventListener("keydown",event=>{
-  if(activeGame!=="ell"||!ellPuzzle||ellComplete||event.ctrlKey||event.metaKey||event.altKey)return;
+  if(event.key==="Escape"&&!document.getElementById("ellConfirmOverlay")?.hidden){
+    event.preventDefault();
+    closeEllConfirm();
+  }
+});
+document.addEventListener("keydown",event=>{
+  if(activeGame!=="ell"||!ellPuzzle||ellComplete||ellInteractionLocked||!document.getElementById("ellConfirmOverlay")?.hidden||event.ctrlKey||event.metaKey||event.altKey)return;
   if(ellEnded&&ellReclaimCandidate===null)return;
   if(/^[A-Za-z]$/.test(event.key)){event.preventDefault();ellTypeLetter(event.key.toUpperCase());return;}
   if(event.key==="Backspace"||event.key==="Delete"||event.code==="Delete"||event.keyCode===46){
@@ -1997,9 +2469,9 @@ let quadsComplete=false;
 let quadsWon=false;
 let quadsIncorrectGuesses=[];
 
-function showQuads(){ setActiveGame("quads"); closeMobileSiteMenu(); }
-function showWordTrail(){ setActiveGame("trail"); closeMobileSiteMenu(); }
-function showMini(){ setActiveGame("mini"); closeMobileSiteMenu(); }
+function showQuads(){ navigatePublicView("quads"); }
+function showWordTrail(){ navigatePublicView("trail"); }
+function showMini(){ navigatePublicView("mini"); }
 
 function shuffleArray(arr){
   const a=[...arr];
@@ -2346,6 +2818,7 @@ function submitQuads(){
         if(finalGroupSolved){
           quadsComplete=true;
           quadsWon=true;
+          registerDailyGameCompletion("quads",quadsPuzzle);
           quadsEndgameSequenceRunning=true;
         }
 
@@ -2387,6 +2860,7 @@ function submitQuads(){
       quadsSelected.clear();
       quadsComplete=true;
       quadsWon=false;
+      registerDailyGameCompletion("quads",quadsPuzzle);
       const solvedLabels=new Set(quadsSolved.map(g=>g.label));
       const remainingGroups=quadsPuzzle.groups.filter(g=>!solvedLabels.has(g.label));
       quadsSolved.push(...remainingGroups.map(g=>({
@@ -2947,6 +3421,7 @@ async function submitWordTrail(){
 
       if(wordTrailFound.length===themeWords.length){
         wordTrailComplete=true;
+        registerDailyGameCompletion("trail",wordTrailPuzzle);
       }
 
       saveWordTrailState();
@@ -3353,7 +3828,7 @@ function drawMiniKeyboard(){
     if(index===2){
       const enter=document.createElement("button");
       enter.type="button";
-      enter.className="key key-action";
+      enter.className="key key-action submit-action";
       enter.textContent="Submit";
       enter.onclick=miniMoveToNextIncompleteEntry;
       wrap.appendChild(enter);
@@ -3588,6 +4063,7 @@ function updateMiniCompletionMessage(){
   if(miniAllFilled()){
     if(miniAllCorrect()){
       miniComplete=true;
+      registerDailyGameCompletion("mini",miniPuzzle);
       host.innerHTML="";
     }else{
       miniComplete=false;
@@ -3626,6 +4102,7 @@ function miniRevealPuzzle(){
   }
   miniRevealedPuzzle=true;
   miniComplete=true;
+  registerDailyGameCompletion("mini",miniPuzzle);
   saveMiniState();
   closeMiniRevealMenu();
   drawMini();
@@ -3815,6 +4292,7 @@ async function initPublicSite(){
   addUniversalTimerHosts();
   updateHomeDashboard();
   setActiveGame(activeGame);
+  history.replaceState(publicHistoryState(activeGame),"",publicViewUrl(activeGame));
   suppressRestoredEndgames=false;
   if(puzzleNookTimerTick)clearInterval(puzzleNookTimerTick);
   puzzleNookTimerTick=setInterval(updatePuzzleTimerDisplays,250);

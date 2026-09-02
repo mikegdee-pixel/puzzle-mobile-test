@@ -2,18 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Puzzle Archive · PuzzleNook</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="archive.101.4.1.css">
-<meta name="puzzlenook-build" content="101.4.1"></head>
+<link rel="stylesheet" href="archive.css?v=103.5-finalqa">
+</head>
 <body>
 <header class="archive-site-header">
-  <a class="archive-brand" href="index.html" aria-label="PuzzleNook home">PuzzleNook</a>
+  <a class="archive-brand" href="/" aria-label="PuzzleNook home">PuzzleNook</a>
   <span class="archive-tagline">Your little escape.</span>
-  <a class="archive-home-link" href="index.html">Today’s puzzles <span class="archive-today-arrow" aria-hidden="true">→</span></a>
+  <a class="archive-home-link" href="/">Today’s puzzles <span class="archive-today-arrow" aria-hidden="true">→</span></a>
 </header>
 
 <main class="archive-main">
@@ -44,7 +44,10 @@
         <div class="archive-day-kicker">SELECTED DAY</div>
         <h2 id="archiveDayTitle"></h2>
       </div>
-      <button type="button" id="archiveDayClose" class="archive-day-close" aria-label="Close selected day">×</button>
+      <div class="archive-day-actions">
+        <a id="archiveViewDate" class="archive-view-date" href="#">View date</a>
+        <button type="button" id="archiveDayClose" class="archive-day-close" aria-label="Close selected day">×</button>
+      </div>
     </div>
     <div id="archiveGameList" class="archive-game-list"></div>
   </section>
@@ -54,7 +57,6 @@
     <span>Use the arrows above to browse another month.</span>
   </div>
 </main>
-<script src="static-data-adapter.101.4.1.js"></script>
-<script src="archive.101.4.1.js"></script>
+<script src="static-data-adapter.js?v=103.5-finalqa"></script><script src="archive.js?v=103.5-finalqa"></script>
 </body>
 </html>

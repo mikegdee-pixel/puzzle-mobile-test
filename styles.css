@@ -4809,8 +4809,8 @@ body.home-view main{max-width:1180px}
 
 /* InCommon preview */
 .quads-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:15px;background:#faf9f8}
-.quads-preview i{min-width:0;height:34px;padding:0 4px;border-radius:6px;display:grid;place-items:center;background:#fff;box-shadow:0 1px 4px rgba(35,31,29,.09);font:900 8.5px/1 Lato;font-style:normal;color:#3e403e}
-.quads-preview i:nth-child(-n+4){background:#f0ded6}.quads-preview i:nth-child(n+5):nth-child(-n+8){background:#e5ece0}
+.quads-preview>i{min-width:0;height:34px;padding:0 4px;border-radius:6px;display:grid;place-items:center;background:#fff;box-shadow:0 1px 4px rgba(35,31,29,.09);font:900 8.5px/1 Lato;font-style:normal;color:#3e403e}
+.quads-preview>i:nth-child(-n+4){background:#f0ded6}.quads-preview>i:nth-child(n+5):nth-child(-n+8){background:#e5ece0}
 
 /* Crossword preview */
 .mini-preview{background:#f7f9fa}
@@ -4857,7 +4857,7 @@ body.home-view main{max-width:1180px}
   .front-card-sub{font-size:10px;margin-top:8px}
   .fp-five-row{gap:4px}.fp-five-row i{width:25px;height:25px;font-size:11px}
   .same-preview{padding:10px 8px;gap:4px}.same-preview>span:not(.same-answer){padding:5px 6px;font-size:8px}.same-preview b{width:13px;height:13px;font-size:7px}
-  .quads-preview{gap:3px;padding:7px}.quads-preview i{height:25px;font-size:6px;border-radius:4px}
+  .quads-preview{gap:3px;padding:7px}.quads-preview>i{height:25px;font-size:6px;border-radius:4px}
   .fp-cross-grid{width:116px;height:116px}.fp-cross-grid i{font-size:10px}
   .fp-ell-grid{grid-template-columns:repeat(5,21px);gap:4px}.fp-ell-grid i{height:21px;font-size:8px;border-radius:4px}
   .home-after{margin-top:22px;padding:18px 2px 0}
@@ -8143,3 +8143,186 @@ body.instructions-open{overflow:hidden}
     font-size:clamp(22px,8vw,26.75px);
   }
 }
+
+
+/* V102.2 — ELL validation/stability + in-game confirmations */
+.ell-current-word.is-invalid{
+  color:#9a433b;
+  font-size:clamp(13px,2.2vw,16px);
+  font-weight:800;
+  letter-spacing:0;
+  text-transform:none;
+}
+.ell-grid.interaction-locked .ell-tile:not(.empty){
+  cursor:default;
+}
+.ell-confirm-overlay[hidden]{display:none!important}
+.ell-confirm-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1100;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  background:rgba(17,21,19,.46);
+  backdrop-filter:blur(2px);
+  animation:globalOverlayIn .18s ease-out;
+}
+.ell-confirm-card{
+  width:min(410px,calc(100vw - 32px));
+  background:#fff;
+  border-radius:18px;
+  box-shadow:0 18px 48px rgba(16,22,18,.18);
+  padding:27px 28px 24px;
+  text-align:center;
+  animation:globalCardIn .22s cubic-bezier(.2,.75,.25,1);
+}
+.ell-confirm-kicker{
+  color:#767d78;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.19em;
+}
+.ell-confirm-card h2{
+  margin:8px 0 0;
+  color:#1f2421;
+  font:900 28px/1.1 Lato,system-ui,sans-serif;
+  letter-spacing:-.025em;
+}
+.ell-confirm-card p{
+  margin:11px auto 20px;
+  max-width:330px;
+  color:#59605c;
+  font-size:14px;
+  line-height:1.45;
+  font-weight:700;
+}
+.ell-confirm-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.ell-confirm-actions button{
+  min-height:44px;
+  border-radius:10px!important;
+  font-size:13px!important;
+  font-weight:900!important;
+}
+#ellConfirmPrimary{
+  background:#2f684f!important;
+  color:#fff!important;
+}
+@media(max-width:560px){
+  .ell-confirm-overlay{padding:12px}
+  .ell-confirm-card{
+    width:calc(100vw - 24px);
+    padding:24px 19px 20px;
+    border-radius:16px;
+  }
+  .ell-confirm-card h2{font-size:26px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ell-confirm-overlay,.ell-confirm-card{animation:none!important}
+}
+
+/* V102.3 — archived-day context + per-game free-play indicators */
+.game-title-with-plays{display:flex;align-items:center;gap:0;min-width:0}.game-title-with-plays .game-name-title{margin:0}
+.play-dots{display:inline-flex;gap:4px;align-items:center;vertical-align:middle;margin-left:1ch}.play-dots i{display:block;width:7px;height:7px;border-radius:50%;border:1.5px solid #1d1d1f;background:transparent;box-sizing:border-box}.play-dots i.is-filled{background:#1d1d1f}
+.front-card-top .play-dots{margin-left:1ch;margin-right:auto}.front-card-top strong+.play-dots+.front-complete-mark{margin-left:auto}
+.home-today{position:relative;isolation:isolate}
+.front-page.is-archived .home-today::before{content:"";position:absolute;z-index:-1;top:-3px;bottom:-3px;left:-5px;right:-5px;background:#f1eee8;border:0;border-radius:0;box-shadow:none;pointer-events:none}
+.front-page.is-archived .home-eyebrow{color:#111;font-weight:900;letter-spacing:.12em}.front-page.is-archived #homeTitle{font-weight:900}
+.home-progress-row{display:flex;align-items:center;justify-content:flex-end;min-height:30px}
+.status-pill.puzzle-date-link{cursor:pointer;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}.status-pill.puzzle-date-link:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.12)}.status-pill.is-archived-puzzle{background:#111!important;color:#fff!important;border-color:#111!important}
+.play-limit-overlay{position:fixed;inset:0;z-index:9999;background:rgba(20,20,20,.38);display:grid;place-items:center;padding:20px}.play-limit-overlay[hidden]{display:none}.play-limit-card{width:min(390px,100%);background:#fff;border-radius:20px;padding:26px;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.24)}.play-limit-kicker{font-size:11px;font-weight:900;letter-spacing:.14em}.play-limit-card h2{margin:8px 0}.play-limit-card p{color:#555;line-height:1.5}.play-limit-card button{margin-top:8px}
+@media(max-width:700px){.play-dots i{width:6px;height:6px}.game-title-with-plays{gap:0}.front-page.is-archived .home-today::before{left:50%;right:auto;width:calc(100vw + 10px);transform:translateX(-50%)}}
+
+
+/* V102.8 — Main Page Date Header overlay navigation fix */
+.main-date-nav{
+  position:absolute!important;
+  top:-3px;
+  bottom:-3px;
+  z-index:3;
+  width:15%;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#111;
+  cursor:pointer;
+  overflow:hidden;
+  opacity:1;
+  appearance:none;
+  -webkit-appearance:none;
+}
+.main-date-nav-prev{left:-5px!important;right:auto!important}
+.main-date-nav-next{right:-5px!important;left:auto!important}
+.main-date-nav span{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  font:400 42px/1 Lato,system-ui,sans-serif;
+  opacity:0;
+  visibility:hidden;
+  background:rgba(255,255,255,.42);
+  transition:opacity .16s ease,background .16s ease,visibility 0s linear .16s;
+  pointer-events:none;
+}
+.main-date-nav:disabled{display:none!important}
+@media(hover:hover) and (pointer:fine){
+  .main-date-nav:not(:disabled):hover span,
+  .main-date-nav:not(:disabled):focus-visible span{
+    opacity:1;
+    visibility:visible;
+    background:rgba(255,255,255,.46);
+    transition-delay:0s;
+  }
+}
+@media(max-width:700px){
+  .main-date-nav{width:25%;}
+  .main-date-nav span{display:none!important}
+  .front-page.is-archived .main-date-nav-prev{left:calc(50% - 50vw - 5px)!important}
+  .front-page.is-archived .main-date-nav-next{right:calc(50% - 50vw - 5px)!important}
+}
+
+
+/* V102.9 — mobile homepage play dots overlay */
+.front-preview-play-dots{display:none}
+@media(max-width:700px){
+  .front-card-top>.play-dots{display:none}
+  .front-card-top{gap:6px}
+  .front-card-top strong{white-space:nowrap;min-width:0}
+  .front-preview{position:relative}
+  .front-preview-play-dots{
+    display:inline-flex;position:absolute;z-index:3;top:7px;left:7px;
+    margin:0!important;padding:4px 5px;border-radius:999px;gap:4px;
+    background:rgba(255,255,255,.78);box-shadow:0 1px 4px rgba(0,0,0,.08);
+    pointer-events:none;
+  }
+}
+
+/* V103.0 menu + pending UI refinements */
+#fivePanel .key.submit-action{background:#4f9164!important;color:#fff!important}
+#miniPanel .mini-keyboard .key.submit-action{background:#587e9b!important;color:#fff!important}
+@media(min-width:701px){.home-archive-art img{object-position:calc(50% - 30px) calc(50% + 10px)}}
+@media(max-width:700px){
+ .home-archive-art img{object-position:50% calc(50% + 10px)}
+}
+.mobile-site-nav{grid-template-columns:1fr!important}
+.mobile-site-nav a,.mobile-site-nav button{display:flex;align-items:center;width:100%;min-height:42px;padding:9px 11px;border:0;border-radius:8px;background:#f5f6f4;color:#242926;text-decoration:none;text-align:left;font:800 13px/1.2 Lato,system-ui,sans-serif}
+.mobile-site-nav a:hover,.mobile-site-nav button:hover{background:#ecefeb;color:#242926;transform:none}
+.site-utility-overlay[hidden]{display:none!important}.site-utility-overlay{position:fixed;z-index:230;inset:0;display:grid;place-items:center;padding:20px;background:rgba(20,24,21,.42);backdrop-filter:blur(3px)}
+.site-utility-card{position:relative;width:min(560px,calc(100vw - 28px));max-height:min(760px,calc(100dvh - 28px));overflow:auto;padding:28px;border-radius:18px;background:#fff;color:#252a27;box-shadow:0 22px 60px rgba(19,24,20,.24)}
+.site-utility-close{position:absolute;top:12px;right:12px;width:36px;height:36px;padding:0!important;border-radius:50%!important;background:#f0f2ef!important;color:#343a36!important;font-size:24px}
+.site-utility-kicker{margin:0 44px 7px 0;color:#788078;font:900 10px/1 Lato,sans-serif;letter-spacing:.14em}.site-utility-card h2{margin:0 42px 20px 0;font:900 27px/1.1 Lato,sans-serif}
+.site-utility-body p{font:400 14px/1.5 Lato,sans-serif;color:#555e58}.utility-choice-list{display:grid;gap:8px}.utility-choice{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px 15px!important;border:1px solid #e3e6e2!important;border-radius:11px!important;background:#f8f9f7!important;color:#252a27!important;text-align:left}.utility-choice:hover{background:#f0f3ef!important;transform:none!important}.utility-choice strong{font:900 14px/1.2 Lato,sans-serif}.utility-choice span{font:400 12.5px/1.35 Lato,sans-serif;color:#707871}
+.feedback-form{display:grid;gap:14px}.feedback-form label{display:grid;gap:6px;color:#404742;font:800 12px/1.2 Lato,sans-serif}.feedback-form input,.feedback-form textarea{width:100%;padding:10px 11px;border:1px solid #d8ddd8;border-radius:9px;background:#fff;color:#252a27;font:400 14px/1.4 Lato,sans-serif;resize:vertical}.feedback-context{color:#7a827c;font:700 11px/1.3 Lato,sans-serif}.feedback-submit{justify-self:start;background:#28352d!important;color:#fff!important}.feedback-dev-note{margin:0!important;font-size:10.5px!important;color:#8a918c!important}body.site-utility-open{overflow:hidden}
+@media(max-width:700px){.site-utility-overlay{padding:10px}.site-utility-card{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);padding:23px 18px 20px;border-radius:15px}.site-utility-card h2{font-size:24px}}
+
+/* V103.1 — InCommon mobile play-counter root fix.
+   Legacy InCommon preview tile rules now target only direct preview-cell <i> elements,
+   so the shared play-dot <i> elements inherit the same sizing as every other game card. */

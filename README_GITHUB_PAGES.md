@@ -1,28 +1,17 @@
-# Cache-fix revision: V101.4.1
+# PuzzleNook — V103.5 Final QA GitHub Pages Test
 
-This GitHub Pages QA package uses physically versioned CSS/JS filenames in addition to no-cache HTML meta directives.
-This is intended to reduce stale physical-phone caching during QA.
+Upload the CONTENTS of this folder to the root of the GitHub Pages test repository.
 
-# PuzzleNook GitHub Pages Public Test — V101.4
+This package is a static GitHub Pages adaptation of the V103.5 public site.
+It includes the static API adapter and cache-busted CSS/JavaScript references
+for physical-device testing.
 
-This package is the static GitHub Pages QA build derived from PuzzleWebsite V101.4.
-It preserves the GitHub Pages static-data adapter used by the prior V100.60 test package.
+IMPORTANT PUZZLE DATA NOTE
+The bundled data/puzzles.json is the copy that was present in the V103.5 project
+package when this GitHub build was produced. Before final tester distribution,
+use Admin > Published > Download Public puzzles.json on the computer containing
+the authoritative current dashboard state, then replace data/puzzles.json in
+this GitHub package with that downloaded file.
 
-QA baseline: V101.4 — Homepage Completion Status
-Generated for testing-team QA.
-
-# PuzzleWebsite V100.60 — GitHub Pages Public Test
-
-Static GitHub Pages testing build generated from the official PuzzleWebsite V100.60 baseline.
-
-Upload the **contents of this folder** to the root of the GitHub Pages repository.
-
-- Includes the current V100.60 public HTML, CSS, JavaScript, assets, and puzzle data.
-- Includes the proven static GitHub Pages data adapter used by the prior V100.8 public test package.
-- Local `/public/...` asset references are converted to repository-relative paths for GitHub Pages.
-- Root `/data/...` and `/api/...` gameplay requests are handled by the static data adapter.
-- CSS, JavaScript, and the adapter use `?v=100.60` cache-busting for physical-device/browser testing.
-- `.nojekyll` is included.
-- This is a public-site testing package only; it does not include the Node admin/server runtime.
-
-Baseline source: PuzzleWebsite V100.60 — InCommon Arial Black Pill.
+The admin dashboard and Node server are intentionally not included in this
+public test package.

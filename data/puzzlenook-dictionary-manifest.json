@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "architecture": "puzzlenook-layered-dictionary",
+  "layers": {
+    "playable": {
+      "file": "puzzlenook-playable-words.json",
+      "purpose": "Player word validation. Broad legitimate-word acceptance.",
+      "currentSources": [
+        "existing Every Last Letter ENABLE-derived validation vocabulary",
+        "PuzzleNook additions",
+        "PuzzleNook blocklist"
+      ],
+      "plannedSource": "Filtered ESDB/SCOWL <=80 when a vetted export is incorporated"
+    },
+    "generator": {
+      "file": "puzzlenook-generator-words.json",
+      "purpose": "ELL solution counting, difficulty estimation, and generator validation.",
+      "currentSources": [
+        "existing ELL Standard-familiarity vocabulary"
+      ],
+      "policy": "Conservative. Obscure playable words do not inflate solution counts."
+    },
+    "overrides": {
+      "additions": "puzzlenook-word-additions.json",
+      "blocklist": "puzzlenook-word-blocklist.json",
+      "purpose": "PuzzleNook editorial control independent of upstream dictionaries."
+    }
+  }
+}

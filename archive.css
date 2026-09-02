@@ -180,6 +180,29 @@ button,a{font:inherit}
   line-height:1.1;
   font-weight:900;
 }
+.archive-day-actions{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.archive-view-date{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:30px;
+  padding:0 11px;
+  border-radius:999px;
+  background:#27302a;
+  color:#fff;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:900;
+  white-space:nowrap;
+  transition:transform .15s ease,background .15s ease;
+}
+.archive-view-date:hover{background:#111;transform:translateY(-1px)}
+.archive-view-date:focus-visible{outline:2px solid #27302a;outline-offset:2px}
 .archive-day-close{
   margin-left:auto;
   width:34px;height:34px;
