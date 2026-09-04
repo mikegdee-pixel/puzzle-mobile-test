@@ -61,15 +61,232 @@ function renderPlayDots(){
 }
 function openPlayLimit(game){
   const overlay=document.getElementById("playLimitOverlay"),msg=document.getElementById("playLimitMessage");
-  if(msg)msg.textContent=`You've used today's 3 ${PUBLIC_GAME_NAMES[game]||"game"} plays.`;
-  if(overlay)overlay.hidden=false;
+  if(msg)msg.textContent=`You've used today's 3 ${PUBLIC_GAME_NAMES[game]||"game"} plays. Come back tomorrow, your available plays will reset every day.`;
+  if(overlay){
+    overlay.hidden=false;
+    overlay.setAttribute("aria-hidden","false");
+  }
 }
-function closePlayLimit(){const overlay=document.getElementById("playLimitOverlay");if(overlay)overlay.hidden=true}
+function closePlayLimit(){
+  const overlay=document.getElementById("playLimitOverlay");
+  if(overlay){
+    overlay.hidden=true;
+    overlay.setAttribute("aria-hidden","true");
+  }
+}
 function canOpenGameUnderAllowance(game){
   const puz=timerPuzzleFor(game);
   if(!puz)return true;
   if(timerGameComplete(game)||puzzleAlreadyCountedToday(game,puz))return true;
   return dailyGamePlaysLeft(game)>0;
+}
+
+/* V103.27 — click a puzzle-view game title + play dots to open the newest
+   unfinished ARCHIVED puzzle for that same game. "Archived" intentionally
+   matches the Archive page definition: scheduled puzzle data with a date
+   earlier than today. */
+const PUBLIC_ARCHIVE_PLAYER_KEYS=Object.freeze({
+  five:"puzzlePublicPlayerV3",
+  same:"puzzlePublicOneAndTheSameV1",
+  quads:"puzzlePublicQuadsV2",
+  mini:"puzzlePublicMiniV2",
+  trail:"puzzlePublicWordTrailV1",
+  ell:"puzzlePublicEveryLastLetterV1"
+});
+let publicArchivePuzzleCache=null;
+
+function archivedGamePuzzleCompleted(game,dateKey){
+  const all=readJsonStorage(PUBLIC_ARCHIVE_PLAYER_KEYS[game],{});
+  const state=all?.[dateKey];
+  if(game==="five")return !!state?.five?.complete;
+  if(game==="ell")return !!(state?.complete||state?.ended);
+  return !!state?.complete;
+}
+
+async function getPublicArchivePuzzles(){
+  if(publicArchivePuzzleCache)return publicArchivePuzzleCache;
+  try{
+    const res=await fetch("data/puzzles.json",{cache:"no-store"});
+    if(!res.ok)throw new Error("Could not load archive puzzle data");
+    const db=await res.json();
+    const today=browserTodayKey();
+    publicArchivePuzzleCache=(db.puzzles||[])
+      .filter(p=>p.status==="scheduled"&&p.date&&p.date<today&&PUBLIC_GAME_IDS.includes(p.game));
+  }catch(err){
+    console.warn("Could not load archived puzzles for game-title navigation",err);
+    publicArchivePuzzleCache=[];
+  }
+  return publicArchivePuzzleCache;
+}
+
+async function newestPlayableArchivedPuzzle(game){
+  const archived=await getPublicArchivePuzzles();
+  const current=timerPuzzleFor(game);
+  return archived
+    .filter(p=>p.game===game)
+    .filter(p=>!(current&&String(p.id)===String(current.id)))
+    .filter(p=>!archivedGamePuzzleCompleted(game,p.date))
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0]||null;
+}
+
+let gameTitleArchiveConfirmGame=null;
+let gameTitleArchiveReturnFocus=null;
+
+function openGameTitleArchiveConfirm(game,returnFocus=null){
+  if(!PUBLIC_GAME_IDS.includes(game))return;
+  if(dailyGamePlaysLeft(game)<=0){
+    openPlayLimit(game);
+    return;
+  }
+  const overlay=document.getElementById("gameTitleArchiveConfirmOverlay");
+  const kicker=document.getElementById("gameTitleArchiveConfirmKicker");
+  const title=document.getElementById("gameTitleArchiveConfirmTitle");
+  const message=document.getElementById("gameTitleArchiveConfirmMessage");
+  const confirmBtn=document.getElementById("gameTitleArchiveConfirmPrimary");
+  if(!overlay||!kicker||!title||!message||!confirmBtn)return;
+
+  gameTitleArchiveConfirmGame=game;
+  gameTitleArchiveReturnFocus=returnFocus instanceof HTMLElement?returnFocus:null;
+  const name=PUBLIC_GAME_NAMES[game]||"Puzzle";
+  kicker.textContent=name.toUpperCase();
+  title.textContent=`Try another ${name} puzzle?`;
+  message.textContent=`Would you like to play another ${name} puzzle from a different day?`;
+  confirmBtn.textContent="Try Another";
+
+  /* A pointer click normally leaves the game-title control focused. Remove
+     that focus before opening the modal so Enter cannot reactivate it later. */
+  gameTitleArchiveReturnFocus?.blur();
+
+  overlay.hidden=false;
+  overlay.setAttribute("aria-hidden","false");
+  document.body.classList.add("ell-confirm-open");
+  requestAnimationFrame(()=>confirmBtn.focus());
+}
+
+function closeGameTitleArchiveConfirm({restoreFocus=false}={}){
+  const overlay=document.getElementById("gameTitleArchiveConfirmOverlay");
+  if(!overlay||overlay.hidden)return;
+  overlay.hidden=true;
+  overlay.setAttribute("aria-hidden","true");
+  document.body.classList.remove("ell-confirm-open");
+  const returnFocus=gameTitleArchiveReturnFocus;
+  gameTitleArchiveConfirmGame=null;
+  gameTitleArchiveReturnFocus=null;
+  if(restoreFocus&&returnFocus){
+    requestAnimationFrame(()=>returnFocus.focus({preventScroll:true}));
+  }
+}
+
+function focusLoadedPuzzle(game){
+  /* Do not leave keyboard focus on the navigation link after changing dates.
+     Put focus back into the puzzle wherever there is a natural input target;
+     otherwise clear focus so the game's own keyboard handlers receive keys. */
+  const active=document.activeElement;
+  if(active instanceof HTMLElement)active.blur();
+
+  requestAnimationFrame(()=>{
+    if(game==="same"){
+      const input=document.getElementById("sameGuessInput");
+      if(input&&!input.disabled&&!input.closest(".same-hidden"))input.focus({preventScroll:true});
+      return;
+    }
+    if(game==="mini"){
+      const activeCell=document.querySelector("#miniGrid .mini-cell.active:not([disabled]), #miniGrid button:not([disabled])");
+      if(activeCell instanceof HTMLElement)activeCell.focus({preventScroll:true});
+      return;
+    }
+    if(game==="quads"){
+      const tile=document.querySelector("#quadsGrid button:not([disabled])");
+      if(tile instanceof HTMLElement)tile.focus({preventScroll:true});
+      return;
+    }
+    if(game==="ell"){
+      const tile=document.querySelector("#ellGrid button:not([disabled])");
+      if(tile instanceof HTMLElement)tile.focus({preventScroll:true});
+      return;
+    }
+    /* Six to Five and Unscrumble use page-level/pointer input. Blurring the
+       modal control is the correct neutral focus state for those games. */
+  });
+}
+
+async function openNewestPlayableArchivedPuzzle(game){
+  if(!PUBLIC_GAME_IDS.includes(game))return;
+  if(dailyGamePlaysLeft(game)<=0){
+    openPlayLimit(game);
+    return;
+  }
+  const next=await newestPlayableArchivedPuzzle(game);
+  if(!next)return;
+
+  suppressRestoredEndgames=true;
+  closeFiveEndgame();
+  closeGlobalEndgame();
+
+  const [y,m,d]=next.date.split("-").map(Number);
+  selectedDate=new Date(y,m-1,d,12,0,0,0);
+  updateDateLabel();
+
+  await Promise.all([
+    loadFiveForSelectedDate(),
+    loadEveryLastLetterForSelectedDate(),
+    loadOneAndTheSameForSelectedDate(),
+    loadQuadsForSelectedDate(),
+    loadWordTrailForSelectedDate(),
+    loadMiniForSelectedDate()
+  ]);
+
+  updateHomeDashboard();
+  suppressRestoredEndgames=false;
+  setActiveGame(game);
+  history.pushState(publicHistoryState(game),"",publicViewUrl(game));
+  window.scrollTo({top:0,behavior:"smooth"});
+  focusLoadedPuzzle(game);
+}
+
+async function confirmGameTitleArchiveNavigation(){
+  const game=gameTitleArchiveConfirmGame;
+  if(!game)return;
+  closeGameTitleArchiveConfirm();
+  await openNewestPlayableArchivedPuzzle(game);
+}
+
+function wireGameTitleArchiveLinks(){
+  document.querySelectorAll(".game-title-with-plays").forEach(host=>{
+    const dots=host.querySelector("[data-play-dots]");
+    const game=dots?.dataset.playDots;
+    if(!PUBLIC_GAME_IDS.includes(game)||host.dataset.archiveLinkWired)return;
+    host.dataset.archiveLinkWired="1";
+    host.classList.add("game-title-archive-link");
+    host.setAttribute("role","button");
+    host.tabIndex=0;
+    host.setAttribute("aria-label",`${PUBLIC_GAME_NAMES[game]}. Try another ${PUBLIC_GAME_NAMES[game]} puzzle from a different day.`);
+    host.addEventListener("click",()=>openGameTitleArchiveConfirm(game,host));
+    host.addEventListener("keydown",event=>{
+      if(event.key==="Enter"||event.key===" "){
+        event.preventDefault();
+        openGameTitleArchiveConfirm(game,host);
+      }
+    });
+  });
+
+  const cancel=document.getElementById("gameTitleArchiveConfirmCancel");
+  const confirm=document.getElementById("gameTitleArchiveConfirmPrimary");
+  const overlay=document.getElementById("gameTitleArchiveConfirmOverlay");
+  if(cancel&&!cancel.dataset.archiveConfirmWired){
+    cancel.dataset.archiveConfirmWired="1";
+    cancel.addEventListener("click",()=>closeGameTitleArchiveConfirm({restoreFocus:true}));
+  }
+  if(confirm&&!confirm.dataset.archiveConfirmWired){
+    confirm.dataset.archiveConfirmWired="1";
+    confirm.addEventListener("click",confirmGameTitleArchiveNavigation);
+  }
+  if(overlay&&!overlay.dataset.archiveConfirmWired){
+    overlay.dataset.archiveConfirmWired="1";
+    overlay.addEventListener("click",event=>{
+      if(event.target===overlay)closeGameTitleArchiveConfirm({restoreFocus:true});
+    });
+  }
 }
 function isTodaySelected(){return currentDateKey()===browserTodayKey()}
 function navigateTodayHome(){
@@ -397,12 +614,46 @@ let globalEndgameCurrent=null;const globalEndgameShown=new Set();
    opening its modal after the player has returned Home or switched games. */
 let endgameNavigationEpoch=0;
 function globalPick(list){return list[Math.floor(Math.random()*list.length)]}
-function globalEndgameKey(game,date,state){return `${game}|${date||currentDateKey()}|${state}`}
+function globalEndgameKey(game,date,state,instanceKey=""){return `${game}|${date||currentDateKey()}|${state}${instanceKey?`|${instanceKey}`:""}`}
 function globalEndgameIcon(game){if(game==="quads")return '<div class="global-emblem global-emblem-quads"><i></i><i></i><i></i><i></i></div>';if(game==="mini")return '<div class="global-emblem global-emblem-mini">'+Array.from({length:9},(_,i)=>`<i class="${[2,4,8].includes(i)?"dark":""}"></i>`).join("")+'</div>';if(game==="trail")return '<div class="global-emblem global-emblem-trail"><span>↗</span></div>';if(game==="ell")return '<div class="global-emblem global-emblem-ell"><i>E</i><i>L</i><i>L</i><i></i></div>';if(game==="same")return '<div class="global-emblem global-emblem-same"><i>1</i><i>=</i><i>1</i></div>';return ""}
+const ENDGAME_STICKER_BASE="assets/endgame/";
+const ENDGAME_GENERIC_WIN_STICKERS=["NeutralWin.png","NeutralWin2.png","NeutralWin4.png","NeutralWin5.png","NeutralWin6.png"];
+const ENDGAME_GENERIC_LOSS_STICKERS=["NeutralLoss.png","NeutralLoss2.png"];
+const endgameStickerChoices=new Map();
+function endgameStickerHtml(filename){return filename?`<img class="global-endgame-sticker" src="${ENDGAME_STICKER_BASE}${filename}" alt="">`:""}
+function randomEndgameSticker(pool,key){
+  if(!pool?.length)return "";
+  if(endgameStickerChoices.has(key))return endgameStickerChoices.get(key);
+  const filename=pool[Math.floor(Math.random()*pool.length)];
+  endgameStickerChoices.set(key,filename);
+  return filename;
+}
+function endgameStickerFor({game,date,state,won,tries,used,endReason,selectionKey=""}){
+  // Stickers are intentionally limited to Unscrumble, Every Last Letter,
+  // and One and the Same. Other games keep their puzzle-breakdown visuals.
+  const fallbackState=state||(won?"win":"loss");
+  const key=`${game}|${date||currentDateKey()}|${fallbackState}${selectionKey?`|${selectionKey}`:""}`;
+  if(game==="trail"&&won){
+    // Unscrumble wins can use its dedicated art or any generic win sticker.
+    return randomEndgameSticker(["UnscrumbleWin.png",...ENDGAME_GENERIC_WIN_STICKERS],key);
+  }
+  if(game==="same"&&won)return tries<=2?"GoodWin.png":"OneSameWin.png";
+  if(game==="ell"&&endReason==="giveup")return "GiveUp.png";
+  if(game==="ell"&&!endReason&&won&&used===25)return "GoodWin.png";
+  if(game==="ell"&&endReason==="stuck"&&used===24){
+    // 24 letters keeps the special Brilliant Play art in the mix, while also
+    // allowing any of the generic win stickers.
+    return randomEndgameSticker(["GoodWin.png",...ENDGAME_GENERIC_WIN_STICKERS],key);
+  }
+  if(game==="ell"&&endReason==="stuck"&&used===23){
+    return randomEndgameSticker(ENDGAME_GENERIC_WIN_STICKERS,key);
+  }
+  return randomEndgameSticker(won?ENDGAME_GENERIC_WIN_STICKERS:ENDGAME_GENERIC_LOSS_STICKERS,key);
+}
 function closeGlobalEndgame(){const o=document.getElementById("globalEndgameOverlay");if(o){o.hidden=true;o.setAttribute("aria-hidden","true")}}
 function globalEndgameShareText(config){return config.shareText||`${config.kicker} — ${config.resultLine||formatPuzzleDate(config.date)}`}
 async function shareGlobalEndgame(kind){if(!globalEndgameCurrent)return;const text=globalEndgameShareText(globalEndgameCurrent);if(kind==="native"&&navigator.share){try{await navigator.share({title:globalEndgameCurrent.kicker,text})}catch(e){}return}try{await navigator.clipboard.writeText(text);const b=document.getElementById(kind==="copy"?"globalEndgameCopy":"globalEndgameShare");if(b){const old=b.innerHTML;b.textContent="Copied ✓";setTimeout(()=>b.innerHTML=old,1200)}}catch(e){}}
-function showGlobalEndgame(config){if(suppressRestoredEndgames||activeGame!==config.game)return;const key=globalEndgameKey(config.game,config.date,config.state||"complete");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
+function showGlobalEndgame(config){if(suppressRestoredEndgames||activeGame!==config.game)return;const key=globalEndgameKey(config.game,config.date,config.state||"complete",config.instanceKey||"");if(globalEndgameShown.has(key))return;globalEndgameShown.add(key);globalEndgameCurrent=config;const o=document.getElementById("globalEndgameOverlay");if(!o)return;document.getElementById("globalEndgameKicker").textContent=config.kicker||"PUZZLE COMPLETE";document.getElementById("globalEndgameVisual").innerHTML=config.visualHtml||globalEndgameIcon(config.game);document.getElementById("globalEndgameTitle").textContent=config.title||"Puzzle complete.";const answer=document.getElementById("globalEndgameAnswer");answer.hidden=!config.answerHtml;answer.innerHTML=config.answerHtml||"";document.getElementById("globalEndgameMessage").textContent=config.message||"";document.getElementById("globalEndgameStats").innerHTML=(config.stats||[]).map(s=>`<div><strong>${s.value}</strong><span>${s.label}</span></div>`).join("");document.getElementById("globalEndgameResultLine").textContent=config.resultLine||"";document.getElementById("globalEndgameShareSection").hidden=config.share===false;o.dataset.game=config.game||"";o.hidden=false;o.setAttribute("aria-hidden","false")}
 function queueGlobalEndgame(config,delay=80){
   if(suppressRestoredEndgames||activeGame!==config.game)return;
   const queuedEpoch=endgameNavigationEpoch;
@@ -413,9 +664,9 @@ function queueGlobalEndgame(config,delay=80){
   },delay);
 }
 function quadsEndgameConfig(){if(timerGameComplete("quads"))completePuzzleTimer("quads");if(!quadsPuzzle||!quadsComplete)return null;const visual=`<div class="global-quads-result">${quadsSolved.map(g=>`<span class="${difficultyClass(g.difficulty)}">${escapeSameHtml(g.label)}</span>`).join("")}</div>`;const mistakes=Math.min(4,quadsMistakes);return{game:"quads",date:quadsPuzzle.date,state:quadsWon?"win":"loss",kicker:"INCOMMON",title:quadsWon?"All four found.":"Not this time.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.quads[quadsWon?"win":"loss"]),visualHtml:visual,stats:[{value:mistakes,label:"MISTAKES"},{value:puzzleTimeText("quads"),label:"TIME"}],resultLine:`InCommon · ${formatPuzzleDate(quadsPuzzle.date)} · ${quadsWon?"Solved":`${mistakes}/4 mistakes`}`,shareText:`InCommon — ${formatPuzzleDate(quadsPuzzle.date)} — ${quadsWon?"Solved":"Not solved"} — ${mistakes}/4 mistakes`}}
-function sameEndgameConfig(){if(timerGameComplete("same"))completePuzzleTimer("same");if(!samePuzzle||!sameComplete)return null;const tries=Math.max(1,Math.min(4,sameRevealed));return{game:"same",date:samePuzzle.date,state:sameWon?"win":"loss",kicker:"ONE AND THE SAME",title:sameWon?`Solved in ${tries}.`:"Not this time.",answerHtml:`The answer was <strong>${escapeSameHtml(samePuzzle.answer)}</strong>`,message:globalPick(GLOBAL_ENDGAME_MESSAGES.same[sameWon?"win":"loss"]),stats:[{value:sameWon?tries:4,label:"GUESSES"},{value:puzzleTimeText("same"),label:"TIME"}],resultLine:`One and the Same · ${formatPuzzleDate(samePuzzle.date)} · ${sameWon?`${tries}/4`:"—/4"}`,shareText:`One and the Same — ${formatPuzzleDate(samePuzzle.date)} — ${sameWon?`Solved in ${tries}/4`:"Not solved"}`}}
-function ellEndgameConfig(){if(timerGameComplete("ell"))completePuzzleTimer("ell");if(!ellPuzzle||(!ellComplete&&!ellEnded))return null;const won=ellComplete,used=ellUsed(),base=ellCurrentScore(),bonus=ellCompletionBonus(used),score=base+bonus;return{game:"ell",date:ellPuzzle.date,state:won?"win":`end-${ellEndReason||"ended"}`,kicker:"EVERY LAST LETTER",title:won?"Every last letter!":ellEndReason==="giveup"?"Run complete.":"No more words.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.ell[won?"win":"loss"]),stats:[{value:score,label:"SCORE"},{value:`${used}/25`,label:"LETTERS USED"},{value:puzzleTimeText("ell"),label:"TIME"}],resultLine:bonus?`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · Base ${base} + ${bonus} bonus = ${score} pts`:`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · ${used}/25 · ${score} pts`,shareText:`Every Last Letter — ${formatPuzzleDate(ellPuzzle.date)} — ${used}/25 letters — ${score} points${bonus?` (${bonus} bonus)`:""} — ${ellSubmitted.length} words`}}
-function trailEndgameConfig(){if(timerGameComplete("trail"))completePuzzleTimer("trail");if(!wordTrailPuzzle||!wordTrailComplete)return null;const total=wtAllThemeWords().length;return{game:"trail",date:wordTrailPuzzle.date,state:"win",kicker:"UNSCRUMBLE",title:"Grid complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.trail.win),stats:[{value:puzzleTimeText("trail"),label:"TIME"},{value:wordTrailHintsUsed,label:"HINTS USED"},{value:wordTrailNonThemeFound.length,label:"NON-THEME WORDS"}],resultLine:`Unscrumble · ${formatPuzzleDate(wordTrailPuzzle.date)} · ${wordTrailFound.length}/${total}`,shareText:`Unscrumble — ${formatPuzzleDate(wordTrailPuzzle.date)} — ${wordTrailFound.length}/${total} theme words — ${wordTrailNonThemeFound.length} bonus words`}}
+function sameEndgameConfig(){if(timerGameComplete("same"))completePuzzleTimer("same");if(!samePuzzle||!sameComplete)return null;const tries=Math.max(1,Math.min(4,sameRevealed)),state=sameWon?"win":"loss";const sticker=endgameStickerFor({game:"same",date:samePuzzle.date,state,won:sameWon,tries});return{game:"same",date:samePuzzle.date,state,kicker:"ONE AND THE SAME",title:sameWon?`Solved in ${tries}.`:"Not this time.",answerHtml:`The answer was <strong>${escapeSameHtml(samePuzzle.answer)}</strong>`,message:globalPick(GLOBAL_ENDGAME_MESSAGES.same[state]),visualHtml:endgameStickerHtml(sticker),stats:[{value:sameWon?tries:4,label:"GUESSES"},{value:puzzleTimeText("same"),label:"TIME"}],resultLine:`One and the Same · ${formatPuzzleDate(samePuzzle.date)} · ${sameWon?`${tries}/4`:"—/4"}`,shareText:`One and the Same — ${formatPuzzleDate(samePuzzle.date)} — ${sameWon?`Solved in ${tries}/4`:"Not solved"}`}}
+function ellEndgameConfig(){if(timerGameComplete("ell"))completePuzzleTimer("ell");if(!ellPuzzle||(!ellComplete&&!ellEnded))return null;const won=ellComplete,used=ellUsed(),base=ellCurrentScore(),bonus=ellCompletionBonus(used),score=base+bonus,state=won?"win":`end-${ellEndReason||"ended"}`,instanceKey=`attempt-${ellEndgameAttempt}`;const sticker=endgameStickerFor({game:"ell",date:ellPuzzle.date,state,won,used,endReason:ellEndReason,selectionKey:instanceKey});return{game:"ell",date:ellPuzzle.date,state,instanceKey,kicker:"EVERY LAST LETTER",title:won?"Every last letter!":ellEndReason==="giveup"?"Run complete.":"No more words.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.ell[won?"win":"loss"]),visualHtml:endgameStickerHtml(sticker),stats:[{value:score,label:"SCORE"},{value:`${used}/25`,label:"LETTERS USED"},{value:puzzleTimeText("ell"),label:"TIME"}],resultLine:bonus?`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · Base ${base} + ${bonus} bonus = ${score} pts`:`Every Last Letter · ${formatPuzzleDate(ellPuzzle.date)} · ${used}/25 · ${score} pts`,shareText:`Every Last Letter — ${formatPuzzleDate(ellPuzzle.date)} — ${used}/25 letters — ${score} points${bonus?` (${bonus} bonus)`:""} — ${ellSubmitted.length} words`}}
+function trailEndgameConfig(){if(timerGameComplete("trail"))completePuzzleTimer("trail");if(!wordTrailPuzzle||!wordTrailComplete)return null;const total=wtAllThemeWords().length,state="win";const sticker=endgameStickerFor({game:"trail",date:wordTrailPuzzle.date,state,won:true});return{game:"trail",date:wordTrailPuzzle.date,state,kicker:"UNSCRUMBLE",title:"Grid complete.",message:globalPick(GLOBAL_ENDGAME_MESSAGES.trail.win),visualHtml:endgameStickerHtml(sticker),stats:[{value:puzzleTimeText("trail"),label:"TIME"},{value:wordTrailHintsUsed,label:"HINTS USED"},{value:wordTrailNonThemeFound.length,label:"NON-THEME WORDS"}],resultLine:`Unscrumble · ${formatPuzzleDate(wordTrailPuzzle.date)} · ${wordTrailFound.length}/${total}`,shareText:`Unscrumble — ${formatPuzzleDate(wordTrailPuzzle.date)} — ${wordTrailFound.length}/${total} theme words — ${wordTrailNonThemeFound.length} bonus words`}}
 function miniEndgameVisual(){if(!miniPuzzle)return globalEndgameIcon("mini");return `<div class="global-mini-result" style="--ge-cols:${miniCols()}">${miniPuzzle.grid.flatMap((row,r)=>row.map((solution,c)=>solution==="#"?'<i class="black"></i>':`<i>${escapeSameHtml(miniValues[miniKey(r,c)]||"")}</i>`)).join("")}</div>`}
 function miniHintSummary(){
   if(miniRevealedPuzzle)return "Full Reveal";
@@ -474,7 +725,7 @@ let mainPageAvailableDateKeys=null;
 async function getMainPageAvailableDateKeys(){
   if(mainPageAvailableDateKeys)return mainPageAvailableDateKeys;
   try{
-    const res=await fetch("/data/puzzles.json",{cache:"no-store"});
+    const res=await fetch("data/puzzles.json",{cache:"no-store"});
     if(!res.ok)throw new Error("Could not load puzzle dates");
     const db=await res.json();
     const today=browserTodayKey();
@@ -542,7 +793,7 @@ async function changeDay(delta){
 }
 
 async function loadDictionary(){
-  const res=await fetch("/data/five-guesses.json");
+  const res=await fetch("data/five-guesses.json");
   if(!res.ok) throw new Error("Could not load Six to Five dictionary.");
   const list=await res.json();
   validGuesses=new Set(list.map(w=>String(w).toUpperCase()));
@@ -742,6 +993,11 @@ document.addEventListener("keydown",event=>{
     closeGameInstructions();
   }
 });
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&!document.getElementById("gameTitleArchiveConfirmOverlay")?.hidden){
+    closeGameTitleArchiveConfirm({restoreFocus:true});
+  }
+});
 
 function setActiveGame(game){
   /* V103.3: commit elapsed foreground time before leaving the current puzzle. */
@@ -755,7 +1011,7 @@ function setActiveGame(game){
   updateGameInstructionsButton();
   document.body.classList.toggle("home-view",game==="home");
   if(game==="home") updateHomeDashboard();
-  renderPlayDots();updatePuzzleMetaLinks();wirePuzzleMetaLinks();
+  renderPlayDots();updatePuzzleMetaLinks();wirePuzzleMetaLinks();wireGameTitleArchiveLinks();
   const frontPage=document.getElementById("frontPage");
   const playArea=document.getElementById("playArea");
   const isHome=game==="home";
@@ -1564,6 +1820,7 @@ let sameRevealed=1;
 let sameWrong=[];
 let sameComplete=false;
 let sameWon=false;
+let sameCorrectGuess="";
 
 function normalizeSameGuess(value){
   return String(value||"")
@@ -1603,7 +1860,8 @@ function saveSameState(){
     revealed:sameRevealed,
     wrong:sameWrong,
     complete:sameComplete,
-    won:sameWon
+    won:sameWon,
+    correctGuess:sameCorrectGuess
   };
   writeJsonStorage(SAME_PLAYER_KEY,all);
 }
@@ -1615,6 +1873,7 @@ function restoreSameState(){
   sameWrong=Array.isArray(s.wrong)?s.wrong:[];
   sameComplete=!!s.complete;
   sameWon=!!s.won;
+  sameCorrectGuess=String(s.correctGuess||"").toUpperCase();
 }
 function resetOneAndTheSameForSelectedDate(){
   const all=readJsonStorage(SAME_PLAYER_KEY,{});
@@ -1624,6 +1883,7 @@ function resetOneAndTheSameForSelectedDate(){
   sameWrong=[];
   sameComplete=false;
   sameWon=false;
+  sameCorrectGuess="";
 }
 async function loadOneAndTheSameForSelectedDate(){
   samePuzzle=null;
@@ -1631,6 +1891,7 @@ async function loadOneAndTheSameForSelectedDate(){
   sameWrong=[];
   sameComplete=false;
   sameWon=false;
+  sameCorrectGuess="";
 
   const meta=document.getElementById("samePuzzleMeta");
   const history=document.getElementById("sameHistory");
@@ -1666,6 +1927,26 @@ function sameHistoryRow(item){
     <div class="same-history-guess"><span class="same-history-guess-text">${escapeSameHtml(item.guess)}</span></div>
   </div>`;
 }
+function sameCompletedSummaryRows(){
+  if(!samePuzzle)return "";
+  const wrongByClue=new Map(sameWrong.map(item=>[item.clueIndex,item.guess]));
+  const solvedIndex=sameWon?Math.max(0,Math.min(3,sameRevealed-1)):-1;
+  const correctGuess=sameCorrectGuess||samePuzzle.answer||"";
+  return (samePuzzle.clues||[]).slice(0,4).map((clue,clueIndex)=>{
+    const wrongGuess=wrongByClue.get(clueIndex);
+    const isCorrect=sameWon&&clueIndex===solvedIndex;
+    const guess=isCorrect?correctGuess:(wrongGuess||"");
+    const rowClass=isCorrect?" same-history-row-correct":(!guess?" same-history-row-revealed":"");
+    const guessClass=isCorrect?" same-history-guess-correct":(!guess?" same-history-guess-empty":"");
+    return `<div class="same-history-row${rowClass}">
+      <div class="same-history-clue">
+        <span class="same-history-index">${clueIndex+1}</span>
+        <span class="same-history-clue-text">${escapeSameHtml(clue)}</span>
+      </div>
+      <div class="same-history-guess${guessClass}">${guess?`<span class="same-history-guess-text">${escapeSameHtml(guess)}</span>`:""}</div>
+    </div>`;
+  }).join("");
+}
 function escapeSameHtml(value){
   return String(value??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
 }
@@ -1689,6 +1970,18 @@ function configureSameGuessInput(){
   const mobile=sameIsMobileKeyboard();
   input.readOnly=mobile;
   input.inputMode=mobile?"none":"text";
+  if(!input.dataset.uppercaseBound){
+    input.addEventListener("input",()=>{
+      const start=input.selectionStart;
+      const end=input.selectionEnd;
+      const upper=input.value.toUpperCase();
+      if(input.value!==upper){
+        input.value=upper;
+        try{ input.setSelectionRange(start,end); }catch(_){}
+      }
+    });
+    input.dataset.uppercaseBound="true";
+  }
   if(mobile)input.blur();
 }
 function sameKeyboardLetter(letter){
@@ -1841,7 +2134,7 @@ function drawOneAndTheSame(){
   const input=document.getElementById("sameGuessInput");
   const status=document.getElementById("sameStatus");
 
-  history.innerHTML=sameWrong.map(sameHistoryRow).join("");
+  history.innerHTML=sameComplete?sameCompletedSummaryRows():sameWrong.map(sameHistoryRow).join("");
   active.classList.remove("same-filing-out");
 
   if(sameComplete){
@@ -1883,7 +2176,8 @@ function drawOneAndTheSame(){
 function submitSameGuess(){
   if(!samePuzzle||sameComplete)return;
   const input=document.getElementById("sameGuessInput");
-  const guess=normalizeSameGuess(input.value);
+  const typedGuess=String(input.value||"").trim().replace(/\s+/g," ");
+  const guess=normalizeSameGuess(typedGuess);
   if(!guess){
     input.classList.remove("same-input-nudge");
     void input.offsetWidth;
@@ -1898,6 +2192,10 @@ function submitSameGuess(){
     const finish=()=>{
       sameComplete=true;
       sameWon=true;
+      // Keep the exact acceptable guess the player entered for the clue-row
+      // summary (for example, "A MATCH"), while the persistent answer card
+      // continues to use samePuzzle.answer (for example, "MATCH").
+      sameCorrectGuess=(typedGuess||guess).toUpperCase();
       registerDailyGameCompletion("same",samePuzzle);
       saveSameState();
       drawOneAndTheSame();
@@ -1946,6 +2244,9 @@ document.addEventListener("visibilitychange",()=>{
 ------------------------------ */
 const ELL_PLAYER_KEY="puzzlePublicEveryLastLetterV1";
 let ellPuzzle=null,ellTiles=[],ellSelected=[],ellSubmitted=[],ellReclaimCandidate=null,ellComplete=false,ellEnded=false,ellEndReason=null;
+// Ephemeral run counter: retries get a fresh end-game instance, while restored
+// completed states still stay silent during date/navigation loads.
+let ellEndgameAttempt=0;
 let ellInteractionLocked=false;
 let ellInlineNotice="";
 let ellConfirmAction=null;
@@ -2114,7 +2415,12 @@ function ellEndGameHtml(reason){
   </div>`;
 }
 function ellTryAgain(){
+  // A retry is a genuinely new run of this puzzle. Give it a new modal/sticker
+  // instance so every subsequent finish can display once, without weakening the
+  // restored-state/navigation suppression safeguards.
+  ellEndgameAttempt++;
   resetEveryLastLetterForSelectedDate();
+  closeGlobalEndgame();
   document.getElementById("ellStatus").innerHTML="";
   drawEll();
 }
@@ -2170,7 +2476,9 @@ function confirmEllAction(){
   const action=ellConfirmAction;
   closeEllConfirm();
   if(action==="startover"){
+    if(ellComplete||ellEnded)ellEndgameAttempt++;
     resetEveryLastLetterForSelectedDate();
+    closeGlobalEndgame();
     document.getElementById("ellStatus").innerHTML="";
     drawEll();
   }else if(action==="giveup"){
@@ -2419,7 +2727,7 @@ function ellReclaim(index){
       ellMotion.returningIds=[];
       ellEndInteractionLock();
       drawEll();
-    },420);
+    },520);
   },220);
 }
 function ellStartOver(){
@@ -2912,10 +3220,13 @@ let wordTrailDragMode=false;
 let wordTrailMotion={
   selectedKey:null,
   correctPath:[],
+  bonusPath:[],
+  invalidPath:[],
   hintPieceIndex:null,
   bankEarnedIndex:null,
   bankSpentIndex:null,
-  hintRevealPath:[]
+  hintRevealPath:[],
+  pathDrawNonce:0
 };
 let wordTrailMotionTimers=[];
 
@@ -3092,6 +3403,12 @@ function drawWordTrail(){
         cell.classList.add("motion-hint-reveal");
         cell.style.setProperty("--wt-hint-delay",`${hintRevealIndex*58}ms`);
       }
+      if(wordTrailMotion.bonusPath.some(([rr,cc])=>rr===r&&cc===c)){
+        cell.classList.add("motion-bonus-valid");
+      }
+      if(wordTrailMotion.invalidPath.some(([rr,cc])=>rr===r&&cc===c)){
+        cell.classList.add("motion-invalid");
+      }
       cell.textContent=letter;
       cell.dataset.r=r;
       cell.dataset.c=c;
@@ -3114,14 +3431,31 @@ function drawWordTrail(){
   for(const word of wordTrailFound){
     lines+=wtPolyline(wtSolutionPath(word)||[], word===wtThemeWord()?"theme-line":"found-line");
   }
-  lines+=wtPolyline(wordTrailPath,wordTrailPath.length?"active-line":"");
+  lines+=wtPolyline(wordTrailPath,wordTrailPath.length?"active-line motion-path-draw":"");
   svg.innerHTML=lines;
+  const activeLine=svg.querySelector("polyline.active-line");
+  if(activeLine && wordTrailPath.length>1){
+    const length=activeLine.getTotalLength?.()||0;
+    if(length>0){
+      activeLine.style.setProperty("--wt-path-length",String(length));
+      // Rebuilt on each accepted drag step, so only the newly extended geometry
+      // receives this very short draw-on response.
+      activeLine.dataset.drawNonce=String(++wordTrailMotion.pathDrawNonce);
+    }
+  }
 
   document.getElementById("wordTrailCurrentWord").textContent=wtPathWord(wordTrailPath);
 
   const total=wtAllThemeWords().length;
-  document.getElementById("wordTrailProgress").textContent=
-    `${wordTrailFound.length} of ${total} theme words found`;
+  const foundCount=Math.min(wordTrailFound.length,total);
+  const remainingCount=Math.max(0,total-foundCount);
+  const progressHost=document.getElementById("wordTrailProgress");
+  if(progressHost){
+    progressHost.setAttribute("aria-label",`${foundCount} theme words found, ${remainingCount} remaining`);
+    progressHost.innerHTML=`<span class="wordtrail-progress-track" aria-hidden="true">${
+      Array.from({length:total},(_,i)=>`<span class="wordtrail-progress-segment${i<foundCount?" is-found":""}"></span>`).join("")
+    }</span>`;
+  }
 
   renderWordTrailHintSystem();
 
@@ -3395,25 +3729,37 @@ async function submitWordTrail(){
 
   const word=wtPathWord(wordTrailPath);
   const themeWords=wtAllThemeWords();
+  const submittedPath=wordTrailPath.map(p=>[...p]);
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const rejectPath=(message,type="bad")=>{
+    showWordTrailMessage(message,type);
+    if(reduced){
+      wordTrailPath=[];
+      drawWordTrail();
+      return;
+    }
+    wordTrailMotion.invalidPath=submittedPath;
+    drawWordTrail();
+    wtLater(()=>{
+      wordTrailMotion.invalidPath=[];
+      wordTrailPath=[];
+      drawWordTrail();
+    },210);
+  };
 
   if(wordTrailFound.includes(word)){
-    showWordTrailMessage("Already found.","warn");
-    wordTrailPath=[];
-    drawWordTrail();
+    rejectPath("Already found.","warn");
     return;
   }
 
   if(themeWords.includes(word)){
-    const intended=wtSolutionPath(word)||[];
-    const exactPath=intended.length===wordTrailPath.length &&
-      intended.every((p,i)=>p[0]===wordTrailPath[i][0]&&p[1]===wordTrailPath[i][1]);
-
-    // Premium confirmation: sweep through the selected path before committing it.
-    const confirmedPath=wordTrailPath.map(p=>[...p]);
-    wordTrailMotion.correctPath=confirmedPath;
+    // Theme words get the premium sequential confirmation sweep. The selected
+    // path remains visible until the sweep finishes, then settles permanently.
+    wordTrailMotion.correctPath=reduced?[]:submittedPath;
     drawWordTrail();
 
-    wtLater(()=>{
+    const commitTheme=()=>{
       wordTrailFound.push(word);
       wordTrailPath=[];
       wordTrailMotion.correctPath=[];
@@ -3427,15 +3773,16 @@ async function submitWordTrail(){
       saveWordTrailState();
       showWordTrailMessage(word===wtThemeWord()?"Theme word found!":"Theme word found.","good");
       drawWordTrail();
-    },Math.min(520,220+confirmedPath.length*42));
+    };
+
+    if(reduced) commitTheme();
+    else wtLater(commitTheme,Math.min(620,260+submittedPath.length*48));
     return;
   }
 
   // Non-theme words must be real dictionary words of at least 4 letters.
   if(word.length<4){
-    showWordTrailMessage("Non-theme words must be at least 4 letters.","bad");
-    wordTrailPath=[];
-    drawWordTrail();
+    rejectPath("Non-theme words must be at least 4 letters.");
     return;
   }
 
@@ -3444,12 +3791,19 @@ async function submitWordTrail(){
 
   if(validBonusWord){
     if(wordTrailNonThemeFound.includes(word)){
-      showWordTrailMessage("Already found that non-theme word.","warn");
-      wordTrailPath=[];
-      drawWordTrail();
+      rejectPath("Already found that non-theme word.","warn");
       return;
     }
 
+    // Keep the path in place for one quick whole-path success pulse before
+    // dissolving it and delivering the hint-piece reward.
+    if(!reduced){
+      wordTrailMotion.bonusPath=submittedPath;
+      drawWordTrail();
+      await new Promise(resolve=>wtLater(resolve,320));
+    }
+
+    wordTrailMotion.bonusPath=[];
     wordTrailNonThemeFound.push(word);
     wordTrailPath=[];
 
@@ -3474,16 +3828,16 @@ async function submitWordTrail(){
           wtLater(()=>{
             wordTrailMotion.bankEarnedIndex=null;
             drawWordTrail();
-          },420);
-        },360);
+          },520);
+        },reduced?0:520);
       }else{
-        showWordTrailMessage("Valid non-theme word.","good");
+        showWordTrailMessage("You earned a Hint piece.","good");
         saveWordTrailState();
         drawWordTrail();
         wtLater(()=>{
           wordTrailMotion.hintPieceIndex=null;
           drawWordTrail();
-        },360);
+        },reduced?0:520);
       }
     }else{
       wordTrailHintProgressCount=0;
@@ -3494,11 +3848,7 @@ async function submitWordTrail(){
     return;
   }
 
-  showWordTrailMessage("Not a valid word.","bad");
-  wordTrailPath=[];
-  drawWordTrail();
-  wordTrailPath=[];
-  drawWordTrail();
+  rejectPath("Not a valid word.");
 }
 
 function useWordTrailHint(){
@@ -3542,19 +3892,33 @@ function sizeWordTrailMobileBoard(){
   const current=document.getElementById("wordTrailCurrentWord");
   if(!panel || !stage || !board || !dock || !current) return;
 
+  const gameplay=document.getElementById("wordTrailGameplay");
+
   if(window.innerWidth>700){
     board.style.removeProperty("width");
     board.style.removeProperty("height");
+    if(gameplay){
+      gameplay.style.removeProperty("height");
+      gameplay.style.removeProperty("min-height");
+    }
     return;
   }
 
   // Hidden panels report unusable geometry. Re-run after Unscrumble is shown.
   if(panel.classList.contains("game-hidden") || stage.offsetParent===null) return;
 
+  // Pin the gameplay region to the remaining visible viewport. This is based
+  // on its actual top edge, so header/theme height changes cannot push the
+  // controls or hint tokens below the fold.
+  if(gameplay){
+    const gameplayTop=gameplay.getBoundingClientRect().top;
+    const availableGameplayHeight=Math.max(0,window.innerHeight-gameplayTop);
+    gameplay.style.setProperty("height",`${availableGameplayHeight}px`,"important");
+    gameplay.style.setProperty("min-height","0","important");
+  }
+
   const stageRect=stage.getBoundingClientRect();
   const dockRect=dock.getBoundingClientRect();
-  const currentRect=current.getBoundingClientRect();
-
   if(stageRect.width<=0 || stageRect.top>=window.innerHeight) return;
 
   const ratio=292/392;
@@ -3562,16 +3926,18 @@ function sizeWordTrailMobileBoard(){
 
   /*
     Full-grid visibility has priority over width.
-    The board must end before the current-word strip and the bottom gameplay
-    dock. On short screens this height limit shrinks the entire 6×8 board
-    proportionally instead of clipping its final row.
+    V103.19: the current-word pill now sits ABOVE the board stage, so its
+    height is already included in stageRect.top and must not be reserved
+    a second time. Only the bottom dock and a small safety gap constrain
+    the available board height.
   */
-  const dockTop=Math.min(window.innerHeight,dockRect.top);
-  const currentReserve=Math.max(18,currentRect.height);
-  const verticalSafety=8;
+  const settledDockRect=dock.getBoundingClientRect();
+  const dockHeight=Math.max(settledDockRect.height,dock.scrollHeight||0);
+  const gridControlsGap=10;
+  const viewportSafety=4;
   const heightLimit=Math.max(
     0,
-    dockTop-stageRect.top-currentReserve-verticalSafety
+    window.innerHeight-stageRect.top-dockHeight-gridControlsGap-viewportSafety
   );
 
   const widthFromHeight=heightLimit*ratio;

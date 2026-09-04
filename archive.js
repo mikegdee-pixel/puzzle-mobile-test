@@ -114,7 +114,7 @@ function selectDay(key,button){
   list.innerHTML=GAME_ORDER.filter(game=>available.has(game)).map(game=>{
     const meta=GAME_META[game];
     const completed=archiveGameCompleted(game,key);
-    return `<a class="archive-game${completed?" is-completed":""}" href="/?date=${encodeURIComponent(key)}&game=${encodeURIComponent(game)}" style="--game-color:${meta.color}">
+    return `<a class="archive-game${completed?" is-completed":""}" href="./?date=${encodeURIComponent(key)}&game=${encodeURIComponent(game)}" style="--game-color:${meta.color}">
       <span class="archive-game-mark" aria-hidden="true"></span>
       <span class="archive-game-copy"><span class="archive-game-name">${meta.name}</span><span class="archive-game-sub">${meta.sub}</span></span>
       ${completed?'<span class="archive-completed-badge">COMPLETED</span>':""}
@@ -145,7 +145,7 @@ document.getElementById("archiveDayClose").addEventListener("click",()=>{
 
 async function initArchive(){
   try{
-    const res=await fetch("/data/puzzles.json",{cache:"no-store"});
+    const res=await fetch("data/puzzles.json",{cache:"no-store"});
     if(!res.ok)throw new Error("Could not load archive data.");
     const db=await res.json();
     const scheduled=(db.puzzles||[]).filter(p=>p.status==="scheduled"&&p.date&&p.date<todayKey&&GAME_META[p.game]);

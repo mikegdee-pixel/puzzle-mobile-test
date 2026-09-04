@@ -4154,7 +4154,7 @@ main{max-width:1040px;padding:0 24px 24px}
 @media(max-width:700px){#playArea>#fivePanel,#playArea>#quadsPanel,#playArea>#wordTrailPanel,#playArea>#miniPanel,#playArea>#ellPanel,#playArea>#samePanel{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;padding-left:10px!important;padding-right:10px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#fff!important}#playArea .game-clean-head{padding-left:4px!important;padding-right:4px!important}}
 @media(min-width:701px){#fivePanel .key{min-height:48px!important;padding-top:10px!important;padding-bottom:10px!important}}
 @media(max-width:700px){#fivePanel .key,#miniPanel .mini-keyboard .key,#samePanel .same-keyboard .key{min-height:51px!important}#fivePanel{padding-bottom:calc(184px + env(safe-area-inset-bottom))!important}#miniPanel{padding-bottom:calc(174px + env(safe-area-inset-bottom))!important}#samePanel{padding-bottom:calc(184px + env(safe-area-inset-bottom))!important}}
-.global-endgame-overlay[hidden]{display:none!important}.global-endgame-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;background:rgba(17,21,19,.46);backdrop-filter:blur(2px);animation:globalOverlayIn .18s ease-out}.global-endgame-card{position:relative;width:min(500px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border-radius:18px;box-shadow:0 18px 48px rgba(16,22,18,.18);padding:27px 34px 25px;animation:globalCardIn .22s cubic-bezier(.2,.75,.25,1)}.global-endgame-close{position:absolute;top:14px;right:15px;width:32px;height:32px;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:#7c837f!important;font:400 25px/1 Lato,system-ui,sans-serif!important}.global-endgame-content{text-align:center}.global-endgame-kicker{color:#767d78;font-size:10px;font-weight:900;letter-spacing:.19em}.global-endgame-visual{min-height:76px;display:grid;place-items:center;margin:15px auto 17px}.global-endgame-content h2{margin:0;color:#1f2421;font:900 30px/1.1 Lato,system-ui,sans-serif;letter-spacing:-.025em}.global-endgame-answer{margin-top:8px;color:#424844;font-size:15px}.global-endgame-message{min-height:24px;margin:10px 0 16px;color:#59605c;font-size:15px;font-weight:700}.global-endgame-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:1px;overflow:hidden;margin:0 auto 18px;border:1px solid #e7e9e6;border-radius:12px;background:#e7e9e6}.global-endgame-stats>div{min-height:68px;display:grid;place-items:center;align-content:center;gap:4px;background:#fff;padding:9px 6px}.global-endgame-stats strong{color:#222723;font-size:22px;font-weight:900;line-height:1.05;overflow-wrap:anywhere}.global-endgame-stats span{color:#858b87;font-size:9px;font-weight:900;letter-spacing:.12em}.global-endgame-share-section{display:grid;grid-template-columns:1fr auto;gap:8px}.global-endgame-primary-share,.global-endgame-copy{min-height:44px!important;border-radius:10px!important;font-size:13px!important;font-weight:900!important}.global-endgame-primary-share{background:#2f684f!important;color:#fff!important}.global-endgame-copy{background:#f2f4f2!important;color:#313733!important;border:1px solid #e2e5e2!important}.global-endgame-result-line{grid-column:1/-1;margin:3px 0 2px;color:#8a8f8c;font-size:11px;font-weight:700}.global-endgame-next{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:space-between;min-height:44px;background:transparent!important;border:1px solid #e2e5e2!important;color:#313733!important;box-shadow:none!important;border-radius:10px!important;padding:10px 13px!important;font-size:13px!important}.global-emblem{width:72px;height:72px}.global-emblem-quads{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:7px;border-radius:17px;background:#f5f4ef}.global-emblem-quads i{border-radius:6px}.global-emblem-quads i:nth-child(1){background:#8db7a1}.global-emblem-quads i:nth-child(2){background:#7e9eb5}.global-emblem-quads i:nth-child(3){background:#bd7158}.global-emblem-quads i:nth-child(4){background:#8c77a4}.global-emblem-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:7px;border-radius:16px;background:#f2f5f3}.global-emblem-mini i{background:#fff;border-radius:4px;box-shadow:0 1px 4px rgba(20,30,24,.12)}.global-emblem-mini i.dark{background:#6284a0}.global-emblem-trail{display:grid;place-items:center;border-radius:20px;background:#eee9f6;color:#7765a0;font-size:40px;font-weight:900}.global-emblem-ell{display:grid;grid-template-columns:1fr 1fr;gap:4px}.global-emblem-ell i{display:grid;place-items:center;border-radius:6px;background:#3c8d88;color:#fff;font-style:normal;font-weight:900}.global-emblem-ell i:last-child{background:#eef2ef}.global-emblem-same{width:auto;height:auto;display:flex;align-items:center;gap:5px}.global-emblem-same i{display:grid;place-items:center;width:29px;height:40px;border-radius:8px;background:#e7c898;color:#594123;font-style:normal;font-weight:900;font-size:18px}.global-emblem-same i:nth-child(2){background:#a8703d;color:#fff}.global-quads-result{width:min(330px,100%);display:grid;gap:4px}.global-quads-result span{display:block;padding:6px 10px;border-radius:7px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.045em}.global-mini-result{display:grid;grid-template-columns:repeat(var(--ge-cols),22px);gap:2px;padding:7px;border-radius:9px;background:#e6eae7}.global-mini-result i{width:22px;height:22px;display:grid;place-items:center;background:#fff;color:#222;font-style:normal;font-size:10px;font-weight:900}.global-mini-result i.black{background:#232624}@keyframes globalOverlayIn{from{opacity:0}to{opacity:1}}@keyframes globalCardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:700px){.global-endgame-overlay{padding:16px}.global-endgame-card{width:min(460px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:24px 20px 20px}.global-endgame-content h2{font-size:27px}.global-endgame-stats strong{font-size:19px}}@media(prefers-reduced-motion:reduce){.global-endgame-overlay,.global-endgame-card{animation:none!important}}
+.global-endgame-overlay[hidden]{display:none!important}.global-endgame-overlay{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:22px;background:rgba(17,21,19,.46);backdrop-filter:blur(2px);animation:globalOverlayIn .18s ease-out}.global-endgame-card{position:relative;width:min(500px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;background:#fff;border-radius:18px;box-shadow:0 18px 48px rgba(16,22,18,.18);padding:27px 34px 25px;animation:globalCardIn .22s cubic-bezier(.2,.75,.25,1)}.global-endgame-close{position:absolute;top:14px;right:15px;width:32px;height:32px;padding:0!important;border:0!important;border-radius:50%!important;background:transparent!important;box-shadow:none!important;color:#7c837f!important;font:400 25px/1 Lato,system-ui,sans-serif!important}.global-endgame-content{text-align:center}.global-endgame-kicker{color:#767d78;font-size:10px;font-weight:900;letter-spacing:.19em}.global-endgame-visual{min-height:76px;display:grid;place-items:center;margin:15px auto 17px}.global-endgame-sticker{display:block;width:auto;height:auto;max-width:min(238px,68vw);max-height:205px;object-fit:contain}.global-endgame-content h2{margin:0;color:#1f2421;font:900 30px/1.1 Lato,system-ui,sans-serif;letter-spacing:-.025em}.global-endgame-answer{margin-top:8px;color:#424844;font-size:15px}.global-endgame-message{min-height:24px;margin:10px 0 16px;color:#59605c;font-size:15px;font-weight:700}.global-endgame-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:1px;overflow:hidden;margin:0 auto 18px;border:1px solid #e7e9e6;border-radius:12px;background:#e7e9e6}.global-endgame-stats>div{min-height:68px;display:grid;place-items:center;align-content:center;gap:4px;background:#fff;padding:9px 6px}.global-endgame-stats strong{color:#222723;font-size:22px;font-weight:900;line-height:1.05;overflow-wrap:anywhere}.global-endgame-stats span{color:#858b87;font-size:9px;font-weight:900;letter-spacing:.12em}.global-endgame-share-section{display:grid;grid-template-columns:1fr auto;gap:8px}.global-endgame-primary-share,.global-endgame-copy{min-height:44px!important;border-radius:10px!important;font-size:13px!important;font-weight:900!important}.global-endgame-primary-share{background:#2f684f!important;color:#fff!important}.global-endgame-copy{background:#f2f4f2!important;color:#313733!important;border:1px solid #e2e5e2!important}.global-endgame-result-line{grid-column:1/-1;margin:3px 0 2px;color:#8a8f8c;font-size:11px;font-weight:700}.global-endgame-next{width:100%;margin-top:12px;display:flex;align-items:center;justify-content:space-between;min-height:44px;background:transparent!important;border:1px solid #e2e5e2!important;color:#313733!important;box-shadow:none!important;border-radius:10px!important;padding:10px 13px!important;font-size:13px!important}.global-emblem{width:72px;height:72px}.global-emblem-quads{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:7px;border-radius:17px;background:#f5f4ef}.global-emblem-quads i{border-radius:6px}.global-emblem-quads i:nth-child(1){background:#8db7a1}.global-emblem-quads i:nth-child(2){background:#7e9eb5}.global-emblem-quads i:nth-child(3){background:#bd7158}.global-emblem-quads i:nth-child(4){background:#8c77a4}.global-emblem-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:7px;border-radius:16px;background:#f2f5f3}.global-emblem-mini i{background:#fff;border-radius:4px;box-shadow:0 1px 4px rgba(20,30,24,.12)}.global-emblem-mini i.dark{background:#6284a0}.global-emblem-trail{display:grid;place-items:center;border-radius:20px;background:#eee9f6;color:#7765a0;font-size:40px;font-weight:900}.global-emblem-ell{display:grid;grid-template-columns:1fr 1fr;gap:4px}.global-emblem-ell i{display:grid;place-items:center;border-radius:6px;background:#3c8d88;color:#fff;font-style:normal;font-weight:900}.global-emblem-ell i:last-child{background:#eef2ef}.global-emblem-same{width:auto;height:auto;display:flex;align-items:center;gap:5px}.global-emblem-same i{display:grid;place-items:center;width:29px;height:40px;border-radius:8px;background:#e7c898;color:#594123;font-style:normal;font-weight:900;font-size:18px}.global-emblem-same i:nth-child(2){background:#a8703d;color:#fff}.global-quads-result{width:min(330px,100%);display:grid;gap:4px}.global-quads-result span{display:block;padding:6px 10px;border-radius:7px;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.045em}.global-mini-result{display:grid;grid-template-columns:repeat(var(--ge-cols),22px);gap:2px;padding:7px;border-radius:9px;background:#e6eae7}.global-mini-result i{width:22px;height:22px;display:grid;place-items:center;background:#fff;color:#222;font-style:normal;font-size:10px;font-weight:900}.global-mini-result i.black{background:#232624}@keyframes globalOverlayIn{from{opacity:0}to{opacity:1}}@keyframes globalCardIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}@media(max-width:700px){.global-endgame-overlay{padding:16px}.global-endgame-card{width:min(460px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:24px 20px 20px}.global-endgame-content h2{font-size:27px}.global-endgame-stats strong{font-size:19px}}@media(prefers-reduced-motion:reduce){.global-endgame-overlay,.global-endgame-card{animation:none!important}}
 
 
 /* =========================================================
@@ -8326,3 +8326,1076 @@ body.instructions-open{overflow:hidden}
 /* V103.1 — InCommon mobile play-counter root fix.
    Legacy InCommon preview tile rules now target only direct preview-cell <i> elements,
    so the shared play-dot <i> elements inherit the same sizing as every other game card. */
+
+
+/* =========================================================
+   V103.9 — ONE AND THE SAME CORRECT-GUESS SUMMARY
+   ========================================================= */
+
+/* Wrong guesses keep the established strike-through treatment. The accepted
+   winning guess is explicitly exempt, including from any animated strike
+   pseudo-element inherited from the wrong-guess presentation rules. */
+#samePanel .same-history-row-correct .same-history-guess-text,
+#samePanel .same-history-guess-correct .same-history-guess-text{
+  text-decoration:none!important;
+  text-decoration-line:none!important;
+  color:#3f7651;
+  font-weight:900;
+}
+#samePanel .same-history-row-correct .same-history-guess-text::after,
+#samePanel .same-history-guess-correct .same-history-guess-text::after{
+  content:none!important;
+  display:none!important;
+}
+#samePanel .same-history-row-correct .same-history-guess,
+#samePanel .same-history-guess-correct{
+  color:#3f7651;
+}
+#samePanel .same-history-row-revealed .same-history-clue{
+  color:#55534d;
+}
+#samePanel .same-history-guess-empty{
+  min-height:1.28em;
+}
+
+
+/* =========================================================
+   V103.11 — UNSCRUMBLE INTERACTION MOTION PASS
+   ========================================================= */
+
+/* Draw the active connector quickly as the path is extended. */
+#wordTrailPanel .wordtrail-live-svg polyline.active-line.motion-path-draw{
+  stroke-dasharray:var(--wt-path-length,900);
+  stroke-dashoffset:0;
+  animation:wtPathDrawIn 105ms ease-out both;
+}
+@keyframes wtPathDrawIn{
+  from{stroke-dashoffset:var(--wt-path-length,900);}
+  to{stroke-dashoffset:0;}
+}
+
+/* Valid non-theme word: one restrained whole-path success pulse. */
+#wordTrailPanel .wordtrail-player-cell.motion-bonus-valid{
+  animation:wtBonusValidPulse 240ms cubic-bezier(.2,.75,.25,1) both!important;
+}
+@keyframes wtBonusValidPulse{
+  0%{transform:translateY(-2px) scale(1.035);filter:brightness(1);}
+  48%{transform:translateY(-2px) scale(1.055);filter:brightness(1.14);}
+  100%{transform:translateY(-2px) scale(1.035);filter:brightness(1);}
+}
+#wordTrailPanel:has(.motion-bonus-valid) .wordtrail-live-svg polyline.active-line{
+  animation:wtBonusLinePulse 240ms ease-out both;
+}
+@keyframes wtBonusLinePulse{
+  0%,100%{opacity:.52;filter:brightness(1);}
+  50%{opacity:.82;filter:brightness(1.25);}
+}
+
+/* Invalid response is intentionally local: only selected letters nudge. */
+#wordTrailPanel .wordtrail-player-cell.motion-invalid{
+  animation:wtInvalidNudge 210ms ease-in-out both!important;
+}
+@keyframes wtInvalidNudge{
+  0%,100%{transform:translateY(-2px) translateX(0) scale(1.035);}
+  24%{transform:translateY(-2px) translateX(-2px) scale(1.035);}
+  52%{transform:translateY(-2px) translateX(2px) scale(1.035);}
+  76%{transform:translateY(-2px) translateX(-1px) scale(1.035);}
+}
+
+/* Existing hint-piece state now reads as an earned reward rather than a
+   simple state change; the destination bank slot follows with its own pop. */
+#wordTrailPanel .ort-hint-piece.motion-earned{
+  animation:wtHintPieceEarn 380ms cubic-bezier(.18,.82,.22,1.15) both!important;
+}
+@keyframes wtHintPieceEarn{
+  0%{transform:translateY(6px) scale(.55);opacity:0;}
+  45%{transform:translateY(-3px) scale(1.16);opacity:1;}
+  72%{transform:translateY(1px) scale(.96);opacity:1;}
+  100%{transform:translateY(0) scale(1);opacity:1;}
+}
+#wordTrailPanel .ort-hint-bank-slot.motion-bank-earned{
+  animation:wtHintBankReceive 420ms cubic-bezier(.18,.82,.22,1.15) both!important;
+}
+@keyframes wtHintBankReceive{
+  0%{transform:scale(.72);filter:brightness(1.2);}
+  42%{transform:scale(1.18);filter:brightness(1.18);}
+  72%{transform:scale(.96);filter:brightness(1.05);}
+  100%{transform:scale(1);filter:brightness(1);}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #wordTrailPanel .wordtrail-live-svg polyline.active-line.motion-path-draw,
+  #wordTrailPanel .wordtrail-player-cell.motion-bonus-valid,
+  #wordTrailPanel .wordtrail-player-cell.motion-invalid,
+  #wordTrailPanel .ort-hint-piece.motion-earned,
+  #wordTrailPanel .ort-hint-bank-slot.motion-bank-earned{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V103.12 — UNSCRUMBLE MOTION REFINEMENT
+   ========================================================= */
+
+
+  65%{transform:translateY(.5px) scale(.99);filter:brightness(1);}
+  100%{transform:translateY(0) scale(1);filter:brightness(1);}
+}
+
+/* Make the valid bonus-word response unmistakable: two rhythmic pulses
+   while keeping all movement local to the selected path. */
+#wordTrailPanel .wordtrail-player-cell.motion-bonus-valid{
+  animation:wtBonusValidDoublePulse 320ms cubic-bezier(.2,.72,.25,1) both!important;
+}
+@keyframes wtBonusValidDoublePulse{
+  0%,100%{transform:translateY(-.5px) scale(1.012);filter:brightness(1);}
+  20%{transform:translateY(-2px) scale(1.075);filter:brightness(1.22);}
+  40%{transform:translateY(-.5px) scale(1.02);filter:brightness(1.04);}
+  67%{transform:translateY(-2px) scale(1.07);filter:brightness(1.2);}
+  86%{transform:translateY(-.5px) scale(1.02);filter:brightness(1.04);}
+}
+#wordTrailPanel:has(.motion-bonus-valid) .wordtrail-live-svg polyline.active-line{
+  animation:wtBonusLineDoublePulse 320ms ease-out both!important;
+}
+@keyframes wtBonusLineDoublePulse{
+  0%,100%{opacity:.52;filter:brightness(1);}
+  20%{opacity:.94;filter:brightness(1.38);}
+  40%{opacity:.62;filter:brightness(1.06);}
+  67%{opacity:.92;filter:brightness(1.34);}
+  86%{opacity:.62;filter:brightness(1.06);}
+}
+
+/* Hint-piece reward is deliberately stronger than V103.11: larger entrance,
+   higher rise, overshoot and a brief glow so the earned piece is noticed. */
+#wordTrailPanel .ort-hint-piece.motion-earned{
+  animation:wtHintPieceEarnStrong 520ms cubic-bezier(.16,.86,.2,1.18) both!important;
+  filter:drop-shadow(0 3px 5px rgba(115,89,163,.28));
+}
+@keyframes wtHintPieceEarnStrong{
+  0%{transform:translateY(14px) scale(.25) rotate(-8deg);opacity:0;filter:brightness(1.45);}
+  36%{transform:translateY(-7px) scale(1.38) rotate(3deg);opacity:1;filter:brightness(1.28);}
+  58%{transform:translateY(2px) scale(.9) rotate(-1deg);opacity:1;filter:brightness(1.08);}
+  78%{transform:translateY(-2px) scale(1.12) rotate(0);opacity:1;filter:brightness(1.12);}
+  100%{transform:translateY(0) scale(1) rotate(0);opacity:1;filter:brightness(1);}
+}
+#wordTrailPanel .ort-hint-bank-slot.motion-bank-earned{
+  animation:wtHintBankReceiveStrong 520ms cubic-bezier(.16,.86,.2,1.18) both!important;
+  filter:drop-shadow(0 3px 6px rgba(115,89,163,.25));
+}
+@keyframes wtHintBankReceiveStrong{
+  0%{transform:scale(.55);filter:brightness(1.35);}
+  34%{transform:scale(1.32);filter:brightness(1.28);}
+  58%{transform:scale(.88);filter:brightness(1.08);}
+  78%{transform:scale(1.12);filter:brightness(1.12);}
+  100%{transform:scale(1);filter:brightness(1);}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #wordTrailPanel .wordtrail-player-cell.motion-bonus-valid,
+  #wordTrailPanel .ort-hint-piece.motion-earned,
+  #wordTrailPanel .ort-hint-bank-slot.motion-bank-earned{
+    animation:none!important;
+  }
+}
+
+
+/* =========================================================
+   V103.14 — UNSCRUMBLE MODERN SQUIRCLE BOARD
+   =========================================================
+   Visual-only board refresh. Gameplay, tile-selection bounce,
+   backtracking behavior, and V103.13 motion timing are unchanged.
+   ========================================================= */
+
+#wordTrailPanel .wordtrail-player-cell{
+  /* Replace the octagonal/clip-path silhouette with a soft squircle. */
+  clip-path:none!important;
+  border-radius:14px!important;
+
+  /* Cleaner floating surface: still tactile, but less game-piece-like. */
+  background:#fbfbfa;
+  border:0!important;
+  box-shadow:
+    0 2px 5px rgba(31,42,35,.105),
+    0 1px 1px rgba(31,42,35,.055);
+  filter:none!important;
+
+  /* Slightly calmer lettering lets the path and selection state lead. */
+  font-size:16px;
+  font-weight:850;
+}
+
+/* Keep hover restrained so the board reads as one quiet field. */
+@media (hover:hover) and (pointer:fine){
+  #wordTrailPanel .wordtrail-player-cell:hover{
+    background:#f7f4fa;
+    transform:translateY(-1px);
+    box-shadow:
+      0 4px 8px rgba(31,42,35,.12),
+      0 1px 2px rgba(31,42,35,.06);
+    filter:none!important;
+  }
+}
+
+/* Preserve the satisfying V103.13 selection lift, now with a cleaner surface. */
+#wordTrailPanel .wordtrail-player-cell.active,
+#wordTrailPanel .wordtrail-player-cell.active.found,
+#wordTrailPanel .wordtrail-player-cell.active.theme-word,
+#wordTrailPanel .wordtrail-player-cell.active.hint,
+#wordTrailPanel .wordtrail-player-cell.active.found.hint,
+#wordTrailPanel .wordtrail-player-cell.active.theme-word.hint{
+  background:#d8cdea!important;
+  color:#25212b!important;
+  box-shadow:
+    0 6px 13px rgba(63,48,86,.17),
+    0 2px 4px rgba(63,48,86,.09)!important;
+  filter:none!important;
+}
+
+/* Found states remain distinctive but a little softer and less plastic. */
+#wordTrailPanel .wordtrail-player-cell.found{
+  background:#679b73;
+  color:#fff;
+  box-shadow:0 2px 5px rgba(42,76,50,.13);
+  filter:none!important;
+}
+#wordTrailPanel .wordtrail-player-cell.theme-word{
+  background:#7359a3;
+  color:#fff;
+  box-shadow:0 2px 5px rgba(63,48,86,.14);
+  filter:none!important;
+}
+#wordTrailPanel .wordtrail-player-cell.hint{
+  background:#f2e7bd;
+  color:#2d2a20;
+  box-shadow:
+    0 3px 7px rgba(92,75,25,.13),
+    inset 0 0 0 1px rgba(181,139,62,.12);
+  filter:none!important;
+}
+
+/* The connector becomes a rounded ribbon underneath the floating tiles.
+   The shape remains unmistakably PuzzleNook rather than a field of circles. */
+#wordTrailPanel .wordtrail-live-svg polyline{
+  stroke-width:10px;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+#wordTrailPanel .wordtrail-live-svg polyline.active-line{
+  opacity:.43;
+}
+#wordTrailPanel .wordtrail-live-svg polyline.found-line{
+  opacity:.34;
+}
+#wordTrailPanel .wordtrail-live-svg polyline.theme-line{
+  opacity:.38;
+}
+
+/* Motion classes inherit the new shadow language instead of drop-shadow. */
+#wordTrailPanel .wordtrail-player-cell.motion-select{
+  filter:none!important;
+}
+#wordTrailPanel .wordtrail-player-cell.motion-correct,
+#wordTrailPanel .wordtrail-player-cell.motion-bonus-valid,
+#wordTrailPanel .wordtrail-player-cell.motion-invalid,
+#wordTrailPanel .wordtrail-player-cell.motion-hint-reveal{
+  filter:none;
+}
+
+
+/* =========================================================
+   V103.15 — SIX TO FIVE SOFTENED BOARD
+   =========================================================
+   Visual-only refinement: preserve board geometry, scoring colors,
+   gameplay and reveal motion while softening the rigid square/bracket look.
+   ========================================================= */
+
+/* Slightly rounded letter tiles: still unmistakably square, but less severe. */
+#fivePanel .tile{
+  border-radius:6px!important;
+  box-shadow:
+    0 2px 5px rgba(28,34,30,.105),
+    0 1px 1px rgba(28,34,30,.05)!important;
+}
+
+/* Keep feedback colors authoritative while using the refined physical depth. */
+#fivePanel .tile.correct,
+#fivePanel .tile.present,
+#fivePanel .tile.absent,
+#fivePanel .tile.reveal-correct,
+#fivePanel .tile.reveal-present,
+#fivePanel .tile.reveal-absent{
+  box-shadow:
+    0 2px 5px rgba(28,34,30,.12),
+    0 1px 1px rgba(28,34,30,.055)!important;
+}
+
+/* Soften bracket-like framing wherever the existing Six to Five board
+   implements it through pseudo-elements/borders. */
+#fivePanel .five-board::before,
+#fivePanel .five-board::after,
+#fivePanel .board::before,
+#fivePanel .board::after,
+#fivePanel .guess-grid::before,
+#fivePanel .guess-grid::after{
+  border-color:#3f423f!important;
+  border-width:2px!important;
+  border-radius:12px!important;
+  opacity:.82;
+}
+
+/* Common bracket classes retained by earlier Six to Five layouts. */
+#fivePanel .five-bracket,
+#fivePanel .five-bracket-left,
+#fivePanel .five-bracket-right,
+#fivePanel .board-bracket,
+#fivePanel .board-bracket-left,
+#fivePanel .board-bracket-right{
+  border-color:#3f423f!important;
+  border-width:2px!important;
+  border-radius:12px!important;
+  opacity:.82;
+}
+
+/* If the bracket arms are individual line elements, round their endpoints. */
+#fivePanel .five-bracket-line,
+#fivePanel .board-bracket-line{
+  background:#3f423f!important;
+  border-radius:999px!important;
+  opacity:.82;
+}
+
+
+/* =========================================================
+   V103.16 — SIX TO FIVE ACTUAL ACTIVE-ROW BRACKET REFINEMENT
+   =========================================================
+   V103.15 targeted generic bracket selectors, but Six to Five's real
+   brackets are the ::before/::after rails on the first/last active tiles.
+   These selectors intentionally override the older V56/V57 rules.
+   ========================================================= */
+
+#fiveGrid .tile.active-five-row-start::before,
+#fiveGrid .tile.active-five-row-end::after{
+  /* slimmer charcoal rails instead of heavy near-black bars */
+  width:3px!important;
+  background:#454945!important;
+  border-radius:999px!important;
+  opacity:.72;
+
+  /* shorten them slightly so they feel like soft markers, not a rigid frame */
+  top:4px!important;
+  bottom:4px!important;
+
+  /* subtle depth, kept much quieter than the tiles */
+  box-shadow:0 1px 2px rgba(27,33,29,.08);
+}
+
+/* Restore some breathing room that V57 had removed. */
+#fiveGrid .tile.active-five-row-start::before{
+  left:-9px!important;
+}
+#fiveGrid .tile.active-five-row-end::after{
+  right:-9px!important;
+}
+
+@media(max-width:700px){
+  #fiveGrid .tile.active-five-row-start::before{
+    left:-8px!important;
+  }
+  #fiveGrid .tile.active-five-row-end::after{
+    right:-8px!important;
+  }
+}
+
+
+/* =========================================================
+   V103.17 — ONE AND THE SAME EDITORIAL ANSWER REVEAL
+   =========================================================
+   Reframes the completed-puzzle result as an integrated editorial reveal
+   rather than a conventional floating result card. The completed clue
+   history remains the game's natural four-to-one visual story.
+   ========================================================= */
+
+#samePanel .same-result{
+  position:relative;
+  width:min(100%,620px);
+  box-sizing:border-box;
+  margin:24px auto 0;
+  padding:24px 18px 10px;
+  border-radius:0;
+  text-align:center;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+/* Quiet editorial divider between the completed clues and answer reveal. */
+#samePanel .same-result::before{
+  content:"";
+  display:block;
+  width:min(100%,520px);
+  height:1px;
+  margin:0 auto 22px;
+  background:linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(181,139,62,.18) 12%,
+    rgba(181,139,62,.52) 50%,
+    rgba(181,139,62,.18) 88%,
+    transparent 100%
+  );
+}
+
+#samePanel .same-result-kicker{
+  margin:0;
+  color:#8b7047;
+  font:900 11px/1.25 Lato,system-ui,sans-serif;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+/* The answer becomes the visual payoff. DM Serif Display is already part
+   of PuzzleNook's established typography, but is used here sparingly. */
+#samePanel .same-result-title{
+  margin:7px auto 0;
+  max-width:100%;
+  color:#292821;
+  font-family:"DM Serif Display",Georgia,serif;
+  font-size:clamp(46px,7vw,68px);
+  font-weight:400;
+  line-height:.98;
+  letter-spacing:.015em;
+  overflow-wrap:anywhere;
+}
+
+/* Supporting result language intentionally recedes behind the answer. */
+#samePanel .same-result-copy{
+  margin:15px auto 0;
+  color:#5e605b;
+  font:700 15px/1.45 Lato,system-ui,sans-serif;
+  letter-spacing:.005em;
+}
+#samePanel .same-result-copy strong{
+  color:#393b37;
+  font-weight:900;
+}
+
+/* Loss uses the same dignified reveal rather than a gray failure card. */
+#samePanel .same-result-loss .same-result-kicker{
+  max-width:none;
+  color:#756f65;
+}
+#samePanel .same-result-loss .same-result-title{
+  color:#34332e;
+}
+
+/* Give the completed clue history a slightly quieter relationship to the
+   large answer reveal without changing its layout or guess/strike logic. */
+#samePanel:has(.same-result) .same-history{
+  margin-bottom:0;
+}
+#samePanel:has(.same-result) .same-history-row{
+  transition:opacity 180ms ease-out;
+}
+
+@media(max-width:620px){
+  #samePanel .same-result{
+    margin-top:16px;
+    padding:16px 10px 8px;
+  }
+  #samePanel .same-result::before{
+    margin-bottom:17px;
+  }
+  #samePanel .same-result-title{
+    font-size:clamp(42px,14vw,58px);
+  }
+  #samePanel .same-result-copy{
+    margin-top:12px;
+    font-size:14px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  #samePanel:has(.same-result) .same-history-row{
+    transition:none;
+  }
+}
+
+
+/* =========================================================
+   V103.19 — UNSCRUMBLE LAYOUT CORRECTION
+   =========================================================
+   Corrects the actual universal timer-row behavior from V103.18:
+   - theme is truly pinned to the left edge
+   - timer keeps its original top/right position
+   - x/X + visual progress occupy a second left-aligned line
+   - traced-word pill is made clearly visible above the board
+   ========================================================= */
+
+/* Do not vertically recenter the timer inside the taller two-line info row.
+   Pin all pieces explicitly so the timer stays where it was before V103.18. */
+#wordTrailPanel .puzzle-timer-row-trail{
+  position:relative!important;
+  display:block!important;
+  width:min(100%,var(--game-meta-width,620px))!important;
+  max-width:var(--game-meta-width,620px)!important;
+  height:40px!important;
+  min-height:40px!important;
+  margin:1px auto 2px!important;
+  padding:0!important;
+  box-sizing:border-box!important;
+}
+
+/* Left block: first line theme, second line exact progress + bar. */
+#wordTrailPanel .puzzle-timer-row-trail>.wordtrail-theme{
+  position:absolute!important;
+  left:0!important;
+  top:0!important;
+  width:min(360px,calc(100% - 92px))!important;
+  margin:0!important;
+  padding:0!important;
+  display:block!important;
+  text-align:left!important;
+  pointer-events:none!important;
+}
+
+#wordTrailPanel .wordtrail-theme-text{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  color:#353832!important;
+  font:850 15px/18px Lato,system-ui,sans-serif!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* x/X is deliberately the FIRST thing on line two. */
+#wordTrailPanel .wordtrail-theme-progress{
+  width:100%!important;
+  height:14px!important;
+  margin:3px 0 0!important;
+  padding:0!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  text-align:left!important;
+}
+#wordTrailPanel .wordtrail-progress-count{
+  order:-1!important;
+  flex:0 0 auto!important;
+  min-width:28px!important;
+  margin:0!important;
+  color:#74766f!important;
+  font:800 11px/12px Lato,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  text-align:left!important;
+}
+#wordTrailPanel .wordtrail-progress-track{
+  flex:0 1 190px!important;
+  width:min(190px,calc(100% - 40px))!important;
+  min-width:72px!important;
+  height:6px!important;
+  margin:0!important;
+  display:flex!important;
+  gap:3px!important;
+}
+
+/* Preserve the universal status badge behavior without using it to lay out
+   the timer during normal play. */
+#wordTrailPanel .puzzle-timer-row-trail>.puzzle-end-status{
+  position:absolute!important;
+  left:50%!important;
+  top:0!important;
+  transform:translateX(-50%)!important;
+  margin:0!important;
+  z-index:1!important;
+}
+
+/* Most important correction: timer is independently pinned to the same
+   upper-right location rather than being vertically centered in 40px. */
+#wordTrailPanel .puzzle-timer-row-trail>.puzzle-live-timer{
+  position:absolute!important;
+  top:0!important;
+  right:0!important;
+  margin:0 8px 0 0!important;
+  min-height:28px!important;
+  height:28px!important;
+  align-items:center!important;
+}
+
+/* Make the traced-word field unmistakably visible even when empty. */
+#wordTrailPanel #wordTrailCurrentWord{
+  position:relative!important;
+  z-index:3!important;
+  box-sizing:border-box!important;
+  width:min(360px,calc(100% - 40px))!important;
+  height:46px!important;
+  min-height:46px!important;
+  margin:4px auto 12px!important;
+  padding:0 18px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:1px solid rgba(54,60,55,.075)!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  color:#302c36!important;
+  box-shadow:
+    0 6px 18px rgba(31,42,35,.13),
+    0 2px 5px rgba(31,42,35,.07)!important;
+  font:900 18px/1 Lato,system-ui,sans-serif!important;
+  letter-spacing:.08em!important;
+  text-align:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+
+/* Maintain the requested small message gap immediately above the pill. */
+#wordTrailPanel #wordTrailStatus{
+  margin-top:4px!important;
+  margin-bottom:4px!important;
+}
+
+@media(max-width:700px){
+  #wordTrailPanel .puzzle-timer-row-trail{
+    width:calc(100% + 16px)!important;
+    max-width:calc(100% + 16px)!important;
+    margin-left:-8px!important;
+    margin-right:-8px!important;
+    height:38px!important;
+    min-height:38px!important;
+  }
+  #wordTrailPanel .puzzle-timer-row-trail>.wordtrail-theme{
+    left:8px!important;
+    width:calc(100% - 82px)!important;
+  }
+  #wordTrailPanel .wordtrail-theme-text{
+    font-size:13px!important;
+    line-height:17px!important;
+  }
+  #wordTrailPanel .wordtrail-theme-progress{
+    margin-top:2px!important;
+    gap:6px!important;
+  }
+  #wordTrailPanel .wordtrail-progress-count{
+    min-width:25px!important;
+    font-size:10px!important;
+  }
+  #wordTrailPanel .wordtrail-progress-track{
+    flex-basis:150px!important;
+    width:min(150px,calc(100% - 34px))!important;
+    height:5px!important;
+    gap:2px!important;
+  }
+  #wordTrailPanel .wordtrail-progress-segment{height:5px!important}
+  #wordTrailPanel .puzzle-timer-row-trail>.puzzle-live-timer{
+    right:8px!important;
+    margin:0!important;
+  }
+  #wordTrailPanel #wordTrailCurrentWord{
+    width:min(330px,calc(100% - 34px))!important;
+    height:42px!important;
+    min-height:42px!important;
+    margin:3px auto 9px!important;
+    font-size:17px!important;
+  }
+}
+
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel .puzzle-timer-row-trail{
+    height:36px!important;
+    min-height:36px!important;
+  }
+  #wordTrailPanel #wordTrailCurrentWord{
+    height:38px!important;
+    min-height:38px!important;
+    margin-bottom:7px!important;
+    font-size:16px!important;
+  }
+}
+
+
+/* =========================================================
+   V103.20 — UNSCRUMBLE ALIGNMENT + GRID-WIDTH ENTRY PILL
+   ========================================================= */
+
+/* Nudge the left-side theme/progress inward to visually align with the
+   game-title text, and pull the timer inward by roughly one character. */
+#wordTrailPanel .puzzle-timer-row-trail>.wordtrail-theme{
+  left:8px!important;
+}
+#wordTrailPanel .puzzle-timer-row-trail>.puzzle-live-timer{
+  right:8px!important;
+  margin-right:8px!important;
+}
+
+/* Desktop board is 292px wide. The traced-word pill now matches it exactly. */
+#wordTrailPanel #wordTrailCurrentWord{
+  width:292px!important;
+  max-width:calc(100% - 40px)!important;
+}
+
+/* Maintain a clean visual break between the bottom edge of the puzzle grid
+   and the controls/hint area. */
+#wordTrailPanel #wordTrailBoardStage{
+  margin-bottom:10px!important;
+}
+
+@media(max-width:700px){
+  /* The mobile timer row extends 8px beyond the normal content frame on each
+     side. These offsets compensate for that and add the requested inset. */
+  #wordTrailPanel .puzzle-timer-row-trail>.wordtrail-theme{
+    left:16px!important;
+    width:calc(100% - 98px)!important;
+  }
+  #wordTrailPanel .puzzle-timer-row-trail>.puzzle-live-timer{
+    right:16px!important;
+    margin-right:0!important;
+  }
+
+  /* JS sets the pill width to the exact dynamically sized board width.
+     These declarations only provide a safe fallback before sizing runs. */
+  #wordTrailPanel #wordTrailCurrentWord{
+    width:min(292px,calc(100% - 40px))!important;
+    max-width:calc(100% - 40px)!important;
+  }
+
+  #wordTrailPanel #wordTrailBoardStage{
+    margin-bottom:10px!important;
+  }
+}
+
+
+/* =========================================================
+   V103.23 — UNSCRUMBLE VERIFIED FLOW FIX
+   ========================================================= */
+
+/* Theme/progress primitives (the V103.18 copy was accidentally serialized
+   with literal \n characters and therefore never parsed by the browser). */
+#wordTrailPanel .wordtrail-theme-text{
+  color:#353832!important;
+  font:850 15px/18px Lato,system-ui,sans-serif!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#wordTrailPanel .wordtrail-theme-progress{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  margin-top:3px!important;
+  text-align:left!important;
+}
+#wordTrailPanel .wordtrail-progress-count{
+  order:-1!important;
+  min-width:28px!important;
+  color:#74766f!important;
+  font:800 11px/12px Lato,system-ui,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  text-align:left!important;
+}
+#wordTrailPanel .wordtrail-progress-track{
+  flex:0 1 190px!important;
+  height:6px!important;
+  display:flex!important;
+  gap:3px!important;
+}
+#wordTrailPanel .wordtrail-progress-segment{
+  flex:1 1 0!important;
+  min-width:5px!important;
+  height:6px!important;
+  border-radius:999px!important;
+  background:#e5e2e8!important;
+}
+#wordTrailPanel .wordtrail-progress-segment.is-found{
+  background:#7359a3!important;
+}
+
+/* No pill: traced letters sit directly on the page above the grid. */
+#wordTrailPanel #wordTrailCurrentWord{
+  width:auto!important;
+  max-width:none!important;
+  height:28px!important;
+  min-height:28px!important;
+  margin:0 auto 5px!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  color:#302c36!important;
+  font:900 18px/28px Lato,system-ui,sans-serif!important;
+  letter-spacing:.08em!important;
+}
+
+/* The 10px grid-to-controls gap is enforced by the mobile sizing reserve in
+   app.js rather than a flex-stage margin that can disappear visually. */
+#wordTrailPanel #wordTrailBoardStage{
+  margin-bottom:0!important;
+}
+#wordTrailPanel .wordtrail-board-wrap{
+  margin-bottom:0!important;
+}
+
+@media(max-width:700px){
+  #wordTrailPanel .wordtrail-theme-text{
+    font-size:13px!important;
+    line-height:17px!important;
+  }
+  #wordTrailPanel .wordtrail-theme-progress{
+    gap:6px!important;
+    margin-top:2px!important;
+  }
+  #wordTrailPanel .wordtrail-progress-count{
+    min-width:25px!important;
+    font-size:10px!important;
+  }
+  #wordTrailPanel .wordtrail-progress-track{
+    flex-basis:150px!important;
+    height:5px!important;
+    gap:2px!important;
+  }
+  #wordTrailPanel .wordtrail-progress-segment{height:5px!important}
+
+  #wordTrailPanel #wordTrailCurrentWord{
+    height:24px!important;
+    min-height:24px!important;
+    margin:0 auto 3px!important;
+    font-size:17px!important;
+    line-height:24px!important;
+  }
+
+  /* Restore the proven V103.14/V103.20 mobile structure: the stage flexes to
+     the available viewport and the complete controls + hint dock stays at the
+     bottom of the gameplay area, visible on initial load. */
+  #wordTrailPanel .wordtrail-board-stage{
+    flex:1 1 auto!important;
+    min-height:125px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+    padding:0 20px!important;
+  }
+  #wordTrailPanel .wordtrail-mobile-dock{
+    position:sticky!important;
+    z-index:60!important;
+    bottom:0!important;
+    flex:0 0 auto!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    margin-top:auto!important;
+    padding:7px 10px calc(8px + env(safe-area-inset-bottom))!important;
+    background:#fff!important;
+    border-top:1px solid #e6e8e6!important;
+    box-shadow:0 -4px 12px rgba(31,42,35,.05)!important;
+    gap:5px!important;
+  }
+}
+
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel #wordTrailCurrentWord{
+    height:21px!important;
+    min-height:21px!important;
+    margin-bottom:2px!important;
+    font-size:15px!important;
+    line-height:21px!important;
+  }
+  #wordTrailPanel .wordtrail-mobile-dock{
+    padding-top:5px!important;
+    padding-bottom:calc(6px + env(safe-area-inset-bottom))!important;
+    gap:3px!important;
+  }
+}
+
+
+/* =========================================================
+   V103.24 — UNSCRUMBLE PROGRESS + MOBILE BOTTOM DOCK
+   ========================================================= */
+#wordTrailPanel .wordtrail-progress-count{display:none!important}
+#wordTrailPanel .wordtrail-progress-track{
+  flex:0 1 218px!important;
+  width:min(218px,100%)!important;
+}
+#wordTrailPanel .wordtrail-progress-segment.is-found{
+  background:#5f8f56!important;
+}
+
+/* Real white space after the grid, before controls. */
+#wordTrailPanel #wordTrailBoardStage{
+  padding-bottom:10px!important;
+  box-sizing:border-box!important;
+}
+
+@media(max-width:700px){
+  #wordTrailPanel .wordtrail-gameplay{
+    min-height:calc(100dvh - 50px - 48px)!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  #wordTrailPanel #wordTrailBoardStage{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    padding:0 20px 10px!important;
+    box-sizing:border-box!important;
+    align-items:flex-start!important;
+    overflow:hidden!important;
+  }
+  #wordTrailPanel .wordtrail-board-wrap{
+    margin:0 auto!important;
+  }
+  #wordTrailPanel .wordtrail-mobile-dock{
+    position:sticky!important;
+    bottom:0!important;
+    flex:0 0 auto!important;
+    margin-top:auto!important;
+    overflow:visible!important;
+  }
+  #wordTrailPanel .wordtrail-hint-system,
+  #wordTrailPanel .ort-hint-flow,
+  #wordTrailPanel .ort-hint-column,
+  #wordTrailPanel .ort-hint-token,
+  #wordTrailPanel .ort-hint-bank-icons,
+  #wordTrailPanel .ort-hint-bank-slot{
+    visibility:visible!important;
+    opacity:1!important;
+  }
+  #wordTrailPanel .ort-hint-flow{min-height:52px!important}
+  #wordTrailPanel .wordtrail-progress-track{
+    flex-basis:185px!important;
+    width:min(185px,100%)!important;
+  }
+}
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel #wordTrailBoardStage{padding-bottom:10px!important}
+  #wordTrailPanel .ort-hint-flow{min-height:46px!important}
+}
+
+
+/* =========================================================
+   V103.25 — UNSCRUMBLE MOBILE VIEWPORT FIT
+   ========================================================= */
+@media(max-width:700px){
+  /* JS now gives gameplay the exact remaining viewport height. */
+  #wordTrailPanel .wordtrail-gameplay{
+    min-height:0!important;
+  }
+
+  /* Keep the traced word close to the grid on mobile. The board stage must
+     start immediately after the word rather than using leftover flex space
+     as visual separation. */
+  #wordTrailPanel #wordTrailCurrentWord{
+    height:22px!important;
+    min-height:22px!important;
+    margin:0 auto 2px!important;
+    line-height:22px!important;
+  }
+  #wordTrailPanel #wordTrailBoardStage{
+    justify-content:flex-start!important;
+    align-items:flex-start!important;
+    padding-top:0!important;
+  }
+  #wordTrailPanel .wordtrail-board-wrap{
+    margin-top:0!important;
+  }
+
+  /* Keep the complete control + hint-token block together at the bottom of
+     the visible gameplay viewport. */
+  #wordTrailPanel .wordtrail-mobile-dock{
+    margin-top:auto!important;
+    flex-shrink:0!important;
+    padding-bottom:calc(5px + env(safe-area-inset-bottom))!important;
+  }
+  #wordTrailPanel #wordTrailHintProgress{
+    display:block!important;
+    overflow:visible!important;
+  }
+  #wordTrailPanel .ort-hint-flow{
+    display:flex!important;
+    min-height:52px!important;
+    margin-bottom:0!important;
+    overflow:visible!important;
+  }
+}
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel #wordTrailCurrentWord{
+    height:20px!important;
+    min-height:20px!important;
+    margin-bottom:1px!important;
+    line-height:20px!important;
+  }
+}
+
+
+/* V103.26 — Unscrumble mobile active-word type */
+@media(max-width:700px){
+  #wordTrailPanel #wordTrailCurrentWord{
+    font-size:20px!important;
+  }
+}
+@media(max-width:380px), (max-height:680px){
+  #wordTrailPanel #wordTrailCurrentWord{
+    font-size:18px!important;
+  }
+}
+
+
+/* =========================================================
+   V103.27 — GAME-TITLE ARCHIVE NAV + UNSCRUMBLE CENTERING
+   ========================================================= */
+
+/* The game name and its remaining-play dots act as one quiet navigation
+   target. Preserve the existing header layout; only add affordance. */
+.game-title-with-plays.game-title-archive-link{
+  cursor:pointer;
+  border-radius:7px;
+}
+.game-title-with-plays.game-title-archive-link:focus-visible{
+  outline:2px solid #787d78;
+  outline-offset:4px;
+}
+
+/* V103.25 intentionally top-aligned the mobile board vertically, but also
+   changed justify-content to flex-start. Because this stage is a row-flex
+   container, that moved the JS-sized grid toward the left/right content
+   edge on narrow phones. Keep vertical top alignment while restoring true
+   horizontal centering. */
+@media(max-width:700px){
+  #wordTrailPanel #wordTrailBoardStage{
+    justify-content:center!important;
+    align-items:flex-start!important;
+  }
+  #wordTrailPanel .wordtrail-board-wrap{
+    margin-left:auto!important;
+    margin-right:auto!important;
+    align-self:flex-start!important;
+  }
+}
+
+
+/* =========================================================
+   V103.29 — GAME-TITLE ARCHIVE NAVIGATION REFINEMENT
+   ========================================================= */
+
+/* The title remains clickable but should look exactly like the normal game
+   heading on hover. */
+.game-title-with-plays.game-title-archive-link:hover .game-name-title,
+.game-title-with-plays.game-title-archive-link:active .game-name-title{
+  text-decoration:none!important;
+  color:inherit!important;
+}
+
+/* Use the exact Every Last Letter confirmation presentation for the
+   "different day" navigation prompt. */
+#gameTitleArchiveConfirmOverlay.ell-confirm-overlay[hidden]{
+  display:none!important;
+}

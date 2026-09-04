@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PuzzleNook</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=103.5-finalqa"></head><body><header class="site-header">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PuzzleNook</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet"><link rel="stylesheet" href="styles.css?v=103.29-finalqa"></head><body><header class="site-header">
   <div class="site-brand-wrap">
     <button type="button" class="brand-home" id="brandHomeBtn" aria-label="PuzzleNook home"><span class="site-name">PuzzleNook</span></button>
     <span class="site-tagline">Your little escape.</span>
@@ -196,12 +196,14 @@
 
   <div id="wordTrailPuzzleStatus" class="puzzle-end-status" hidden></div>
   <div id="wordTrailGameplay" class="wordtrail-gameplay">
-    <div class="wordtrail-theme">
-      <div class="muted">Theme</div>
+    <div class="wordtrail-theme" data-timer-row-instructions="trail">
       <div id="wordTrailTheme" class="wordtrail-theme-text">Loading…</div>
+      <div id="wordTrailProgress" class="wordtrail-theme-progress" aria-label="Theme word progress"></div>
     </div>
 
     <div id="wordTrailStatus"></div>
+
+    <div id="wordTrailCurrentWord" class="wordtrail-current" aria-label="Current traced word"></div>
 
     <div id="wordTrailBoardStage" class="wordtrail-board-stage">
       <div class="wordtrail-board-wrap">
@@ -210,10 +212,7 @@
       </div>
     </div>
 
-    <div id="wordTrailCurrentWord" class="wordtrail-current"></div>
-
     <div id="wordTrailDock" class="wordtrail-controls wordtrail-mobile-dock">
-      <div id="wordTrailProgress" class="muted"></div>
       <div class="action-row">
         <button type="button" id="wordTrailClearBtn" class="secondary">Clear Path</button>
         <button type="button" id="wordTrailSubmitBtn">Submit Word</button>
@@ -297,6 +296,17 @@
       <button type="button" id="ellConfirmPrimary">Confirm</button>
     </div>
   </section>
+</div>
+<div id="gameTitleArchiveConfirmOverlay" class="ell-confirm-overlay" hidden aria-hidden="true">
+  <section class="ell-confirm-card" role="dialog" aria-modal="true" aria-labelledby="gameTitleArchiveConfirmTitle">
+    <div id="gameTitleArchiveConfirmKicker" class="ell-confirm-kicker">PUZZLENOOK</div>
+    <h2 id="gameTitleArchiveConfirmTitle">Try another puzzle?</h2>
+    <p id="gameTitleArchiveConfirmMessage"></p>
+    <div class="ell-confirm-actions">
+      <button type="button" id="gameTitleArchiveConfirmCancel" class="secondary">Cancel</button>
+      <button type="button" id="gameTitleArchiveConfirmPrimary">Try Another</button>
+    </div>
+  </section>
 </div><div id="fiveEndgameOverlay" class="five-endgame-overlay" hidden aria-hidden="true"><section class="five-endgame-card" role="dialog" aria-modal="true" aria-labelledby="fiveEndgameTitle"><button type="button" id="fiveEndgameClose" class="five-endgame-close" aria-label="Close results">×</button><div class="five-endgame-content"><div class="five-endgame-kicker">SIX TO FIVE</div><div id="fiveEndgameMiniGrid" class="five-endgame-mini-grid" aria-hidden="true"></div><h2 id="fiveEndgameTitle">Solved in 3.</h2><div id="fiveEndgameAnswer" class="five-endgame-answer" hidden></div><div id="fiveEndgameMessage" class="five-endgame-message"></div><img class="five-endgame-art" src="assets/six-to-five-endgame-target.png" alt=""><div id="fiveEndgameStats" class="five-endgame-stats"></div><div id="fiveEndgameShareSection" class="five-endgame-share-section"><button type="button" class="five-endgame-primary-share" data-share="native">Share result <span aria-hidden="true">↗</span></button><button type="button" class="five-endgame-copy" data-share="copy">Copy result</button><div id="fiveEndgameResultLine" class="five-endgame-result-line"></div></div><div id="fiveEndgameDailyLine" class="five-endgame-daily-line"></div><button type="button" id="fiveTryAnother" class="five-endgame-next" aria-label="Try another Six to Five puzzle"><span>Try another one</span><strong aria-hidden="true">→</strong></button></div></section></div><div id="globalEndgameOverlay" class="global-endgame-overlay" hidden aria-hidden="true"><section class="global-endgame-card" role="dialog" aria-modal="true" aria-labelledby="globalEndgameTitle"><button type="button" id="globalEndgameClose" class="global-endgame-close" aria-label="Close results">×</button><div class="global-endgame-content"><div id="globalEndgameKicker" class="global-endgame-kicker"></div><div id="globalEndgameVisual" class="global-endgame-visual" aria-hidden="true"></div><h2 id="globalEndgameTitle"></h2><div id="globalEndgameAnswer" class="global-endgame-answer" hidden></div><div id="globalEndgameMessage" class="global-endgame-message"></div><div id="globalEndgameStats" class="global-endgame-stats"></div><div id="globalEndgameShareSection" class="global-endgame-share-section"><button type="button" id="globalEndgameShare" class="global-endgame-primary-share">Share result <span aria-hidden="true">↗</span></button><button type="button" id="globalEndgameCopy" class="global-endgame-copy">Copy result</button><div id="globalEndgameResultLine" class="global-endgame-result-line"></div></div><button type="button" id="globalEndgameHome" class="global-endgame-next"><span>Back to Front Page</span><strong aria-hidden="true">→</strong></button></div></section></div><div id="gameInstructionsOverlay" class="game-instructions-overlay" hidden aria-hidden="true">
   <section class="game-instructions-card" role="dialog" aria-modal="true" aria-labelledby="gameInstructionsTitle">
     <button type="button" id="gameInstructionsClose" class="game-instructions-close" aria-label="Close how to play">×</button>
@@ -306,5 +316,5 @@
       <div id="gameInstructionsBody" class="game-instructions-body"></div>
     </div>
   </section>
-</div><div id="siteUtilityOverlay" class="site-utility-overlay" hidden aria-hidden="true"><section class="site-utility-card" role="dialog" aria-modal="true" aria-labelledby="siteUtilityTitle"><button type="button" id="siteUtilityClose" class="site-utility-close" aria-label="Close">×</button><div id="siteUtilityKicker" class="site-utility-kicker"></div><h2 id="siteUtilityTitle"></h2><div id="siteUtilityBody" class="site-utility-body"></div></section></div><script src="static-data-adapter.js?v=103.5-finalqa"></script><script src="app.js?v=103.5-finalqa"></script><div id="playLimitOverlay" class="play-limit-overlay" hidden><section class="play-limit-card" role="dialog" aria-modal="true" aria-labelledby="playLimitTitle"><div class="play-limit-kicker">DAILY PLAYS</div><h2 id="playLimitTitle">No plays remaining</h2><p id="playLimitMessage"></p><button type="button" id="playLimitClose">Got it</button></section></div>
+</div><div id="siteUtilityOverlay" class="site-utility-overlay" hidden aria-hidden="true"><section class="site-utility-card" role="dialog" aria-modal="true" aria-labelledby="siteUtilityTitle"><button type="button" id="siteUtilityClose" class="site-utility-close" aria-label="Close">×</button><div id="siteUtilityKicker" class="site-utility-kicker"></div><h2 id="siteUtilityTitle"></h2><div id="siteUtilityBody" class="site-utility-body"></div></section></div><div id="playLimitOverlay" class="play-limit-overlay" hidden aria-hidden="true"><section class="play-limit-card" role="dialog" aria-modal="true" aria-labelledby="playLimitTitle"><div class="play-limit-kicker">DAILY PLAYS</div><h2 id="playLimitTitle">No plays remaining</h2><p id="playLimitMessage"></p><button type="button" id="playLimitClose">Got it</button></section></div><script src="static-data-adapter.js?v=103.29-finalqa"></script><script src="app.js?v=103.29-finalqa"></script>
 </body></html>

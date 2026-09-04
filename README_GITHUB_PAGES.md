@@ -1,17 +1,14 @@
-# PuzzleNook — V103.5 Final QA GitHub Pages Test
+# PuzzleNook V103.29 — GitHub Pages Final QA
 
-Upload the CONTENTS of this folder to the root of the GitHub Pages test repository.
+Upload the CONTENTS of this ZIP to the root of the GitHub Pages testing repository.
 
-This package is a static GitHub Pages adaptation of the V103.5 public site.
-It includes the static API adapter and cache-busted CSS/JavaScript references
-for physical-device testing.
+This build is adapted from the current V103.29 project for static GitHub Pages.
+The admin dashboard and Node server are intentionally excluded.
 
-IMPORTANT PUZZLE DATA NOTE
-The bundled data/puzzles.json is the copy that was present in the V103.5 project
-package when this GitHub build was produced. Before final tester distribution,
-use Admin > Published > Download Public puzzles.json on the computer containing
-the authoritative current dashboard state, then replace data/puzzles.json in
-this GitHub package with that downloaded file.
+Archive routing fix:
+GitHub project pages are hosted below a repository path. Root-relative links such
+as `/?date=...` or `/archive.html` jump to the domain root and can produce 404s.
+This QA build uses repository-relative navigation so Archive dates, game links,
+home navigation, and date navigation remain inside the GitHub Pages project.
 
-The admin dashboard and Node server are intentionally not included in this
-public test package.
+Cache-bust: 103.29-finalqa
