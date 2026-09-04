@@ -109,7 +109,7 @@ function selectDay(key,button){
   const available=new Map(puzzles.map(p=>[p.game,p]));
   document.getElementById("archiveDayTitle").textContent=prettyDate(key);
   const viewDate=document.getElementById("archiveViewDate");
-  if(viewDate)viewDate.href=`/?date=${encodeURIComponent(key)}`;
+  if(viewDate)viewDate.href=`./?date=${encodeURIComponent(key)}`;
   const list=document.getElementById("archiveGameList");
   list.innerHTML=GAME_ORDER.filter(game=>available.has(game)).map(game=>{
     const meta=GAME_META[game];
@@ -145,7 +145,7 @@ document.getElementById("archiveDayClose").addEventListener("click",()=>{
 
 async function initArchive(){
   try{
-    const res=await fetch("data/puzzles.json",{cache:"no-store"});
+    const res=await fetch("/data/puzzles.json",{cache:"no-store"});
     if(!res.ok)throw new Error("Could not load archive data.");
     const db=await res.json();
     const scheduled=(db.puzzles||[]).filter(p=>p.status==="scheduled"&&p.date&&p.date<todayKey&&GAME_META[p.game]);

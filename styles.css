@@ -9399,3 +9399,10 @@ body.instructions-open{overflow:hidden}
 #gameTitleArchiveConfirmOverlay.ell-confirm-overlay[hidden]{
   display:none!important;
 }
+
+/* V103.31 — standardized end-game Next Options */
+.endgame-next-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.endgame-next-options .five-endgame-next,.endgame-next-options .global-endgame-next{margin:0!important;min-height:44px!important;padding:10px 13px!important;border:1px solid #e2e5e2!important;border-radius:10px!important;background:transparent!important;box-shadow:none!important;color:#313733!important;font:800 13px Lato,system-ui,sans-serif!important}
+.endgame-next-options .five-endgame-next:hover,.endgame-next-options .global-endgame-next:hover{background:#f5f7f5!important;color:#2f5f3d!important}
+.endgame-next-options [hidden]{display:none!important}
+@media(max-width:420px){.endgame-next-options{grid-template-columns:1fr}}
