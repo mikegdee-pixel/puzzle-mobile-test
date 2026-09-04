@@ -14,3 +14,6 @@ GitHub Pages adaptations:
   are retained.
 
 Cache-bust: 103.33-finalqa
+
+
+QA routing fix: Archive header links are repository-relative, and completed-puzzle swipe-right now uses the same most-recent-unfinished destination rule as clicking the game title.

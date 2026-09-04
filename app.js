@@ -563,10 +563,11 @@ function wireGameTitleArchiveLinks(){
     });
   }
 }
-/* V103.30 — completed-puzzle swipe navigation.
-   A deliberate swipe RIGHT moves to the next older unfinished puzzle for the
-   same game. Right is the natural "back/previous" direction when older dates
-   sit to the left of the current date in chronological navigation. */
+/* V103.33 QA fix — completed-puzzle swipe navigation.
+   A deliberate swipe RIGHT uses the same destination rule as clicking the
+   game title: open the most recent available unfinished archived puzzle for
+   the same game. This remains consistent even when the completed puzzle is
+   itself an older archive puzzle. */
 const COMPLETED_PUZZLE_SWIPE_THRESHOLD=72;
 let completedPuzzleSwipeStart=null;
 let completedPuzzleSwipeBusy=false;
@@ -594,7 +595,7 @@ function wireCompletedPuzzleSwipe(){
       const t=event.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y,elapsed=Date.now()-start.time;
       if(elapsed>1000||dx<COMPLETED_PUZZLE_SWIPE_THRESHOLD||Math.abs(dx)<Math.abs(dy)*1.35)return;
       completedPuzzleSwipeBusy=true;
-      openNextOlderArchivedPuzzle(activeGame).finally(()=>{completedPuzzleSwipeBusy=false;});
+      openNewestPlayableArchivedPuzzle(activeGame).finally(()=>{completedPuzzleSwipeBusy=false;});
     },{passive:true});
     host.addEventListener("touchcancel",()=>{completedPuzzleSwipeStart=null},{passive:true});
   });
